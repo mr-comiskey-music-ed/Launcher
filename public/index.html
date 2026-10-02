@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FloatDoc - Logic Pro Floating Doc Launcher</title>
+  <meta name="description" content="Logic Pro Floating Doc Launcher for Audio Engineering Students">
+  <meta property="og:title" content="FloatDoc - Logic Pro Floating Doc Launcher">
+  <meta property="og:description" content="Logic Pro Floating Doc Launcher for Audio Engineering Students">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <style>
+    /* Logic Pro Dark Aesthetic */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #121212;
+      color: #e3e3e3;
+    }
+    .card {
+      background: #242426;
+      border: 1px solid #3a3a3c;
+      padding: 28px;
+      border-radius: 10px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+      text-align: center;
+      max-width: 440px;
+      width: 90%;
+    }
+    .logic-lcd {
+      background: #0d1117;
+      border: 1px solid #1f2937;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 20px;
+      color: #38bdf8;
+      font-family: monospace;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    h2 { margin: 0 0 6px 0; font-size: 20px; color: #f3f4f6; font-weight: 600; }
+    p { color: #9ca3af; font-size: 13px; line-height: 1.4; margin-bottom: 16px; }
+    
+    .select-group {
+      text-align: left;
+      margin-bottom: 14px;
+    }
+    label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: block;
+      margin-bottom: 4px;
+    }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      background: #18181a;
+      border: 1px solid #3a3a3c;
+      color: #f3f4f6;
+      border-radius: 5px;
+      box-sizing: border-box;
+      font-size: 13px;
+      outline: none;
+    }
+    select:focus, input[type="text"]:focus {
+      border-color: #38bdf8;
+    }
+
+    .help-text {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 6px;
+      margin-bottom: 12px;
+      font-style: italic;
+    }
+
+    .divider {
+      border-top: 1px solid #3a3a3c;
+      margin: 14px 0 18px 0;
+      position: relative;
+    }
+    .divider span {
+      position: absolute;
+      top: -9px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #242426;
+      padding: 0 8px;
+      font-size: 10px;
+      color: #6b7280;
+      text-transform: uppercase;
+    }
+
+    button.main-btn {
+      background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      border: 1px solid #60a5fa;
+      padding: 12px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    button.main-btn:hover { background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%); }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logic-lcd">LOGIC PRO // PROJECT FLOATER</div>
+  <h2>Select Assignment Doc</h2>
+  <p>Choose your course project from the folders below or paste a custom link:</p>
+
+  <div class="select-group">
+    <label>🎛 Sound Engineering</label>
+    <select id="seSelect">
+      <option value="">-- Loading Folder Projects... --</option>
+    </select>
+  </div>
+
+  <div class="select-group">
+    <label>🎹 Advanced Music Production</label>
+    <select id="ampSelect">
+      <option value="">-- Loading Folder Projects... --</option>
+    </select>
+  </div>
+
+  <div class="help-text">Don't see it? Insert doc link below ↓</div>
+
+  <div class="divider"><span>OR</span></div>
+
+  <div class="select-group">
+    <label>🔗 Custom Google Doc Link</label>
+    <input type="text" id="docInput" placeholder="Paste Google Doc link here...">
+  </div>
+
+  <button id="floatBtn" class="main-btn">Float Away!</button>
+</div>
+
+<script>
+  const seSelect = document.getElementById('seSelect');
+  const ampSelect = document.getElementById('ampSelect');
+  const docInput = document.getElementById('docInput');
+
+  // Fallback Static Registries if API fails or local testing
+  const FALLBACK_SE = [
+    { title: "Project #1: Loops in Soundtrap", id: "1HOLjorJv6ONr7ACmGEcJq6CFbhi_Rr41dNDNvRFtngE" },
+    { title: "Project #2: My Musical Life", id: "1Tiy5EIDgB1-_XDSe1aX0pLpIYnL2YYmWuJjWR38PFok" },
+    { title: "Project #3: Soundtrap Drums & Loops", id: "1JCTDjoXTgTqK7goxczUCbN-nk4afQAUlrhrOH5TShtw" },
+    { title: "Project #5: Podcast Project", id: "1RkESXLqDIc36SlzUOzu3kz1ciqwcW7VSOCOPJqADTDY" },
+    { title: "Project #8: Mixing Raw Stems", id: "1oQbqJMabNBT-1DfnPAugMmyH3LN3qXXfFqWqsdWnzF8" },
+    { title: "Project #9: Drum Programming", id: "15HKH1U--ZCv9xFkxOvbmyeDWeSpN1dci3sONnmc6RcA" },
+    { title: "Project #11: Pingu Project", id: "1LwVqdcdJ5caRrjhWnqoT3TTCVkK4VqUNZZgZjpUUy0s" },
+    { title: "Project #12: Foley/SFX Project", id: "1mhrnMKKxMBXWL8UwwS9lz7BotftIy-RYvbwjtpZ5cBs" },
+    { title: "Project #13: Found Sound Composition", id: "16Flq6UC0EKrCDdx_Nd-7tk5QzEDlrlF0GjAgmdedRRM" },
+    { title: "Project #14: Sampling Project", id: "1EZG-3EZbeMK3MzlMOunfylgxU6p2QM8Xnl7HA9tl6nA" }
+  ];
+
+  const FALLBACK_AMP = [
+    { title: "Autodidact #1", id: "1K4co7I5S-zcpXhOtjO7Y0H3JW9lqnlkpenyIFn5HgHQ" },
+    { title: "Project #1: Partner Project & Logic Review", id: "118H-sHLE_Ezjn_rooh52rVnDZ6Kf_f7h0Wlioj24Wx4" }
+  ];
+
+  function populateSelect(selectElem, docs, defaultText) {
+    selectElem.innerHTML = `<option value="">${defaultText}</option>`;
+    docs.forEach(doc => {
+      const opt = document.createElement('option');
+      opt.value = doc.id;
+      opt.textContent = doc.title;
+      selectElem.appendChild(opt);
+    });
+  }
+
+  // Fetch Dynamic Folder Contents
+  async function loadDriveDocs() {
+    try {
+      const res = await fetch('/api/get-docs');
+      if (!res.ok) throw new Error('API fetch error');
+      const data = await res.json();
+      
+      populateSelect(seSelect, data.se || FALLBACK_SE, '-- Choose Sound Engineering Project --');
+      populateSelect(ampSelect, data.amp || FALLBACK_AMP, '-- Choose AMP Project --');
+    } catch (e) {
+      console.warn('Dynamic Drive fetch failed, using fallback lists.', e);
+      populateSelect(seSelect, FALLBACK_SE, '-- Choose Sound Engineering Project --');
+      populateSelect(ampSelect, FALLBACK_AMP, '-- Choose AMP Project --');
+    }
+  }
+
+  loadDriveDocs();
+
+  // Clear mutual inputs
+  seSelect.addEventListener('change', () => { if(seSelect.value) { ampSelect.value = ''; docInput.value = ''; } });
+  ampSelect.addEventListener('change', () => { if(ampSelect.value) { seSelect.value = ''; docInput.value = ''; } });
+  docInput.addEventListener('input', () => { if(docInput.value) { seSelect.value = ''; ampSelect.value = ''; } });
+
+  // Drum Patterns Dataset
+  const CR = [
+    {"id":"pocket-one-and-seven-and-five-and-thirteen","name":"Starter Groove 01","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"kick":[0,3],"snare":[2,6]},"meta":{"style":["basic","training"],"energy":1,"feel":"straight","section":"verse","family":"pocket-basic-patterns","bpmRange":[75,120]}},
+    {"id":"pocket-boots-n-cats","name":"Starter Groove 02","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,8],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,13]},"meta":{"style":["basic","training"],"energy":3,"feel":"straight","section":"verse","family":"pocket-basic-patterns","bpmRange":[75,120]}},
+    {"id":"pocket-tiny-house","name":"Starter Groove 03","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"hihatO":[1,3,5,7],"kick":[0,2,4,6]},"meta":{"style":["basic","training"],"energy":2,"feel":"straight","section":"verse","family":"pocket-basic-patterns","bpmRange":[75,120]}},
+    {"id":"pocket-good-to-go","name":"Starter Groove 04","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,6,10],"snare":[4,12]},"meta":{"style":["basic","training"],"energy":2,"feel":"straight","section":"verse","family":"pocket-basic-patterns","bpmRange":[75,120]}},
+    {"id":"pocket-hip-hop","name":"Starter Groove 05","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,6,7,14],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["basic","training"],"energy":4,"feel":"straight","section":"verse","family":"pocket-basic-patterns","bpmRange":[75,120]}},
+    {"id":"pocket-standard-break-1","name":"Break Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,10],"snare":[4,12],"hihatC":[0,2,4,6,8,9,10,12,14]},"meta":{"style":["breakbeat"],"energy":3,"feel":"straight","section":"verse","family":"pocket-standard-breaks","bpmRange":[85,115]}},
+    {"id":"pocket-rock-1","name":"Rock Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,7,8,10],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["rock"],"energy":3,"feel":"straight","section":"verse","family":"pocket-rock","bpmRange":[85,125]}},
+    {"id":"pocket-electro-1-a","name":"Electro Groove 01","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"snare":[2,6],"kick":[0,3]},"meta":{"style":["electro","dance"],"energy":1,"feel":"straight","section":"verse","family":"pocket-electro","bpmRange":[90,125]}},
+    {"id":"pocket-new-wave","name":"Electro Groove 09","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,6,8,9],"snare":[4,12],"hihatC":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"hihatO":[2]},"meta":{"style":["electro","dance"],"energy":5,"feel":"straight","section":"verse","family":"pocket-electro","bpmRange":[90,125]}},
+    {"id":"pocket-house-2","name":"House Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,4,8,12],"snare":[4,12],"hihatC":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"hihatO":[2,5,10,13]},"meta":{"style":["house","dance"],"energy":5,"feel":"straight","section":"verse","family":"pocket-house","bpmRange":[110,130]}},
+    {"id":"pocket-miami-bass-a","name":"Miami Bass Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,6],"snare":[4,12],"hihatC":[0,2,3,4,6,7,8,10,11,12,14,15]},"meta":{"style":["miami-bass","electro","hip-hop"],"energy":4,"feel":"straight","section":"verse","family":"pocket-miami-bass","bpmRange":[95,130]}},
+    {"id":"pocket-amen-break-a","name":"Funk-Soul Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,10,11],"snare":[4,7,9,12,15],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["funk","soul","breakbeat"],"energy":4,"feel":"straight","section":"verse","family":"pocket-funk-and-soul","bpmRange":[80,115]}},
+    {"id":"pocket-son-clave","name":"Afro-Cuban Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,4,7,8,11,12,15],"snare":[0,3,6,10,12],"hihatC":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]},"meta":{"style":["afro-cuban","latin"],"energy":5,"feel":"straight","section":"verse","family":"pocket-afro-cuban","bpmRange":[85,120]}},
+    {"id":"pocket-drum-and-bass-1-a","name":"Drum & Bass Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,7,9,10,15],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["drum-and-bass","jungle","breakbeat"],"energy":4,"feel":"straight","section":"verse","family":"pocket-drum-and-bass","bpmRange":[150,180]}},
+    {"id":"pocket-techno","name":"Electronic Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,4,8,12,14],"snare":[4,12],"hihatC":[9],"hihatO":[2,6,10,14]},"meta":{"style":["edm","dance"],"energy":3,"feel":"straight","section":"verse","family":"pocket-edm","bpmRange":[120,150]}},
+    {"id":"pocket-reggaeton","name":"Dub Groove 05","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,4,8,12],"snare":[3,6,11,14],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["dub","reggae"],"energy":4,"feel":"straight","section":"verse","family":"pocket-dub","bpmRange":[65,95]}}
+  ];
+
+  // Shortcuts Data
+  const SHORTCUTS_DATA = [
+    { category: "Navigation & Transport", items: [
+      { key: "SPACE", desc: "Play or Stop" },
+      { key: "R", desc: "Record" },
+      { key: "⌘ + ⬅︎ / ➡︎", desc: "Zoom Horizontal Out / In" },
+      { key: "⌘ + ⬆︎ / ⬇︎", desc: "Zoom Vertical Out / In" },
+      { key: "< or ,", desc: "Back 1 Bar" },
+      { key: "> or .", desc: "Forward 1 Bar" },
+      { key: "Shift + SPACE", desc: "Play from Selection" },
+      { key: "Enter", desc: "Return Playhead to Beginning" },
+      { key: "Z", desc: "Zoom in on Selected Region" },
+      { key: "C", desc: "Cycle (Loop) On / Off" },
+      { key: "⌘ + U", desc: "Set Cycle to Selected Regions" },
+      { key: "K", desc: "Click / Metronome On / Off" },
+      { key: "Shift + K", desc: "Count-in On / Off" },
+      { key: ";", desc: "Snap Selected Region to Playhead" }
+    ]},
+    { category: "Tools & View Windows", items: [
+      { key: "X", desc: "Mixer" },
+      { key: "E", desc: "MIDI / Audio Editor" },
+      { key: "Y", desc: "Instrument Library" },
+      { key: "I", desc: "Inspector Toolbar" },
+      { key: "B", desc: "Smart Controls" },
+      { key: "A", desc: "Automation View" },
+      { key: "T", desc: "Tool Selector" },
+      { key: "O", desc: "Loop Browser" },
+      { key: "P", desc: "Piano Roll" },
+      { key: "G", desc: "Show / Hide Global Tracks" },
+      { key: "Option + C", desc: "Color Palette" }
+    ]},
+    { category: "Editing & Track Controls", items: [
+      { key: "⌘ + Z / ⌘ + Shift + Z", desc: "Undo / Redo" },
+      { key: "⌘ + X / C / V", desc: "Cut / Copy / Paste" },
+      { key: "⌘ + A", desc: "Select All" },
+      { key: "⌘ + J", desc: "Join Regions" },
+      { key: "⌘ + T", desc: "Split Region at Playhead" },
+      { key: "⌘ + R", desc: "Repeat Region / Notes" },
+      { key: "⌘ + D", desc: "Duplicate Track" },
+      { key: "S / M", desc: "Solo / Mute Selected Track" },
+      { key: "Option + S / M", desc: "Un-Solo All / Un-Mute All" },
+      { key: "Q", desc: "Quantize MIDI Notes" },
+      { key: "L", desc: "Loop Region On / Off" },
+      { key: "⌘ + Shift + D", desc: "Create Track Stack" },
+      { key: "⌘ + Option + N", desc: "Create New Track" },
+      { key: "⌘ + Option + A", desc: "Create Audio Track" },
+      { key: "⌘ + Option + S", desc: "Create Software Instrument Track" },
+      { key: "Option + Drag", desc: "Copy Region by Dragging" },
+      { key: "Option + Click", desc: "Reset Knob / Fader to 0" },
+      { key: "⌘ + B", desc: "Bounce Project" },
+      { key: "⌘ + S", desc: "Save Project" }
+    ]}
+  ];
+
+  async function launchFloater(selectedDocId) {
+    let docId = selectedDocId.replace(/[\/%\s]+$/, '');
+    const match = docId.match(/\/d\/(e\/[a-zA-Z0-9-_]+|[a-zA-Z0-9-_]+)/);
+    if (match && match[1]) docId = match[1];
+
+    const iframeSrc = docId.startsWith('e/')
+      ? `https://docs.google.com/document/d/${docId}/pub?embedded=true`
+      : `https://docs.google.com/document/d/${docId}/preview`;
+
+    try {
+      const pipWindow = await window.documentPictureInPicture.requestWindow({
+        width: 640,
+        height: 820,
+      });
+
+      const style = pipWindow.document.createElement('style');
+      style.textContent = `
+        body, html {
+          margin: 0; padding: 0; height: 100%; display: flex; flex-direction: column; overflow: hidden;
+          background: #18181a; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; color: #e3e3e3;
+        }
+        .toolbar {
+          display: flex; align-items: center; justify-content: space-between; background: #242426;
+          padding: 6px 10px; gap: 4px; border-bottom: 1px solid #3a3a3c; user-select: none; z-index: 10; flex-wrap: wrap;
+        }
+        .control-group { display: flex; align-items: center; gap: 4px; font-size: 12px; }
+        .toolbar button {
+          background: #3a3a3c; color: #f3f4f6; border: 1px solid #4a4a4c; padding: 4px 7px;
+          border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 11px;
+        }
+        .toolbar button:hover { background: #4a4a4c; }
+        .toolbar button.shortcuts-btn { background: #2563eb; border-color: #3b82f6; }
+        .toolbar button.ai-btn { background: #1e3a8a; border-color: #3b82f6; color: #93c5fd; }
+        .toolbar button.patterns-btn { background: #047857; border-color: #059669; color: #a7f3d0; }
+        .toolbar button.active-btn { background: #16a34a !important; border-color: #22c55e !important; }
+
+        .viewport-area { flex: 1; width: 100%; height: 100%; overflow: auto; position: relative; background: #ffffff; }
+        .doc-wrapper { width: 100%; height: 100%; transform-origin: top left; }
+        iframe { width: 100%; height: 100%; border: none; display: block; }
+        .no-pointer { pointer-events: none !important; }
+
+        .loupe {
+          display: none; position: absolute; width: 200px; height: 200px; border-radius: 50%;
+          border: 3px solid #38bdf8; box-shadow: 0 6px 24px rgba(0,0,0,0.6); pointer-events: none;
+          overflow: hidden; z-index: 50; background: #ffffff;
+        }
+        .loupe-iframe { position: absolute; border: none; transform-origin: top left; pointer-events: none; }
+
+        /* AI Chat Drawer UI */
+        .chat-drawer {
+          display: none; position: absolute; bottom: 0; left: 0; width: 100%; height: 280px;
+          background: #18181a; border-top: 1px solid #3a3a3c; flex-direction: column; z-index: 90;
+          box-shadow: 0 -6px 24px rgba(0,0,0,0.7);
+        }
+        .chat-header {
+          display: flex; justify-content: space-between; align-items: center; padding: 6px 12px;
+          background: #242426; border-bottom: 1px solid #3a3a3c; font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase;
+        }
+        .chat-close { background: transparent !important; border: none !important; color: #9ca3af !important; font-size: 16px !important; cursor: pointer; }
+        .chat-messages {
+          flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; font-size: 12px; background: #121212;
+        }
+        .chat-msg { padding: 8px 10px; border-radius: 6px; max-width: 85%; line-height: 1.4; word-break: break-word; }
+        .chat-msg.user { background: #2563eb; color: #fff; align-self: flex-end; }
+        .chat-msg.assistant { background: #242426; color: #e3e3e3; border: 1px solid #3a3a3c; align-self: flex-start; }
+        .chat-input-area { display: flex; padding: 8px; background: #242426; border-top: 1px solid #3a3a3c; gap: 6px; }
+        .chat-input-area input {
+          flex: 1; padding: 6px 10px; background: #18181a; border: 1px solid #3a3a3c; color: #f3f4f6; border-radius: 4px; font-size: 12px; outline: none;
+        }
+        .chat-input-area input:focus { border-color: #38bdf8; }
+        .chat-input-area button {
+          background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 12px;
+        }
+        .chat-input-area button:hover { background: #3b82f6; }
+
+        /* Modal Overlays */
+        .modal-overlay {
+          display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+          background: rgba(0, 0, 0, 0.85); z-index: 100; justify-content: center; align-items: center; padding: 14px; box-sizing: border-box;
+        }
+        .modal-content {
+          background: #242426; color: #f3f4f6; width: 100%; max-width: 580px; max-height: 90%;
+          border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #3a3a3c;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #18181a; border-bottom: 1px solid #3a3a3c; }
+        .modal-header h3 { margin: 0; font-size: 14px; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; }
+        .modal-close { background: transparent !important; color: #9ca3af !important; font-size: 18px !important; border: none !important; cursor: pointer; }
+        .modal-body { padding: 16px; overflow-y: auto; font-size: 12px; }
+
+        /* Drum Patterns Styles */
+        .drum-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .drum-search, .drum-filter {
+          background: #18181a; border: 1px solid #3a3a3c; color: #f3f4f6; padding: 6px 10px; border-radius: 4px; font-size: 12px; outline: none;
+        }
+        .drum-search { flex: 1; min-width: 140px; }
+        .drum-grid { display: grid; grid-template-columns: 1fr; gap: 10px; max-height: 60vh; overflow-y: auto; }
+        .drum-card { background: #18181a; border: 1px solid #3a3a3c; border-radius: 6px; padding: 10px; }
+        .drum-card-title { font-weight: bold; color: #38bdf8; font-size: 13px; margin-bottom: 6px; }
+        .drum-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+        .drum-tag { background: #242426; border: 1px solid #3a3a3c; color: #9ca3af; font-size: 10px; padding: 2px 6px; border-radius: 10px; }
+        .sequencer-table { display: flex; flex-direction: column; gap: 3px; background: #121212; padding: 6px; border-radius: 4px; border: 1px solid #2a2a2c; }
+        .seq-row { display: flex; align-items: center; gap: 4px; }
+        .seq-label { width: 55px; font-size: 10px; color: #9ca3af; text-transform: uppercase; font-family: monospace; }
+        .seq-steps { display: flex; gap: 2px; flex: 1; }
+        .seq-step { flex: 1; height: 12px; background: #242426; border-radius: 2px; min-width: 6px; }
+        .seq-step.active-hihatO { background: #c084fc !important; }
+        .seq-step.active-hihatC { background: #facc15 !important; }
+        .seq-step.active-snare { background: #f87171 !important; }
+        .seq-step.active-kick { background: #38bdf8 !important; }
+        .seq-step.beat-divider { border-left: 2px solid #38bdf866; }
+
+        .tab-nav { display: flex; gap: 6px; margin-bottom: 12px; border-bottom: 1px solid #3a3a3c; padding-bottom: 8px; flex-wrap: wrap; }
+        .tab-btn { background: #18181a; color: #9ca3af; border: 1px solid #3a3a3c; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .tab-btn.active { background: #2563eb; color: #fff; border-color: #3b82f6; }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        .freq-bar { display: flex; height: 26px; border-radius: 4px; overflow: hidden; margin-top: 8px; font-weight: bold; font-size: 10px; text-align: center; line-height: 26px; }
+        .freq-sub { background: #1e3a8a; color: #93c5fd; width: 12%; }
+        .freq-bass { background: #1e40af; color: #bfdbfe; width: 18%; }
+        .freq-lowmid { background: #0369a1; color: #bae6fd; width: 20%; }
+        .freq-mid { background: #047857; color: #a7f3d0; width: 20%; }
+        .freq-highmid { background: #b45309; color: #fef08a; width: 18%; }
+        .freq-high { background: #b91c1c; color: #fecaca; width: 12%; }
+
+        .shortcut-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #3a3a3c; }
+        .shortcut-key { font-family: monospace; background: #18181a; padding: 2px 6px; border-radius: 4px; color: #38bdf8; }
+        .bpm-display { font-size: 32px; font-weight: bold; color: #38bdf8; text-align: center; margin: 10px 0; font-family: monospace; }
+        .tap-btn { background: #2563eb; color: white; border: none; padding: 14px; width: 100%; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
+
+        .video-container {
+          position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-top: 10px; margin-bottom: 16px; border-radius: 6px; border: 1px solid #3a3a3c; background: #000;
+        }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .expandable-img-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 12px 0; }
+        .expandable-card { background: #18181a; border: 1px solid #3a3a3c; border-radius: 6px; padding: 8px; cursor: pointer; transition: border-color 0.2s; }
+        .expandable-card:hover { border-color: #38bdf8; }
+        .expandable-card img { width: 100%; height: auto; border-radius: 4px; display: block; }
+        .expandable-caption { font-size: 11px; color: #38bdf8; margin-top: 6px; text-align: center; font-weight: 600; }
+        .lightbox-modal {
+          display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
+        }
+        .lightbox-content { max-width: 90%; max-height: 90%; border-radius: 6px; border: 2px solid #38bdf8; }
+      `;
+      pipWindow.document.head.appendChild(style);
+
+      const toolbar = pipWindow.document.createElement('div');
+      toolbar.className = 'toolbar';
+      toolbar.innerHTML = `
+        <div class="control-group">
+          <button id="openShortcutsBtn" class="shortcuts-btn">Shortcuts</button>
+          <button id="openMixTipsBtn">🎛 Mix Tips</button>
+          <button id="openBpmBtn">⏱ BPM</button>
+          <button id="openAiChatBtn" class="ai-btn">🤖 Ask AI</button>
+          <button id="openPatternsBtn" class="patterns-btn">🥁 Patterns</button>
+        </div>
+        <div class="control-group">
+          <button id="loupeToggleBtn">🔍 Magnify</button>
+          <span>Zoom:</span>
+          <button id="zoomOut">-</button>
+          <span id="zoomVal">100%</span>
+          <button id="zoomIn">+</button>
+          <button id="zoomReset">Reset</button>
+        </div>
+      `;
+      pipWindow.document.body.appendChild(toolbar);
+
+      const viewportArea = pipWindow.document.createElement('div');
+      viewportArea.className = 'viewport-area';
+
+      const docWrapper = pipWindow.document.createElement('div');
+      docWrapper.className = 'doc-wrapper';
+
+      const iframe = pipWindow.document.createElement('iframe');
+      iframe.src = iframeSrc;
+
+      docWrapper.appendChild(iframe);
+      viewportArea.appendChild(docWrapper);
+
+      const loupe = pipWindow.document.createElement('div');
+      loupe.className = 'loupe';
+
+      const loupeIframe = pipWindow.document.createElement('iframe');
+      loupeIframe.src = iframeSrc;
+      loupeIframe.className = 'loupe-iframe';
+
+      loupe.appendChild(loupeIframe);
+      viewportArea.appendChild(loupe);
+
+      // AI Chat Drawer element
+      const chatDrawer = pipWindow.document.createElement('div');
+      chatDrawer.className = 'chat-drawer';
+      chatDrawer.id = 'chatDrawer';
+      chatDrawer.innerHTML = `
+        <div class="chat-header">
+          <span>🤖 Mr. Comiskey's Music Tech AI</span>
+          <button class="chat-close" id="closeChatBtn">&times;</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-msg assistant">Hello! I'm your Lane Tech Music Tech AI assistant. Ask me anything about Logic Pro 11, Soundtrap, EQ, compression, or your assignment!</div>
+        </div>
+        <div class="chat-input-area">
+          <input type="text" id="chatInput" placeholder="Ask about Logic Pro, EQ, shortcuts...">
+          <button id="chatSendBtn">Send</button>
+        </div>
+      `;
+      viewportArea.appendChild(chatDrawer);
+
+      pipWindow.document.body.appendChild(viewportArea);
+
+      // Chat Drawer Logic
+      const openAiChatBtn = pipWindow.document.getElementById('openAiChatBtn');
+      const closeChatBtn = pipWindow.document.getElementById('closeChatBtn');
+      const chatMessages = pipWindow.document.getElementById('chatMessages');
+      const chatInput = pipWindow.document.getElementById('chatInput');
+      const chatSendBtn = pipWindow.document.getElementById('chatSendBtn');
+
+      openAiChatBtn.addEventListener('click', () => {
+        const isVisible = chatDrawer.style.display === 'flex';
+        chatDrawer.style.display = isVisible ? 'none' : 'flex';
+        if (!isVisible) chatInput.focus();
+      });
+
+      closeChatBtn.addEventListener('click', () => { chatDrawer.style.display = 'none'; });
+
+      async function sendChatQuery() {
+        const promptText = chatInput.value.trim();
+        if (!promptText) return;
+
+        const userMsg = pipWindow.document.createElement('div');
+        userMsg.className = 'chat-msg user';
+        userMsg.textContent = promptText;
+        chatMessages.appendChild(userMsg);
+        chatInput.value = '';
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        const thinkingMsg = pipWindow.document.createElement('div');
+        thinkingMsg.className = 'chat-msg assistant';
+        thinkingMsg.textContent = 'Thinking...';
+        chatMessages.appendChild(thinkingMsg);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        try {
+          const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: promptText, currentDocId: docId })
+          });
+          const data = await res.json();
+          if (data.reply) {
+            thinkingMsg.textContent = data.reply;
+          } else if (data.error) {
+            thinkingMsg.textContent = 'Error: ' + data.error;
+          } else {
+            thinkingMsg.textContent = 'Sorry, I encountered an error answering that.';
+          }
+        } catch (e) {
+          thinkingMsg.textContent = 'Connection error. Please check your network.';
+        }
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      chatSendBtn.addEventListener('click', sendChatQuery);
+      chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChatQuery(); });
+
+      // Modal Overlay for Shortcuts, Mix Tips, BPM, and Patterns
+      const modalOverlay = pipWindow.document.createElement('div');
+      modalOverlay.className = 'modal-overlay';
+      modalOverlay.id = 'modalOverlay';
+      modalOverlay.innerHTML = `
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="modalTitle">MODAL</h3>
+            <button class="modal-close" id="closeModalBtn">&times;</button>
+          </div>
+          <div class="modal-body" id="modalBody"></div>
+        </div>
+      `;
+      pipWindow.document.body.appendChild(modalOverlay);
+
+      const lightboxModal = pipWindow.document.createElement('div');
+      lightboxModal.className = 'lightbox-modal';
+      lightboxModal.id = 'lightboxModal';
+      lightboxModal.innerHTML = `<img class="lightbox-content" id="lightboxImg" src="" alt="Zoomed view">`;
+      pipWindow.document.body.appendChild(lightboxModal);
+      lightboxModal.addEventListener('click', () => { lightboxModal.style.display = 'none'; });
+
+      const modal = pipWindow.document.getElementById('modalOverlay');
+      const modalTitle = pipWindow.document.getElementById('modalTitle');
+      const modalBody = pipWindow.document.getElementById('modalBody');
+
+      pipWindow.document.getElementById('closeModalBtn').addEventListener('click', () => modal.style.display = 'none');
+
+      // Patterns Modal Trigger
+      pipWindow.document.getElementById('openPatternsBtn').addEventListener('click', () => {
+        modalTitle.textContent = "🥁 DRUM PATTERN DATABASE";
+        
+        const renderPatterns = (filterText = '', styleFilter = 'all') => {
+          const filtered = CR.filter(p => {
+            const matchesSearch = !filterText || p.name.toLowerCase().includes(filterText.toLowerCase()) || p.meta.style.some(s => s.toLowerCase().includes(filterText.toLowerCase()));
+            const matchesStyle = styleFilter === 'all' || p.meta.style.includes(styleFilter) || p.meta.feel === styleFilter || p.meta.family === styleFilter;
+            return matchesSearch && matchesStyle;
+          });
+
+          const allStyles = [...new Set(CR.flatMap(p => p.meta.style))];
+
+          let html = `
+            <div class="drum-controls">
+              <input type="text" id="drumSearch" class="drum-search" placeholder="Search pattern name or style (e.g. electro, house)..." value="${filterText}">
+              <select id="drumStyleFilter" class="drum-filter">
+                <option value="all">All Styles & Genres</option>
+                ${allStyles.map(s => `<option value="${s}" ${styleFilter === s ? 'selected' : ''}>${s}</option>`).join('')}
+              </select>
+            </div>
+            <div class="drum-grid">
+          `;
+
+          if (filtered.length === 0) {
+            html += `<div style="text-align:center; color:#9ca3af; padding:20px;">No drum patterns found matching your search.</div>`;
+          } else {
+            filtered.forEach(pat => {
+              const totalSteps = (pat.stepsPerBeat || 4) * (pat.beats || 4) * (pat.bars || 1);
+              const voices = pat.voices || {};
+              const renderVoiceRow = (voiceKey, label, colorClass) => {
+                const activeSteps = voices[voiceKey] || [];
+                let stepsHtml = '';
+                for(let i=0; i<totalSteps; i++) {
+                  const isActive = activeSteps.includes(i);
+                  const isDivider = (i === 4 || i === 8 || i === 12); // steps 5, 9, 13 (1-indexed)
+                  const cls = `seq-step ${isActive ? colorClass : ''} ${isDivider ? 'beat-divider' : ''}`;
+                  stepsHtml += `<div class="${cls}" title="Step ${i+1}"></div>`;
+                }
+                return `
+                  <div class="seq-row">
+                    <div class="seq-label">${label}</div>
+                    <div class="seq-steps">${stepsHtml}</div>
+                  </div>
+                `;
+              };
+
+              html += `
+                <div class="drum-card">
+                  <div class="drum-card-title">${pat.name}</div>
+                  <div class="drum-tags">
+                    ${pat.meta.style.map(st => `<span class="drum-tag">${st}</span>`).join('')}
+                    <span class="drum-tag">Feel: ${pat.meta.feel}</span>
+                    <span class="drum-tag">Section: ${pat.meta.section}</span>
+                    <span class="drum-tag">Energy: ${pat.meta.energy}/5</span>
+                  </div>
+                  <div class="sequencer-table">
+                    ${renderVoiceRow('hihatO', 'Hi-Hat O', 'active-hihatO')}
+                    ${renderVoiceRow('hihatC', 'Hi-Hat C', 'active-hihatC')}
+                    ${renderVoiceRow('snare', 'Snare', 'active-snare')}
+                    ${renderVoiceRow('kick', 'Kick', 'active-kick')}
+                  </div>
+                </div>
+              `;
+            });
+          }
+
+          html += `</div>`;
+          modalBody.innerHTML = html;
+
+          const searchInput = pipWindow.document.getElementById('drumSearch');
+          const styleSelect = pipWindow.document.getElementById('drumStyleFilter');
+
+          searchInput.addEventListener('input', (e) => {
+            renderPatterns(e.target.value, styleSelect.value);
+          });
+          styleSelect.addEventListener('change', (e) => {
+            renderPatterns(searchInput.value, e.target.value);
+          });
+        };
+
+        renderPatterns();
+        modal.style.display = 'flex';
+      });
+
+      pipWindow.document.getElementById('openShortcutsBtn').addEventListener('click', () => {
+        modalTitle.textContent = "🎹 LOGIC KEYBOARD SHORTCUTS";
+        let html = '';
+        SHORTCUTS_DATA.forEach(cat => {
+          html += `<div style="color:#38bdf8; font-weight:bold; margin:10px 0 4px 0; border-bottom:1px solid #3a3a3c;">${cat.category}</div>`;
+          cat.items.forEach(item => {
+            html += `<div class="shortcut-row"><span>${item.desc}</span><span class="shortcut-key">${item.key}</span></div>`;
+          });
+        });
+        modalBody.innerHTML = html;
+        modal.style.display = 'flex';
+      });
+
+      pipWindow.document.getElementById('openMixTipsBtn').addEventListener('click', () => {
+        modalTitle.textContent = "🎛 MIX TIPS & FREQUENCY CHEATSHEET";
+        modalBody.innerHTML = `
+          <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('eqGeneric')">EQ Generic & Charts</button>
+            <button class="tab-btn" onclick="switchTab('eqInstruments')">EQ Instruments</button>
+            <button class="tab-btn" onclick="switchTab('compTips')">Compression & Tutorials</button>
+          </div>
+          <div id="eqGeneric" class="tab-pane active">
+            <p><b>Generic Frequency Spectrum:</b></p>
+            <div class="freq-bar">
+              <div class="freq-sub">SUB (20-60)</div>
+              <div class="freq-bass">BASS (60-250)</div>
+              <div class="freq-lowmid">LOW-MID (250-500)</div>
+              <div class="freq-mid">MIDS (500-2k)</div>
+              <div class="freq-highmid">UPPER (2k-6k)</div>
+              <div class="freq-high">HIGHS (6k-20k)</div>
+            </div>
+            <ul style="padding-left:18px; margin-top:12px; line-height:1.6;">
+              <li><b>Sub (20-60 Hz):</b> Rumble, feeling rather than hearing. High-pass filter non-bass tracks here.</li>
+              <li><b>Bass (60-250 Hz):</b> Fundamental notes of bass & kick. Cut 200Hz to reduce mud.</li>
+              <li><b>Low-Mids (250-500 Hz):</b> Boxiness & warmth. Cut here to clarify vocals & guitars.</li>
+              <li><b>Mids (500-2k Hz):</b> Honkiness & vocal presence. Boost 1kHz for clarity.</li>
+              <li><b>Upper-Mids (2k-6k Hz):</b> Harshness & attack. Boost 3kHz to bring instruments forward.</li>
+              <li><b>Highs (6k-20k Hz):</b> Air & sparkle. Use smooth high shelf for vocal air.</li>
+            </ul>
+
+            <div style="margin-top:16px; font-weight:bold; color:#38bdf8;">Reference Visual Charts (Click to Expand):</div>
+            <div class="expandable-img-grid">
+              <div class="expandable-card" onclick="openLightbox('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1200&q=80')">
+                <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=600&q=80" alt="Instrument Frequency Chart">
+                <div class="expandable-caption">🔍 Instrument Frequency Ranges Chart (Click to expand)</div>
+              </div>
+              <div class="expandable-card" onclick="openLightbox('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80')">
+                <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80" alt="5 Ranges Descriptive Audio Terms">
+                <div class="expandable-caption">🔍 5 Ranges Descriptive Audio Terms (Click to expand)</div>
+              </div>
+            </div>
+
+            <div style="margin-top:16px; font-weight:bold; color:#38bdf8;">More Info:</div>
+            <div class="video-container">
+              <iframe src="https://www.youtube.com/embed/7H3cHfV8rXI" title="EQ Masterclass Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+          </div>
+
+          <div id="eqInstruments" class="tab-pane">
+            <p><b>Instrument Magic Frequencies:</b></p>
+            <ul style="padding-left:18px; line-height:1.6;">
+              <li><b>Kick Drum:</b> Punch at 80Hz, Boxiness at 300Hz (cut), Click at 2.5kHz.</li>
+              <li><b>Snare Drum:</b> Fatness at 120Hz, Ring at 400Hz (cut), Snap at 3kHz.</li>
+              <li><b>Bass Guitar:</b> Sub-weight at 60Hz, Growl at 700Hz, String snap at 2kHz.</li>
+              <li><b>Acoustic Guitar:</b> Body at 200Hz, Presence at 3kHz, Air at 10kHz.</li>
+              <li><b>Vocals:</b> Fullness at 150Hz, Mud at 300Hz (cut), Intelligibility at 3kHz, Air at 12kHz.</li>
+            </ul>
+          </div>
+
+          <div id="compTips" class="tab-pane">
+            <p><b>Compression & Bussing Rules:</b></p>
+            <ul style="padding-left:18px; line-height:1.6;">
+              <li><b>Slow Attack (>30ms):</b> Lets transients through (punchy drums & percussion).</li>
+              <li><b>Fast Attack (<10ms):</b> Catches peaks & smooths out performances (tames vocals/bass).</li>
+              <li><b>Auto/Sync Release:</b> Keeps compressor pumping smoothly with song tempo.</li>
+              <li><b>Drum Bus Compression:</b> 2:1 or 4:1 ratio, 30ms attack, fast release for glue.</li>
+            </ul>
+
+            <div style="margin-top:16px; font-weight:bold; color:#38bdf8;">Simple Tutorial:</div>
+            <div class="video-container">
+              <iframe src="https://www.youtube.com/embed/LGqDVhww-hs" title="Simple Compression Tutorial" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+
+            <div style="margin-top:16px; font-weight:bold; color:#38bdf8;">In Depth Tutorial:</div>
+            <div class="video-container">
+              <iframe src="https://www.youtube.com/embed/booRjPgtIS4" title="In Depth Compression Tutorial" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+          </div>
+        `;
+
+        pipWindow.switchTab = (tabId) => {
+          pipWindow.document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          pipWindow.document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+          event.target.classList.add('active');
+          pipWindow.document.getElementById(tabId).classList.add('active');
+        };
+
+        pipWindow.openLightbox = (imgSrc) => {
+          const lb = pipWindow.document.getElementById('lightboxModal');
+          const lbImg = pipWindow.document.getElementById('lightboxImg');
+          lbImg.src = imgSrc;
+          lb.style.display = 'flex';
+        };
+
+        modal.style.display = 'flex';
+      });
+
+      pipWindow.document.getElementById('openBpmBtn').addEventListener('click', () => {
+        modalTitle.textContent = "⏱ TAP TEMPO & DELAY MATH";
+        modalBody.innerHTML = `
+          <div class="bpm-display" id="bpmVal">120 BPM</div>
+          <button class="tap-btn" id="tapPad">TAP TEMPO HERE</button>
+          <div style="margin-top:16px;">
+            <b>Delay Sync Values:</b>
+            <div id="delayTable" style="margin-top:8px; line-height:1.6;"></div>
+          </div>
+        `;
+
+        let taps = [];
+        const bpmVal = pipWindow.document.getElementById('bpmVal');
+        const delayTable = pipWindow.document.getElementById('delayTable');
+
+        const updateDelays = (bpm) => {
+          const quarterMs = Math.round((60000 / bpm));
+          const eighthMs = Math.round(quarterMs / 2);
+          const sixteenthMs = Math.round(quarterMs / 4);
+          const dottedEighthMs = Math.round(eighthMs * 1.5);
+
+          delayTable.innerHTML = `
+            <div class="shortcut-row"><span>1/4 Note Delay:</span><span class="shortcut-key">${quarterMs} ms</span></div>
+            <div class="shortcut-row"><span>1/8 Note Delay:</span><span class="shortcut-key">${eighthMs} ms</span></div>
+            <div class="shortcut-row"><span>1/8 Dotted Delay:</span><span class="shortcut-key">${dottedEighthMs} ms</span></div>
+            <div class="shortcut-row"><span>1/16 Note Delay:</span><span class="shortcut-key">${sixteenthMs} ms</span></div>
+          `;
+        };
+
+        updateDelays(120);
+
+        pipWindow.document.getElementById('tapPad').addEventListener('click', () => {
+          const now = Date.now();
+          taps.push(now);
+          if (taps.length > 4) taps.shift();
+          if (taps.length > 1) {
+            const diffs = [];
+            for (let i = 1; i < taps.length; i++) diffs.push(taps[i] - taps[i-1]);
+            const avgMs = diffs.reduce((a, b) => a + b) / diffs.length;
+            const bpm = Math.round(60000 / avgMs);
+            bpmVal.textContent = `${bpm} BPM`;
+            updateDelays(bpm);
+          }
+        });
+
+        modal.style.display = 'flex';
+      });
+
+      let currentZoom = 1.0;
+      const setZoom = (newZoom) => {
+        currentZoom = Math.round(Math.max(0.5, Math.min(2.0, newZoom)) * 10) / 10;
+        docWrapper.style.transform = `scale(${currentZoom})`;
+        docWrapper.style.width = `${100 / currentZoom}%`;
+        docWrapper.style.height = `${100 / currentZoom}%`;
+        pipWindow.document.getElementById('zoomVal').textContent = `${Math.round(currentZoom * 100)}%`;
+      };
+
+      pipWindow.document.getElementById('zoomIn').addEventListener('click', () => setZoom(currentZoom + 0.1));
+      pipWindow.document.getElementById('zoomOut').addEventListener('click', () => setZoom(currentZoom - 0.1));
+      pipWindow.document.getElementById('zoomReset').addEventListener('click', () => setZoom(1.0));
+
+      let loupeActive = false;
+      const loupeBtn = pipWindow.document.getElementById('loupeToggleBtn');
+
+      loupeBtn.addEventListener('click', () => {
+        loupeActive = !loupeActive;
+        loupeBtn.classList.toggle('active-btn', loupeActive);
+        loupe.style.display = loupeActive ? 'block' : 'none';
+        iframe.classList.toggle('no-pointer', loupeActive);
+
+        if (loupeActive) {
+          const rect = viewportArea.getBoundingClientRect();
+          loupeIframe.style.width = `${rect.width}px`;
+          loupeIframe.style.height = `${rect.height}px`;
+        }
+      });
+
+      viewportArea.addEventListener('mousemove', (e) => {
+        if (!loupeActive) return;
+        const rect = viewportArea.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        const zoomFactor = 2.0;
+        const radius = 100;
+
+        loupe.style.left = `${mouseX - radius}px`;
+        loupe.style.top = `${mouseY - radius}px`;
+
+        loupeIframe.style.transform = `scale(${zoomFactor})`;
+        loupeIframe.style.left = `${radius - (mouseX * zoomFactor)}px`;
+        loupeIframe.style.top = `${radius - (mouseY * zoomFactor)}px`;
+      });
+
+    } catch (err) {
+      alert('Error opening window: ' + err.message);
+    }
+  }
+
+  document.getElementById('floatBtn').addEventListener('click', () => {
+    let selectedDocId = seSelect.value || ampSelect.value || docInput.value.trim();
+    if (!selectedDocId) {
+      alert('Please select a project from a dropdown or paste a link.');
+      return;
+    }
+    launchFloater(selectedDocId);
+  });
+
+  // URL Deep-Linking (e.g. float.mrcomiskey.com/?doc=DOC_ID)
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const docParam = params.get('doc');
+    if (docParam) {
+      setTimeout(() => {
+        launchFloater(docParam);
+      }, 500);
+    }
+  });
+</script>
+
+</body>
+</html>
