@@ -28,7 +28,7 @@ Core Directives:
 3. Focus & Safety: Keep answers strictly focused on music production, sound engineering, and classroom project guidance. Refuse off-topic requests politely.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.5-flash-lite',
       contents: prompt,
       config: {
         systemInstruction,

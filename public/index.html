@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>FloatDoc - Logic Pro Floating Doc Launcher</title>
   <meta name="description" content="Logic Pro Floating Doc Launcher for Audio Engineering Students">
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta property="og:title" content="FloatDoc - Logic Pro Floating Doc Launcher">
   <meta property="og:description" content="Logic Pro Floating Doc Launcher for Audio Engineering Students">
   <meta property="og:type" content="website">
@@ -204,26 +205,6 @@
   ampSelect.addEventListener('change', () => { if(ampSelect.value) { seSelect.value = ''; docInput.value = ''; } });
   docInput.addEventListener('input', () => { if(docInput.value) { seSelect.value = ''; ampSelect.value = ''; } });
 
-  // Drum Patterns Dataset
-  const CR = [
-    {"id":"pocket-one-and-seven-and-five-and-thirteen","name":"Starter Groove 01","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"kick":[0,3],"snare":[2,6]},"meta":{"style":["basic","training"],"energy":1,"feel":"straight","section":"verse","family":"pocket-basic-patterns","bpmRange":[75,120]}},
-    {"id":"pocket-boots-n-cats","name":"Starter Groove 02","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,8],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,13]},"meta":{"style":["basic","training"],"energy":3,"feel":"straight","section":"verse","family":"pocket-basic-patterns","bpmRange":[75,120]}},
-    {"id":"pocket-tiny-house","name":"Starter Groove 03","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"hihatO":[1,3,5,7],"kick":[0,2,4,6]},"meta":{"style":["basic","training"],"energy":2,"feel":"straight","section":"verse","family":"pocket-basic-patterns","bpmRange":[75,120]}},
-    {"id":"pocket-good-to-go","name":"Starter Groove 04","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,6,10],"snare":[4,12]},"meta":{"style":["basic","training"],"energy":2,"feel":"straight","section":"verse","family":"pocket-basic-patterns","bpmRange":[75,120]}},
-    {"id":"pocket-hip-hop","name":"Starter Groove 05","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,6,7,14],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["basic","training"],"energy":4,"feel":"straight","section":"verse","family":"pocket-basic-patterns","bpmRange":[75,120]}},
-    {"id":"pocket-standard-break-1","name":"Break Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,10],"snare":[4,12],"hihatC":[0,2,4,6,8,9,10,12,14]},"meta":{"style":["breakbeat"],"energy":3,"feel":"straight","section":"verse","family":"pocket-standard-breaks","bpmRange":[85,115]}},
-    {"id":"pocket-rock-1","name":"Rock Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,7,8,10],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["rock"],"energy":3,"feel":"straight","section":"verse","family":"pocket-rock","bpmRange":[85,125]}},
-    {"id":"pocket-electro-1-a","name":"Electro Groove 01","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"snare":[2,6],"kick":[0,3]},"meta":{"style":["electro","dance"],"energy":1,"feel":"straight","section":"verse","family":"pocket-electro","bpmRange":[90,125]}},
-    {"id":"pocket-new-wave","name":"Electro Groove 09","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,6,8,9],"snare":[4,12],"hihatC":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"hihatO":[2]},"meta":{"style":["electro","dance"],"energy":5,"feel":"straight","section":"verse","family":"pocket-electro","bpmRange":[90,125]}},
-    {"id":"pocket-house-2","name":"House Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,4,8,12],"snare":[4,12],"hihatC":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"hihatO":[2,5,10,13]},"meta":{"style":["house","dance"],"energy":5,"feel":"straight","section":"verse","family":"pocket-house","bpmRange":[110,130]}},
-    {"id":"pocket-miami-bass-a","name":"Miami Bass Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,6],"snare":[4,12],"hihatC":[0,2,3,4,6,7,8,10,11,12,14,15]},"meta":{"style":["miami-bass","electro","hip-hop"],"energy":4,"feel":"straight","section":"verse","family":"pocket-miami-bass","bpmRange":[95,130]}},
-    {"id":"pocket-amen-break-a","name":"Funk-Soul Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,10,11],"snare":[4,7,9,12,15],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["funk","soul","breakbeat"],"energy":4,"feel":"straight","section":"verse","family":"pocket-funk-and-soul","bpmRange":[80,115]}},
-    {"id":"pocket-son-clave","name":"Afro-Cuban Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,4,7,8,11,12,15],"snare":[0,3,6,10,12],"hihatC":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]},"meta":{"style":["afro-cuban","latin"],"energy":5,"feel":"straight","section":"verse","family":"pocket-afro-cuban","bpmRange":[85,120]}},
-    {"id":"pocket-drum-and-bass-1-a","name":"Drum & Bass Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,7,9,10,15],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["drum-and-bass","jungle","breakbeat"],"energy":4,"feel":"straight","section":"verse","family":"pocket-drum-and-bass","bpmRange":[150,180]}},
-    {"id":"pocket-techno","name":"Electronic Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,4,8,12,14],"snare":[4,12],"hihatC":[9],"hihatO":[2,6,10,14]},"meta":{"style":["edm","dance"],"energy":3,"feel":"straight","section":"verse","family":"pocket-edm","bpmRange":[120,150]}},
-    {"id":"pocket-reggaeton","name":"Dub Groove 05","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,4,8,12],"snare":[3,6,11,14],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["dub","reggae"],"energy":4,"feel":"straight","section":"verse","family":"pocket-dub","bpmRange":[65,95]}}
-  ];
-
   // Shortcuts Data
   const SHORTCUTS_DATA = [
     { category: "Navigation & Transport", items: [
@@ -388,20 +369,21 @@
         .seq-step.active-snare { background: #f87171 !important; }
         .seq-step.active-kick { background: #38bdf8 !important; }
         .seq-step.beat-divider { border-left: 2px solid #38bdf866; }
+        .drum-play-btn {
+          background: #2563eb; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600; float: right;
+        }
+        .drum-play-btn.playing { background: #dc2626 !important; }
+        .drum-fav-btn {
+          background: transparent; color: #facc15; border: 1px solid #3a3a3c; padding: 3px 6px; border-radius: 4px; font-size: 13px; cursor: pointer;
+        }
+        .drum-fav-btn:hover { background: #242426; border-color: #facc15; }
+        .seq-step.playing-step { border: 1px solid #38bdf8 !important; box-shadow: 0 0 6px #38bdf8; transform: scale(1.1); }
 
         .tab-nav { display: flex; gap: 6px; margin-bottom: 12px; border-bottom: 1px solid #3a3a3c; padding-bottom: 8px; flex-wrap: wrap; }
         .tab-btn { background: #18181a; color: #9ca3af; border: 1px solid #3a3a3c; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; }
         .tab-btn.active { background: #2563eb; color: #fff; border-color: #3b82f6; }
         .tab-pane { display: none; }
         .tab-pane.active { display: block; }
-
-        .freq-bar { display: flex; height: 26px; border-radius: 4px; overflow: hidden; margin-top: 8px; font-weight: bold; font-size: 10px; text-align: center; line-height: 26px; }
-        .freq-sub { background: #1e3a8a; color: #93c5fd; width: 12%; }
-        .freq-bass { background: #1e40af; color: #bfdbfe; width: 18%; }
-        .freq-lowmid { background: #0369a1; color: #bae6fd; width: 20%; }
-        .freq-mid { background: #047857; color: #a7f3d0; width: 20%; }
-        .freq-highmid { background: #b45309; color: #fef08a; width: 18%; }
-        .freq-high { background: #b91c1c; color: #fecaca; width: 12%; }
 
         .shortcut-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #3a3a3c; }
         .shortcut-key { font-family: monospace; background: #18181a; padding: 2px 6px; border-radius: 4px; color: #38bdf8; }
@@ -569,91 +551,303 @@
       const modalTitle = pipWindow.document.getElementById('modalTitle');
       const modalBody = pipWindow.document.getElementById('modalBody');
 
-      pipWindow.document.getElementById('closeModalBtn').addEventListener('click', () => modal.style.display = 'none');
+      class DrumSynth {
+        constructor(audioContext, outputNode) {
+          this.context = audioContext;
+          this.dry = outputNode || audioContext.destination;
+          this.noiseBuffer = null;
+        }
 
-      // Patterns Modal Trigger
-      pipWindow.document.getElementById('openPatternsBtn').addEventListener('click', () => {
+        getNoise() {
+          if (this.noiseBuffer) return this.noiseBuffer;
+          const bufferSize = this.context.sampleRate;
+          const buffer = this.context.createBuffer(1, bufferSize, this.context.sampleRate);
+          const output = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+          this.noiseBuffer = buffer;
+          return this.noiseBuffer;
+        }
+
+        scheduleKick(t) {
+          if (!this.context || !this.dry) return;
+          const o = this.context.createOscillator(), i = this.context.createGain();
+          o.type = "sine";
+          o.frequency.setValueAtTime(155, t);
+          o.frequency.exponentialRampToValueAtTime(47, t + .13);
+          i.gain.setValueAtTime(1e-4, t);
+          i.gain.exponentialRampToValueAtTime(.19, t + .004);
+          i.gain.exponentialRampToValueAtTime(1e-4, t + .16);
+          o.connect(i); i.connect(this.dry);
+          o.start(t); o.stop(t + .18);
+        }
+
+        scheduleSnare(t) {
+          const o = this.getNoise();
+          if (!this.context || !o || !this.dry) return;
+          const i = this.context.createBufferSource(), c = this.context.createBiquadFilter(), d = this.context.createGain();
+          i.buffer = o; c.type = "highpass"; c.frequency.setValueAtTime(1400, t);
+          d.gain.setValueAtTime(.13, t);
+          d.gain.exponentialRampToValueAtTime(1e-4, t + .12);
+          i.connect(c); c.connect(d); d.connect(this.dry);
+          i.start(t); i.stop(t + .14);
+        }
+
+        scheduleHat(t) {
+          const o = this.getNoise();
+          if (!this.context || !o || !this.dry) return;
+          const i = this.context.createBufferSource(), c = this.context.createBiquadFilter(), d = this.context.createGain();
+          i.buffer = o; c.type = "highpass"; c.frequency.setValueAtTime(5600, t);
+          d.gain.setValueAtTime(.04, t);
+          d.gain.exponentialRampToValueAtTime(1e-4, t + .045);
+          i.connect(c); c.connect(d); d.connect(this.dry);
+          i.start(t); i.stop(t + .06);
+        }
+
+        scheduleOpenHat(t) {
+          const o = this.getNoise();
+          if (!this.context || !o || !this.dry) return;
+          const i = this.context.createBufferSource(), c = this.context.createBiquadFilter(), d = this.context.createGain();
+          i.buffer = o; c.type = "highpass"; c.frequency.setValueAtTime(5600, t);
+          d.gain.setValueAtTime(.06, t);
+          d.gain.exponentialRampToValueAtTime(1e-4, t + .35);
+          i.connect(c); c.connect(d); d.connect(this.dry);
+          i.start(t); i.stop(t + .38);
+        }
+      }
+
+      let currentPlayingCardId = null;
+      let currentPlaybackInterval = null;
+      let currentAudioCtx = null;
+      let currentSynth = null;
+
+      const stopCurrentPlayback = () => {
+        if (currentPlaybackInterval) {
+          clearInterval(currentPlaybackInterval);
+          currentPlaybackInterval = null;
+        }
+        if (currentAudioCtx && currentAudioCtx.state !== 'closed') {
+          currentAudioCtx.close();
+          currentAudioCtx = null;
+        }
+        currentSynth = null;
+        if (currentPlayingCardId) {
+          const btn = pipWindow.document.getElementById(`play-btn-${currentPlayingCardId}`);
+          if (btn) {
+            btn.textContent = "▶ Play";
+            btn.classList.remove('playing');
+          }
+          const card = pipWindow.document.getElementById(`drum-card-${currentPlayingCardId}`);
+          if (card) {
+            card.querySelectorAll('.seq-step').forEach(s => s.classList.remove('playing-step'));
+          }
+          currentPlayingCardId = null;
+        }
+      };
+
+      pipWindow.document.getElementById('closeModalBtn').addEventListener('click', () => {
+        stopCurrentPlayback();
+        modal.style.display = 'none';
+      });
+
+      // Patterns Modal Trigger with cachedPatterns & non-destructive search update
+      let cachedPatterns = null;
+      pipWindow.document.getElementById('openPatternsBtn').addEventListener('click', async () => {
         modalTitle.textContent = "🥁 DRUM PATTERN DATABASE";
         
-        const renderPatterns = (filterText = '', styleFilter = 'all') => {
-          const filtered = CR.filter(p => {
-            const matchesSearch = !filterText || p.name.toLowerCase().includes(filterText.toLowerCase()) || p.meta.style.some(s => s.toLowerCase().includes(filterText.toLowerCase()));
-            const matchesStyle = styleFilter === 'all' || p.meta.style.includes(styleFilter) || p.meta.feel === styleFilter || p.meta.family === styleFilter;
+        modalBody.innerHTML = `
+          <div class="drum-controls">
+            <input type="text" id="drumSearch" class="drum-search" placeholder="Search pattern name or style (e.g. electro, house)...">
+            <select id="drumStyleFilter" class="drum-filter">
+              <option value="all">All Styles & Genres</option>
+            </select>
+          </div>
+          <div class="drum-grid" id="drumGridContainer">
+            <div style="text-align:center; color:#9ca3af; padding:20px;">Loading drum patterns...</div>
+          </div>
+        `;
+        modal.style.display = 'flex';
+
+        if (!cachedPatterns) {
+          try {
+            const res = await fetch('/patterns.json');
+            cachedPatterns = await res.json();
+          } catch (e) {
+            cachedPatterns = [];
+          }
+        }
+
+        const searchInput = pipWindow.document.getElementById('drumSearch');
+        const styleSelect = pipWindow.document.getElementById('drumStyleFilter');
+        const gridContainer = pipWindow.document.getElementById('drumGridContainer');
+
+        const getFavorites = () => {
+          try {
+            return JSON.parse(localStorage.getItem('floatdoc_favorite_patterns') || '[]');
+          } catch(e) {
+            return [];
+          }
+        };
+
+        const toggleFavorite = (cardId) => {
+          let favs = getFavorites();
+          if (favs.includes(cardId)) {
+            favs = favs.filter(id => id !== cardId);
+          } else {
+            favs.push(cardId);
+          }
+          try {
+            localStorage.setItem('floatdoc_favorite_patterns', JSON.stringify(favs));
+          } catch(e) {}
+          updateGrid();
+        };
+
+        styleSelect.innerHTML = `<option value="all">All Styles & Genres</option><option value="favorites">⭐ Favorites Only</option>`;
+        const allStyles = [...new Set(cachedPatterns.flatMap(p => p.meta.style))];
+        allStyles.forEach(s => {
+          const opt = pipWindow.document.createElement('option');
+          opt.value = s;
+          opt.textContent = s;
+          styleSelect.appendChild(opt);
+        });
+
+        const updateGrid = () => {
+          stopCurrentPlayback();
+          const filterText = searchInput.value.trim().toLowerCase();
+          const styleFilter = styleSelect.value;
+          const favs = getFavorites();
+
+          const filtered = cachedPatterns.filter((p, idx) => {
+            const cardId = p.id || `pat-${idx}`;
+            const matchesSearch = !filterText || p.name.toLowerCase().includes(filterText) || p.meta.style.some(s => s.toLowerCase().includes(filterText));
+            let matchesStyle = true;
+            if (styleFilter === 'favorites') {
+              matchesStyle = favs.includes(cardId);
+            } else if (styleFilter !== 'all') {
+              matchesStyle = p.meta.style.includes(styleFilter) || p.meta.feel === styleFilter || p.meta.family === styleFilter;
+            }
             return matchesSearch && matchesStyle;
           });
 
-          const allStyles = [...new Set(CR.flatMap(p => p.meta.style))];
-
-          let html = `
-            <div class="drum-controls">
-              <input type="text" id="drumSearch" class="drum-search" placeholder="Search pattern name or style (e.g. electro, house)..." value="${filterText}">
-              <select id="drumStyleFilter" class="drum-filter">
-                <option value="all">All Styles & Genres</option>
-                ${allStyles.map(s => `<option value="${s}" ${styleFilter === s ? 'selected' : ''}>${s}</option>`).join('')}
-              </select>
-            </div>
-            <div class="drum-grid">
-          `;
-
           if (filtered.length === 0) {
-            html += `<div style="text-align:center; color:#9ca3af; padding:20px;">No drum patterns found matching your search.</div>`;
-          } else {
-            filtered.forEach(pat => {
-              const totalSteps = (pat.stepsPerBeat || 4) * (pat.beats || 4) * (pat.bars || 1);
-              const voices = pat.voices || {};
-              const renderVoiceRow = (voiceKey, label, colorClass) => {
-                const activeSteps = voices[voiceKey] || [];
-                let stepsHtml = '';
-                for(let i=0; i<totalSteps; i++) {
-                  const isActive = activeSteps.includes(i);
-                  const isDivider = (i === 4 || i === 8 || i === 12); // steps 5, 9, 13 (1-indexed)
-                  const cls = `seq-step ${isActive ? colorClass : ''} ${isDivider ? 'beat-divider' : ''}`;
-                  stepsHtml += `<div class="${cls}" title="Step ${i+1}"></div>`;
-                }
-                return `
-                  <div class="seq-row">
-                    <div class="seq-label">${label}</div>
-                    <div class="seq-steps">${stepsHtml}</div>
-                  </div>
-                `;
-              };
-
-              html += `
-                <div class="drum-card">
-                  <div class="drum-card-title">${pat.name}</div>
-                  <div class="drum-tags">
-                    ${pat.meta.style.map(st => `<span class="drum-tag">${st}</span>`).join('')}
-                    <span class="drum-tag">Feel: ${pat.meta.feel}</span>
-                    <span class="drum-tag">Section: ${pat.meta.section}</span>
-                    <span class="drum-tag">Energy: ${pat.meta.energy}/5</span>
-                  </div>
-                  <div class="sequencer-table">
-                    ${renderVoiceRow('hihatO', 'Hi-Hat O', 'active-hihatO')}
-                    ${renderVoiceRow('hihatC', 'Hi-Hat C', 'active-hihatC')}
-                    ${renderVoiceRow('snare', 'Snare', 'active-snare')}
-                    ${renderVoiceRow('kick', 'Kick', 'active-kick')}
-                  </div>
-                </div>
-              `;
-            });
+            gridContainer.innerHTML = `<div style="text-align:center; color:#9ca3af; padding:20px;">No drum patterns found matching your search.</div>`;
+            return;
           }
 
-          html += `</div>`;
-          modalBody.innerHTML = html;
+          let gridHtml = '';
+          filtered.forEach((pat, idx) => {
+            const cardId = pat.id || `pat-${idx}`;
+            const isFav = favs.includes(cardId);
+            const totalSteps = (pat.stepsPerBeat || 4) * (pat.beats || 4) * (pat.bars || 1);
+            const voices = pat.voices || {};
+            const renderVoiceRow = (voiceKey, label, colorClass) => {
+              const activeSteps = voices[voiceKey] || [];
+              let stepsHtml = '';
+              for(let i=0; i<totalSteps; i++) {
+                const isActive = activeSteps.includes(i);
+                const isDivider = (i === 4 || i === 8 || i === 12);
+                const cls = `seq-step ${isActive ? colorClass : ''} ${isDivider ? 'beat-divider' : ''}`;
+                stepsHtml += `<div class="${cls} step-index-${i}" title="Step ${i+1}"></div>`;
+              }
+              return `
+                <div class="seq-row">
+                  <div class="seq-label">${label}</div>
+                  <div class="seq-steps">${stepsHtml}</div>
+                </div>
+              `;
+            };
 
-          const searchInput = pipWindow.document.getElementById('drumSearch');
-          const styleSelect = pipWindow.document.getElementById('drumStyleFilter');
-
-          searchInput.addEventListener('input', (e) => {
-            renderPatterns(e.target.value, styleSelect.value);
+            gridHtml += `
+              <div class="drum-card" id="drum-card-${cardId}">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <div class="drum-card-title" style="margin-bottom:0;">${pat.name}</div>
+                  <div style="display:flex; gap:6px; align-items:center;">
+                    <button class="drum-fav-btn" data-card-id="${cardId}" title="Toggle Favorite">${isFav ? '★' : '☆'}</button>
+                    <button class="drum-play-btn" id="play-btn-${cardId}" data-card-id="${cardId}">▶ Play</button>
+                  </div>
+                </div>
+                <div class="drum-tags">
+                  ${pat.meta.style.map(st => `<span class="drum-tag">${st}</span>`).join('')}
+                  <span class="drum-tag">Feel: ${pat.meta.feel}</span>
+                  <span class="drum-tag">Section: ${pat.meta.section}</span>
+                  <span class="drum-tag">Energy: ${pat.meta.energy}/5</span>
+                </div>
+                <div class="sequencer-table">
+                  ${renderVoiceRow('hihatO', 'Hi-Hat O', 'active-hihatO')}
+                  ${renderVoiceRow('hihatC', 'Hi-Hat C', 'active-hihatC')}
+                  ${renderVoiceRow('snare', 'Snare', 'active-snare')}
+                  ${renderVoiceRow('kick', 'Kick', 'active-kick')}
+                </div>
+              </div>
+            `;
           });
-          styleSelect.addEventListener('change', (e) => {
-            renderPatterns(searchInput.value, e.target.value);
+          gridContainer.innerHTML = gridHtml;
+
+          gridContainer.querySelectorAll('.drum-fav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const cardId = btn.getAttribute('data-card-id');
+              toggleFavorite(cardId);
+            });
+          });
+
+          gridContainer.querySelectorAll('.drum-play-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const cardId = btn.getAttribute('data-card-id');
+              const pat = filtered.find(p => (p.id || `pat-${filtered.indexOf(p)}`) === cardId);
+              if (!pat) return;
+
+              if (currentPlayingCardId === cardId) {
+                stopCurrentPlayback();
+                return;
+              }
+
+              stopCurrentPlayback();
+              currentPlayingCardId = cardId;
+              btn.textContent = "⏹ Stop";
+              btn.classList.add('playing');
+
+              const AudioContextClass = pipWindow.AudioContext || pipWindow.webkitAudioContext;
+              currentAudioCtx = new AudioContextClass();
+              if (currentAudioCtx.state === 'suspended') {
+                await currentAudioCtx.resume();
+              }
+              currentSynth = new DrumSynth(currentAudioCtx);
+
+              const bpm = (pat.meta.bpmRange && pat.meta.bpmRange[0]) ? pat.meta.bpmRange[0] : 120;
+              const stepTime = (60 / bpm) / 4;
+              const totalSteps = (pat.stepsPerBeat || 4) * (pat.beats || 4) * (pat.bars || 1);
+              const voices = pat.voices || {};
+
+              let currentStep = 0;
+              const cardEl = pipWindow.document.getElementById(`drum-card-${cardId}`);
+
+              const scheduleStep = () => {
+                if (!currentAudioCtx || currentAudioCtx.state === 'closed') return;
+                const now = currentAudioCtx.currentTime;
+
+                if ((voices.kick || []).includes(currentStep)) currentSynth.scheduleKick(now);
+                if ((voices.snare || []).includes(currentStep)) currentSynth.scheduleSnare(now);
+                if ((voices.hihatC || []).includes(currentStep)) currentSynth.scheduleHat(now);
+                if ((voices.hihatO || []).includes(currentStep)) currentSynth.scheduleOpenHat(now);
+
+                if (cardEl) {
+                  cardEl.querySelectorAll('.seq-step').forEach(s => s.classList.remove('playing-step'));
+                  cardEl.querySelectorAll(`.step-index-${currentStep}`).forEach(s => s.classList.add('playing-step'));
+                }
+
+                currentStep = (currentStep + 1) % totalSteps;
+              };
+
+              scheduleStep();
+              currentPlaybackInterval = setInterval(scheduleStep, stepTime * 1000);
+            });
           });
         };
 
-        renderPatterns();
-        modal.style.display = 'flex';
+        searchInput.addEventListener('input', updateGrid);
+        styleSelect.addEventListener('change', updateGrid);
+        updateGrid();
+        searchInput.focus();
       });
 
       pipWindow.document.getElementById('openShortcutsBtn').addEventListener('click', () => {
@@ -673,61 +867,31 @@
         modalTitle.textContent = "🎛 MIX TIPS & FREQUENCY CHEATSHEET";
         modalBody.innerHTML = `
           <div class="tab-nav">
-            <button class="tab-btn active" onclick="switchTab('eqGeneric')">EQ Generic & Charts</button>
-            <button class="tab-btn" onclick="switchTab('eqInstruments')">EQ Instruments</button>
-            <button class="tab-btn" onclick="switchTab('compTips')">Compression & Tutorials</button>
+            <button class="tab-btn active" onclick="switchTab('eqTab')">EQ</button>
+            <button class="tab-btn" onclick="switchTab('compTab')">Compression</button>
           </div>
-          <div id="eqGeneric" class="tab-pane active">
-            <p><b>Generic Frequency Spectrum:</b></p>
-            <div class="freq-bar">
-              <div class="freq-sub">SUB (20-60)</div>
-              <div class="freq-bass">BASS (60-250)</div>
-              <div class="freq-lowmid">LOW-MID (250-500)</div>
-              <div class="freq-mid">MIDS (500-2k)</div>
-              <div class="freq-highmid">UPPER (2k-6k)</div>
-              <div class="freq-high">HIGHS (6k-20k)</div>
-            </div>
-            <ul style="padding-left:18px; margin-top:12px; line-height:1.6;">
-              <li><b>Sub (20-60 Hz):</b> Rumble, feeling rather than hearing. High-pass filter non-bass tracks here.</li>
-              <li><b>Bass (60-250 Hz):</b> Fundamental notes of bass & kick. Cut 200Hz to reduce mud.</li>
-              <li><b>Low-Mids (250-500 Hz):</b> Boxiness & warmth. Cut here to clarify vocals & guitars.</li>
-              <li><b>Mids (500-2k Hz):</b> Honkiness & vocal presence. Boost 1kHz for clarity.</li>
-              <li><b>Upper-Mids (2k-6k Hz):</b> Harshness & attack. Boost 3kHz to bring instruments forward.</li>
-              <li><b>Highs (6k-20k Hz):</b> Air & sparkle. Use smooth high shelf for vocal air.</li>
-            </ul>
-
-            <div style="margin-top:16px; font-weight:bold; color:#38bdf8;">Reference Visual Charts (Click to Expand):</div>
+          <div id="eqTab" class="tab-pane active">
+            <div style="margin-top:4px; font-weight:bold; color:#38bdf8;">Reference Visual Charts (Click to Expand):</div>
             <div class="expandable-img-grid">
-              <div class="expandable-card" onclick="openLightbox('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1200&q=80')">
-                <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=600&q=80" alt="Instrument Frequency Chart">
+              <div class="expandable-card" onclick="openLightbox('/sweetwater_eq_chart.jpg')">
+                <img src="/sweetwater_eq_chart.jpg" alt="Instrument Frequency Chart">
                 <div class="expandable-caption">🔍 Instrument Frequency Ranges Chart (Click to expand)</div>
               </div>
-              <div class="expandable-card" onclick="openLightbox('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80')">
-                <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80" alt="5 Ranges Descriptive Audio Terms">
+              <div class="expandable-card" onclick="openLightbox('/descriptive_audio_terms.jpg')">
+                <img src="/descriptive_audio_terms.jpg" alt="5 Ranges Descriptive Audio Terms">
                 <div class="expandable-caption">🔍 5 Ranges Descriptive Audio Terms (Click to expand)</div>
               </div>
             </div>
 
             <div style="margin-top:16px; font-weight:bold; color:#38bdf8;">More Info:</div>
             <div class="video-container">
-              <iframe src="https://www.youtube.com/embed/7H3cHfV8rXI" title="EQ Masterclass Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              <iframe src="https://www.youtube-nocookie.com/embed/7H3cHfV8rXI" title="EQ Masterclass Video" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
           </div>
 
-          <div id="eqInstruments" class="tab-pane">
-            <p><b>Instrument Magic Frequencies:</b></p>
-            <ul style="padding-left:18px; line-height:1.6;">
-              <li><b>Kick Drum:</b> Punch at 80Hz, Boxiness at 300Hz (cut), Click at 2.5kHz.</li>
-              <li><b>Snare Drum:</b> Fatness at 120Hz, Ring at 400Hz (cut), Snap at 3kHz.</li>
-              <li><b>Bass Guitar:</b> Sub-weight at 60Hz, Growl at 700Hz, String snap at 2kHz.</li>
-              <li><b>Acoustic Guitar:</b> Body at 200Hz, Presence at 3kHz, Air at 10kHz.</li>
-              <li><b>Vocals:</b> Fullness at 150Hz, Mud at 300Hz (cut), Intelligibility at 3kHz, Air at 12kHz.</li>
-            </ul>
-          </div>
-
-          <div id="compTips" class="tab-pane">
+          <div id="compTab" class="tab-pane">
             <p><b>Compression & Bussing Rules:</b></p>
-            <ul style="padding-left:18px; line-height:1.6;">
+            <ul style="padding-left:18px; line-height:1.6; margin-bottom:14px;">
               <li><b>Slow Attack (>30ms):</b> Lets transients through (punchy drums & percussion).</li>
               <li><b>Fast Attack (<10ms):</b> Catches peaks & smooths out performances (tames vocals/bass).</li>
               <li><b>Auto/Sync Release:</b> Keeps compressor pumping smoothly with song tempo.</li>
@@ -736,12 +900,12 @@
 
             <div style="margin-top:16px; font-weight:bold; color:#38bdf8;">Simple Tutorial:</div>
             <div class="video-container">
-              <iframe src="https://www.youtube.com/embed/LGqDVhww-hs" title="Simple Compression Tutorial" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              <iframe src="https://www.youtube-nocookie.com/embed/LGqDVhww-hs" title="Simple Compression Tutorial" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
 
             <div style="margin-top:16px; font-weight:bold; color:#38bdf8;">In Depth Tutorial:</div>
             <div class="video-container">
-              <iframe src="https://www.youtube.com/embed/booRjPgtIS4" title="In Depth Compression Tutorial" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              <iframe src="https://www.youtube-nocookie.com/embed/booRjPgtIS4" title="In Depth Compression Tutorial" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
           </div>
         `;
