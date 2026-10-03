@@ -236,9 +236,7 @@
     <input type="text" id="docInput" placeholder="Paste Google Doc link here...">
   </div>
 
-  <div class="glossary-hint-box">
-    <strong>💡 Highlight &amp; Inspect:</strong> Hover (&gt;300ms) or double-click audio terms like <span class="logic-term" data-term="EQ">EQ</span>, <span class="logic-term" data-term="Compressor">Compressor</span>, <span class="logic-term" data-term="Gain Staging">Gain Staging</span>, or <span class="logic-term" data-term="Bounce">Bounce</span> anywhere to inspect definitions!
-  </div>
+
 
   <button id="floatBtn" class="main-btn">Float Away!</button>
 </div>
@@ -1036,7 +1034,7 @@
         return buffer;
       }
 
-      function generatePatternMidiBlob(pat) {
+      function generatePatternMidiDataUri(pat) {
         const ticksPerBeat = 480;
         const stepsPerBeat = pat.stepsPerBeat || 4;
         const ticksPerStep = Math.round(ticksPerBeat / stepsPerBeat);
@@ -1105,21 +1103,23 @@
         ];
 
         const midiData = new Uint8Array([...header, ...trackHeader, ...trackBytes]);
-        return new Blob([midiData], { type: 'audio/midi' });
+        let binaryStr = '';
+        for (let i = 0; i < midiData.length; i++) {
+          binaryStr += String.fromCharCode(midiData[i]);
+        }
+        return `data:audio/midi;base64,${btoa(binaryStr)}`;
       }
 
       function exportPatternMidi(pat) {
-        const blob = generatePatternMidiBlob(pat);
+        const dataUri = generatePatternMidiDataUri(pat);
         const nameStr = pat.name || 'Drum Pattern';
-        const url = URL.createObjectURL(blob);
         const a = pipWindow.document.createElement('a');
-        a.href = url;
+        a.href = dataUri;
         a.download = `${nameStr.replace(/[^a-zA-Z0-9_-]/g, '_')}.mid`;
         pipWindow.document.body.appendChild(a);
         a.click();
         setTimeout(() => {
           pipWindow.document.body.removeChild(a);
-          URL.revokeObjectURL(url);
         }, 150);
       }
 
@@ -1267,13 +1267,11 @@
               const pat = filtered.find(p => (p.id || ('pat-' + filtered.indexOf(p))) === cardId);
               if (!pat) return;
 
-              const blob = generatePatternMidiBlob(pat);
-              const blobUrl = URL.createObjectURL(blob);
-              card._dragBlobUrl = blobUrl;
-
+              const dataUri = generatePatternMidiDataUri(pat);
               const midiFileName = `${pat.name.replace(/\s+/g, '_')}.mid`;
-              e.dataTransfer.setData('DownloadURL', `audio/midi:${midiFileName}:${blobUrl}`);
+              e.dataTransfer.setData('DownloadURL', `audio/midi:${midiFileName}:${dataUri}`);
               e.dataTransfer.setData('text/plain', midiFileName);
+              e.dataTransfer.setData('text/uri-list', dataUri);
               e.dataTransfer.effectAllowed = 'copy';
 
               card.classList.add('is-dragging');
@@ -1281,10 +1279,6 @@
 
             card.addEventListener('dragend', () => {
               card.classList.remove('is-dragging');
-              if (card._dragBlobUrl) {
-                URL.revokeObjectURL(card._dragBlobUrl);
-                card._dragBlobUrl = null;
-              }
             });
           });
 
@@ -1375,7 +1369,6 @@
           });
         });
         modalBody.innerHTML = html;
-        if (pipWindow.annotateGlossaryTerms) pipWindow.annotateGlossaryTerms(modalBody);
         modal.style.display = 'flex';
       });
 
@@ -1433,7 +1426,6 @@
           const pane = pipWindow.document.getElementById(tabId);
           if (pane) {
             pane.classList.add('active');
-            if (pipWindow.annotateGlossaryTerms) pipWindow.annotateGlossaryTerms(pane);
           }
         };
 
@@ -1444,7 +1436,6 @@
           lb.style.display = 'flex';
         };
 
-        if (pipWindow.annotateGlossaryTerms) pipWindow.annotateGlossaryTerms(modalBody);
         modal.style.display = 'flex';
       });
 
@@ -1452,9 +1443,6 @@
         modalTitle.textContent = "📖 LOGIC PRO & MUSIC TECH GLOSSARY";
         modalBody.innerHTML = `
           <input type="text" id="glossarySearch" class="glossary-search-input" placeholder="Search terms (e.g. Sidechain, Bus, Bounce, EQ, Latency)...">
-          <div style="font-size: 11px; color: #9ca3af; margin-bottom: 10px;">
-            💡 <em>Hover over any term for &gt;300ms or double-click / highlight text in any window to view its definition!</em>
-          </div>
           <div id="glossaryListContainer" style="max-height: 55vh; overflow-y: auto;"></div>
         `;
         const searchInput = pipWindow.document.getElementById('glossarySearch');
@@ -1477,8 +1465,6 @@
               <div class="glossary-list-def">${def}</div>
             </div>
           `).join('');
-
-          if (pipWindow.annotateGlossaryTerms) pipWindow.annotateGlossaryTerms(listContainer);
         };
 
         searchInput.addEventListener('input', (e) => renderGlossaryList(e.target.value));
@@ -1583,9 +1569,6 @@
 
       // Initialize Logic Glossary & Inspector in the PiP Window
       initGlossary(pipWindow.document, pipWindow);
-      if (pipWindow.annotateGlossaryTerms) {
-        pipWindow.annotateGlossaryTerms(toolbar);
-      }
 
     } catch (err) {
       alert('Error opening window: ' + err.message);
@@ -1609,11 +1592,6 @@
       setTimeout(() => {
         launchFloater(docParam);
       }, 500);
-    }
-    // Initialize glossary annotation on main launcher card
-    if (window.annotateGlossaryTerms) {
-      const card = document.querySelector('.card');
-      if (card) window.annotateGlossaryTerms(card);
     }
   });
 
