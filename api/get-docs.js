@@ -27,15 +27,21 @@ export default async function handler(req, res) {
 
   try {
     const fetchFolder = async (folderId) => {
-      const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&key=${apiKey}&fields=files(id,name,webViewLink)&orderBy=name`;
+      const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&key=${apiKey}&fields=files(id,name,webViewLink,mimeType)&orderBy=name`;
       const response = await fetch(url);
       if (!response.ok) throw new Error(`Google Drive API error: ${response.statusText}`);
       const data = await response.json();
-      return (data.files || []).map(f => ({
-        title: f.name,
-        id: f.id,
-        webViewLink: f.webViewLink || `https://docs.google.com/document/d/${f.id}/view`
-      })).sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' }));
+      return (data.files || []).map(f => {
+        const isGoogleDoc = f.mimeType === 'application/vnd.google-apps.document';
+        const webViewLink = isGoogleDoc
+          ? `https://docs.google.com/document/d/${f.id}/view`
+          : (f.webViewLink || `https://docs.google.com/document/d/${f.id}/view`);
+        return {
+          title: f.name,
+          id: f.id,
+          webViewLink
+        };
+      }).sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' }));
     };
 
     const [se, amp] = await Promise.all([

@@ -269,7 +269,7 @@
     selectElem.innerHTML = `<option value="">${defaultText}</option>`;
     docs.forEach(doc => {
       const opt = document.createElement('option');
-      opt.value = doc.webViewLink || doc.id;
+      opt.value = doc.webViewLink || `https://docs.google.com/document/d/${doc.id}/view`;
       opt.textContent = doc.title;
       selectElem.appendChild(opt);
     });
