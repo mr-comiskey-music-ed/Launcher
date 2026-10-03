@@ -211,7 +211,7 @@
 <div class="card">
   <div class="logic-lcd">Mr. Comiskey's Floating App</div>
   <h2>Select Assignment Doc</h2>
-  <p>Choose your course project from the folders below or paste a custom link:</p>
+
 
   <div class="select-group">
     <label>🎛 Sound Engineering</label>
@@ -232,7 +232,7 @@
   <div class="divider"><span>OR</span></div>
 
   <div class="select-group">
-    <label>🔗 Custom Google Doc Link</label>
+    <label>🔗 Google Doc Link</label>
     <input type="text" id="docInput" placeholder="Paste Google Doc link here...">
   </div>
 
@@ -365,7 +365,7 @@
 
       iframeSrc = docId.startsWith('e/')
         ? `https://docs.google.com/document/d/${docId}/pub?embedded=true`
-        : `https://docs.google.com/document/d/${docId}/preview`;
+        : `https://docs.google.com/document/d/${docId}/preview?rm=minimal&authuser=0`;
       
       directUrl = docId.startsWith('e/')
         ? `https://docs.google.com/document/d/${docId}/pub`
@@ -753,42 +753,14 @@
       const viewportArea = pipWindow.document.createElement('div');
       viewportArea.className = 'viewport-area';
 
-      const isGoogleDoc = iframeSrc.includes('docs.google.com');
+      const docWrapper = pipWindow.document.createElement('div');
+      docWrapper.className = 'doc-wrapper';
 
-      if (isGoogleDoc) {
-        viewportArea.style.background = '#18181a';
-        viewportArea.style.display = 'flex';
-        viewportArea.style.flexDirection = 'column';
-        viewportArea.style.alignItems = 'center';
-        viewportArea.style.justifyContent = 'center';
-        viewportArea.style.padding = '30px';
-        viewportArea.style.textAlign = 'center';
+      const iframe = pipWindow.document.createElement('iframe');
+      iframe.src = iframeSrc;
 
-        viewportArea.innerHTML = `
-          <div style="max-width: 460px; background: #242426; border: 1px solid #3a3a3c; border-radius: 12px; padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
-            <div style="font-size: 36px; margin-bottom: 12px;">📄</div>
-            <h2 style="color: #38bdf8; margin: 0 0 10px 0; font-size: 18px;">Mr. Comiskey's Assignment Hub</h2>
-            <p style="color: #9ca3af; font-size: 13px; line-height: 1.5; margin-bottom: 20px;">
-              Google Docs restrict direct window embedding due to security policies. Click below to open your assignment in a dedicated tab, while using your floating AI Co-Pilot & Shortcuts right here!
-            </p>
-            <a href="${directUrl}" target="_blank" style="display: inline-block; background: #2563eb; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 14px; box-shadow: 0 4px 12px rgba(37, 99, 235,.4); margin-bottom: 14px;">
-              🚀 Open Assignment in Google Docs
-            </a>
-            <div style="font-size: 11px; color: #6b7280;">
-              Tip: Click <strong>🤖 Ask AI</strong> below if you need instant help with Logic Pro!
-            </div>
-          </div>
-        `;
-      } else {
-        const docWrapper = pipWindow.document.createElement('div');
-        docWrapper.className = 'doc-wrapper';
-
-        const iframe = pipWindow.document.createElement('iframe');
-        iframe.src = iframeSrc;
-
-        docWrapper.appendChild(iframe);
-        viewportArea.appendChild(docWrapper);
-      }
+      docWrapper.appendChild(iframe);
+      viewportArea.appendChild(docWrapper);
 
       const loupe = pipWindow.document.createElement('div');
       loupe.className = 'loupe';
