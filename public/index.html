@@ -209,7 +209,7 @@
 <body>
 
 <div class="card">
-  <div class="logic-lcd">LOGIC PRO // PROJECT FLOATER</div>
+  <div class="logic-lcd">Mr. Comiskey's Floating App</div>
   <h2>Select Assignment Doc</h2>
   <p>Choose your course project from the folders below or paste a custom link:</p>
 
@@ -567,7 +567,7 @@
         .seq-row { display: flex; align-items: center; gap: 4px; }
         .seq-label { width: 55px; font-size: 10px; color: #9ca3af; text-transform: uppercase; font-family: monospace; }
         .seq-steps { display: flex; gap: 2px; flex: 1; }
-        .seq-step { flex: 1; height: 12px; background: #242426; border-radius: 2px; min-width: 6px; }
+        .seq-step { flex: 1; height: 12px; background: #242426; border-radius: 2px; min-width: 6px; box-sizing: border-box; }
         .seq-step.active-hihatO { background: #c084fc !important; }
         .seq-step.active-hihatC { background: #facc15 !important; }
         .seq-step.active-snare { background: #f87171 !important; }
@@ -587,7 +587,7 @@
           background: #27272a; color: #38bdf8; border: 1px solid #3f3f46; padding: 3px 7px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
         }
         .drum-midi-btn:hover { background: #38bdf8; color: #09090b; border-color: #38bdf8; }
-        .seq-step.playing-step { border: 1px solid #38bdf8 !important; box-shadow: 0 0 6px #38bdf8; transform: scale(1.1); }
+        .seq-step.playing-step { box-shadow: inset 0 0 0 2px #38bdf8, 0 0 8px #38bdf8 !important; filter: brightness(1.3); }
 
         .tab-nav { display: flex; gap: 6px; margin-bottom: 12px; border-bottom: 1px solid #3a3a3c; padding-bottom: 8px; flex-wrap: wrap; }
         .tab-btn { background: #18181a; color: #9ca3af; border: 1px solid #3a3a3c; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; }
@@ -753,14 +753,42 @@
       const viewportArea = pipWindow.document.createElement('div');
       viewportArea.className = 'viewport-area';
 
-      const docWrapper = pipWindow.document.createElement('div');
-      docWrapper.className = 'doc-wrapper';
+      const isGoogleDoc = iframeSrc.includes('docs.google.com');
 
-      const iframe = pipWindow.document.createElement('iframe');
-      iframe.src = iframeSrc;
+      if (isGoogleDoc) {
+        viewportArea.style.background = '#18181a';
+        viewportArea.style.display = 'flex';
+        viewportArea.style.flexDirection = 'column';
+        viewportArea.style.alignItems = 'center';
+        viewportArea.style.justifyContent = 'center';
+        viewportArea.style.padding = '30px';
+        viewportArea.style.textAlign = 'center';
 
-      docWrapper.appendChild(iframe);
-      viewportArea.appendChild(docWrapper);
+        viewportArea.innerHTML = `
+          <div style="max-width: 460px; background: #242426; border: 1px solid #3a3a3c; border-radius: 12px; padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+            <div style="font-size: 36px; margin-bottom: 12px;">📄</div>
+            <h2 style="color: #38bdf8; margin: 0 0 10px 0; font-size: 18px;">Mr. Comiskey's Assignment Hub</h2>
+            <p style="color: #9ca3af; font-size: 13px; line-height: 1.5; margin-bottom: 20px;">
+              Google Docs restrict direct window embedding due to security policies. Click below to open your assignment in a dedicated tab, while using your floating AI Co-Pilot & Shortcuts right here!
+            </p>
+            <a href="${directUrl}" target="_blank" style="display: inline-block; background: #2563eb; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 14px; box-shadow: 0 4px 12px rgba(37, 99, 235,.4); margin-bottom: 14px;">
+              🚀 Open Assignment in Google Docs
+            </a>
+            <div style="font-size: 11px; color: #6b7280;">
+              Tip: Click <strong>🤖 Ask AI</strong> below if you need instant help with Logic Pro!
+            </div>
+          </div>
+        `;
+      } else {
+        const docWrapper = pipWindow.document.createElement('div');
+        docWrapper.className = 'doc-wrapper';
+
+        const iframe = pipWindow.document.createElement('iframe');
+        iframe.src = iframeSrc;
+
+        docWrapper.appendChild(iframe);
+        viewportArea.appendChild(docWrapper);
+      }
 
       const loupe = pipWindow.document.createElement('div');
       loupe.className = 'loupe';
