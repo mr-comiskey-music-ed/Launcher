@@ -269,7 +269,7 @@
     selectElem.innerHTML = `<option value="">${defaultText}</option>`;
     docs.forEach(doc => {
       const opt = document.createElement('option');
-      opt.value = doc.id;
+      opt.value = doc.webViewLink || doc.id;
       opt.textContent = doc.title;
       selectElem.appendChild(opt);
     });
@@ -353,13 +353,18 @@
   ];
 
   async function launchFloater(selectedDocId) {
-    let docId = selectedDocId.replace(/[\/%\s]+$/, '');
-    const match = docId.match(/\/d\/(e\/[a-zA-Z0-9-_]+|[a-zA-Z0-9-_]+)/);
-    if (match && match[1]) docId = match[1];
+    let iframeSrc = '';
+    if (selectedDocId.startsWith('http://') || selectedDocId.startsWith('https://')) {
+      iframeSrc = selectedDocId;
+    } else {
+      let docId = selectedDocId.replace(/[\/%\s]+$/, '');
+      const match = docId.match(/\/d\/(e\/[a-zA-Z0-9-_]+|[a-zA-Z0-9-_]+)/);
+      if (match && match[1]) docId = match[1];
 
-    const iframeSrc = docId.startsWith('e/')
-      ? `https://docs.google.com/document/d/${docId}/pub?embedded=true`
-      : `https://docs.google.com/document/d/${docId}/view`;
+      iframeSrc = docId.startsWith('e/')
+        ? `https://docs.google.com/document/d/${docId}/pub?embedded=true`
+        : `https://docs.google.com/document/d/${docId}/view`;
+    }
 
     try {
       const pipWindow = await window.documentPictureInPicture.requestWindow({
