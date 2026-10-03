@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 export default async function handler(req, res) {
   // CORS Headers
@@ -82,17 +82,18 @@ When a student needs visual or audio demonstrations beyond text steps:
    * *Produce Like A Pro* (Mixing & engineering)
 2. **Provide Search Phrases:** Give exact search phrases to paste into YouTube (e.g., *"Search YouTube for: 'Logic Pro Flex Pitch MusicTechHelpGuy'"*).`;
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ 
+    // Initialize using the new @google/genai SDK
+    const ai = new GoogleGenAI({ apiKey });
+
+    const response = await ai.models.generateContent({
       model: "gemini-3.5-flash-lite",
-      systemInstruction: systemInstruction
+      contents: prompt,
+      config: {
+        systemInstruction: systemInstruction,
+      },
     });
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-
-    return res.status(200).json({ text });
+    return res.status(200).json({ text: response.text });
 
   } catch (err) {
     console.error("Gemini API Error:", err);
