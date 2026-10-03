@@ -293,10 +293,29 @@
 
   loadDriveDocs();
 
-  // Clear mutual inputs
-  seSelect.addEventListener('change', () => { if(seSelect.value) { ampSelect.value = ''; docInput.value = ''; } });
-  ampSelect.addEventListener('change', () => { if(ampSelect.value) { seSelect.value = ''; docInput.value = ''; } });
-  docInput.addEventListener('input', () => { if(docInput.value) { seSelect.value = ''; ampSelect.value = ''; } });
+  // Populate docInput when dropdown selected, clear mutual dropdown
+  seSelect.addEventListener('change', () => { 
+    if(seSelect.value) { 
+      ampSelect.value = ''; 
+      docInput.value = seSelect.value; 
+    } else {
+      docInput.value = '';
+    }
+  });
+  ampSelect.addEventListener('change', () => { 
+    if(ampSelect.value) { 
+      seSelect.value = ''; 
+      docInput.value = ampSelect.value; 
+    } else {
+      docInput.value = '';
+    }
+  });
+  docInput.addEventListener('input', () => { 
+    if(docInput.value) { 
+      seSelect.value = ''; 
+      ampSelect.value = ''; 
+    } 
+  });
 
   // Shortcuts Data
   const SHORTCUTS_DATA = [
@@ -753,14 +772,42 @@
       const viewportArea = pipWindow.document.createElement('div');
       viewportArea.className = 'viewport-area';
 
-      const docWrapper = pipWindow.document.createElement('div');
-      docWrapper.className = 'doc-wrapper';
+      const isGoogleDoc = iframeSrc.includes('docs.google.com');
 
-      const iframe = pipWindow.document.createElement('iframe');
-      iframe.src = iframeSrc;
+      if (isGoogleDoc) {
+        viewportArea.style.background = '#18181a';
+        viewportArea.style.display = 'flex';
+        viewportArea.style.flexDirection = 'column';
+        viewportArea.style.alignItems = 'center';
+        viewportArea.style.justifyContent = 'center';
+        viewportArea.style.padding = '30px';
+        viewportArea.style.textAlign = 'center';
 
-      docWrapper.appendChild(iframe);
-      viewportArea.appendChild(docWrapper);
+        viewportArea.innerHTML = `
+          <div style="max-width: 460px; background: #242426; border: 1px solid #3a3a3c; border-radius: 12px; padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+            <div style="font-size: 36px; margin-bottom: 12px;">📄</div>
+            <h2 style="color: #38bdf8; margin: 0 0 10px 0; font-size: 18px;">Mr. Comiskey's Assignment Hub</h2>
+            <p style="color: #9ca3af; font-size: 13px; line-height: 1.5; margin-bottom: 20px;">
+              Google Docs enforce strict security policies that block all iframe embedding. Click below to open your assignment in a dedicated tab, while keeping your floating AI Co-Pilot & Shortcuts right here!
+            </p>
+            <a href="${directUrl}" target="_blank" style="display: inline-block; background: #2563eb; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 14px; box-shadow: 0 4px 12px rgba(37, 99, 235,.4); margin-bottom: 14px;">
+              🚀 Open Assignment in Google Docs
+            </a>
+            <div style="font-size: 11px; color: #6b7280;">
+              Tip: Click <strong>🤖 Ask AI</strong> below if you need instant help with Logic Pro!
+            </div>
+          </div>
+        `;
+      } else {
+        const docWrapper = pipWindow.document.createElement('div');
+        docWrapper.className = 'doc-wrapper';
+
+        const iframe = pipWindow.document.createElement('iframe');
+        iframe.src = iframeSrc;
+
+        docWrapper.appendChild(iframe);
+        viewportArea.appendChild(docWrapper);
+      }
 
       const loupe = pipWindow.document.createElement('div');
       loupe.className = 'loupe';
