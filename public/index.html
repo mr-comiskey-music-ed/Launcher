@@ -367,6 +367,10 @@
         height: 820,
       });
 
+      const markedScript = pipWindow.document.createElement('script');
+      markedScript.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+      pipWindow.document.head.appendChild(markedScript);
+
       const style = pipWindow.document.createElement('style');
       style.textContent = `
         body, html {
@@ -417,6 +421,11 @@
         .chat-msg { padding: 8px 10px; border-radius: 6px; max-width: 85%; line-height: 1.4; word-break: break-word; }
         .chat-msg.user { background: #2563eb; color: #fff; align-self: flex-end; }
         .chat-msg.assistant { background: #242426; color: #e3e3e3; border: 1px solid #3a3a3c; align-self: flex-start; }
+        .chat-msg.assistant strong, .chat-msg.assistant b { color: #38bdf8; font-weight: 700; }
+        .chat-msg.assistant ul, .chat-msg.assistant ol { padding-left: 16px; margin: 4px 0; }
+        .chat-msg.assistant li { margin-bottom: 3px; }
+        .chat-msg.assistant code { background: #18181a; color: #e2e8f0; padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 11px; border: 1px solid #3a3a3c; }
+        .chat-msg.assistant p { margin: 4px 0; }
         .chat-input-area { display: flex; padding: 8px; background: #242426; border-top: 1px solid #3a3a3c; gap: 6px; }
         .emergency-pill-strip {
           display: flex;
@@ -821,8 +830,13 @@
             body: JSON.stringify({ prompt: apiPayload, currentDocId: docId })
           });
           const data = await res.json();
-          if (data.reply) {
-            thinkingMsg.textContent = data.reply;
+          const replyText = data.reply || data.text || data.message || data.response;
+          if (replyText) {
+            if (pipWindow.marked && typeof pipWindow.marked.parse === 'function') {
+              thinkingMsg.innerHTML = pipWindow.marked.parse(replyText);
+            } else {
+              thinkingMsg.textContent = replyText;
+            }
           } else if (data.error) {
             thinkingMsg.textContent = 'Error: ' + data.error;
           } else {
