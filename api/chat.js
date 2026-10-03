@@ -86,15 +86,21 @@ When a student needs visual or audio demonstrations beyond text steps:
     const ai = new GoogleGenAI({ apiKey });
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash-lite",
+      model: "gemini-3.5-flash",
       contents: prompt,
       config: {
         systemInstruction: systemInstruction,
       },
     });
 
-    return res.status(200).json({ text: response.text });
+const outputText = response.text || "No response generated.";
 
+return res.status(200).json({ 
+  text: outputText,
+  reply: outputText,
+  message: outputText,
+  response: outputText
+});
   } catch (err) {
     console.error("Gemini API Error:", err);
     return res.status(500).json({ 
