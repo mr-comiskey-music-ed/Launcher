@@ -113,6 +113,97 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.4);
     }
     button.main-btn:hover { background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%); }
+
+    /* Logic Pro 11 Dark Mode Glossary Tooltip */
+    .logic-glossary-tooltip {
+      position: fixed;
+      z-index: 999999;
+      background: #18181a;
+      color: #f3f4f6;
+      border: 1px solid #38bdf8;
+      border-radius: 6px;
+      padding: 10px 14px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8), 0 0 14px rgba(56, 189, 248, 0.25);
+      pointer-events: none;
+      max-width: 300px;
+      opacity: 0;
+      display: none;
+      transform: translateY(4px);
+      transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+      user-select: none;
+    }
+    .logic-glossary-tooltip.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .logic-glossary-tooltip .tooltip-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid #2e2e33;
+      padding-bottom: 4px;
+    }
+    .logic-glossary-tooltip .tooltip-badge {
+      background: #0284c7;
+      color: #f0f9ff;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .logic-glossary-tooltip .tooltip-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #38bdf8;
+      letter-spacing: 0.3px;
+    }
+    .logic-glossary-tooltip .tooltip-body {
+      color: #e2e8f0;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .logic-glossary-tooltip .tooltip-footer {
+      margin-top: 6px;
+      font-size: 9px;
+      color: #94a3b8;
+      font-style: italic;
+      text-align: right;
+    }
+
+    /* Logic Glossary Highlighted Term */
+    .logic-term {
+      border-bottom: 1px dashed rgba(56, 189, 248, 0.65);
+      cursor: help;
+      transition: color 0.15s ease, border-bottom-color 0.15s ease, background 0.15s ease;
+      position: relative;
+    }
+    .logic-term:hover {
+      color: #38bdf8;
+      border-bottom: 1px solid #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      border-radius: 2px;
+    }
+    .glossary-hint-box {
+      margin-top: 14px;
+      margin-bottom: 12px;
+      background: #18181a;
+      border: 1px solid #3a3a3c;
+      border-left: 3px solid #38bdf8;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 11px;
+      color: #9ca3af;
+      text-align: left;
+      line-height: 1.4;
+    }
+    .glossary-hint-box strong {
+      color: #38bdf8;
+    }
   </style>
 </head>
 <body>
@@ -143,6 +234,10 @@
   <div class="select-group">
     <label>🔗 Custom Google Doc Link</label>
     <input type="text" id="docInput" placeholder="Paste Google Doc link here...">
+  </div>
+
+  <div class="glossary-hint-box">
+    <strong>💡 Highlight &amp; Inspect:</strong> Hover (&gt;300ms) or double-click audio terms like <span class="logic-term" data-term="EQ">EQ</span>, <span class="logic-term" data-term="Compressor">Compressor</span>, <span class="logic-term" data-term="Gain Staging">Gain Staging</span>, or <span class="logic-term" data-term="Bounce">Bounce</span> anywhere to inspect definitions!
   </div>
 
   <button id="floatBtn" class="main-btn">Float Away!</button>
@@ -325,6 +420,39 @@
         .chat-msg.user { background: #2563eb; color: #fff; align-self: flex-end; }
         .chat-msg.assistant { background: #242426; color: #e3e3e3; border: 1px solid #3a3a3c; align-self: flex-start; }
         .chat-input-area { display: flex; padding: 8px; background: #242426; border-top: 1px solid #3a3a3c; gap: 6px; }
+        .emergency-pill-strip {
+          display: flex;
+          gap: 6px;
+          overflow-x: auto;
+          padding: 6px 8px;
+          background: #18181a;
+          border-top: 1px solid #3a3a3c;
+          white-space: nowrap;
+          scrollbar-width: thin;
+          scrollbar-color: #3a3a3c transparent;
+        }
+        .emergency-pill-strip::-webkit-scrollbar { height: 4px; }
+        .emergency-pill-strip::-webkit-scrollbar-thumb { background: #3a3a3c; border-radius: 2px; }
+        .emergency-pill {
+          background: #242426;
+          border: 1px solid #3a3a3c;
+          color: #ffffff;
+          padding: 4px 10px;
+          border-radius: 12px;
+          font-size: 11px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: border-color 0.15s, background 0.15s, color 0.15s;
+          flex-shrink: 0;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .emergency-pill:hover {
+          border-color: #38bdf8;
+          background: #2a2a2d;
+          color: #38bdf8;
+        }
         .chat-input-area input {
           flex: 1; padding: 6px 10px; background: #18181a; border: 1px solid #3a3a3c; color: #f3f4f6; border-radius: 4px; font-size: 12px; outline: none;
         }
@@ -355,7 +483,41 @@
         }
         .drum-search { flex: 1; min-width: 140px; }
         .drum-grid { display: grid; grid-template-columns: 1fr; gap: 10px; max-height: 60vh; overflow-y: auto; }
-        .drum-card { background: #18181a; border: 1px solid #3a3a3c; border-radius: 6px; padding: 10px; }
+        .drum-card {
+          background: #18181a;
+          border: 1px solid #3a3a3c;
+          border-radius: 6px;
+          padding: 10px;
+          transition: opacity 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+        }
+        .drum-card.is-dragging {
+          opacity: 0.6 !important;
+          border-color: #38bdf8 !important;
+          box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+        }
+        .drum-drag-handle {
+          cursor: grab;
+          user-select: none;
+          display: inline-flex;
+          align-items: center;
+          gap: 3px;
+          color: #9ca3af;
+          background: #202023;
+          border: 1px solid #3a3a3c;
+          padding: 2px 7px;
+          border-radius: 4px;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.3px;
+        }
+        .drum-drag-handle:hover {
+          color: #38bdf8;
+          border-color: #38bdf8;
+          background: #27272a;
+        }
+        .drum-drag-handle:active, .drum-card:active .drum-drag-handle {
+          cursor: grabbing;
+        }
         .drum-card-title { font-weight: bold; color: #38bdf8; font-size: 13px; margin-bottom: 6px; }
         .drum-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
         .drum-tag { background: #242426; border: 1px solid #3a3a3c; color: #9ca3af; font-size: 10px; padding: 2px 6px; border-radius: 10px; }
@@ -370,13 +532,19 @@
         .seq-step.active-kick { background: #38bdf8 !important; }
         .seq-step.beat-divider { border-left: 2px solid #38bdf866; }
         .drum-play-btn {
-          background: #2563eb; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600; float: right;
+          background: #2563eb; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600;
         }
+        .drum-play-btn:hover { background: #3b82f6; }
         .drum-play-btn.playing { background: #dc2626 !important; }
         .drum-fav-btn {
-          background: transparent; color: #facc15; border: 1px solid #3a3a3c; padding: 3px 6px; border-radius: 4px; font-size: 13px; cursor: pointer;
+          background: transparent; color: #9ca3af; border: 1px solid #3a3a3c; padding: 2px 6px; border-radius: 4px; font-size: 13px; cursor: pointer; line-height: 1; display: inline-flex; align-items: center; justify-content: center;
         }
-        .drum-fav-btn:hover { background: #242426; border-color: #facc15; }
+        .drum-fav-btn:hover { background: #242426; border-color: #facc15; color: #facc15; }
+        .drum-fav-btn.is-fav { color: #facc15; border-color: #facc15; text-shadow: 0 0 6px rgba(250, 204, 21, 0.5); }
+        .drum-midi-btn {
+          background: #27272a; color: #38bdf8; border: 1px solid #3f3f46; padding: 3px 7px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .drum-midi-btn:hover { background: #38bdf8; color: #09090b; border-color: #38bdf8; }
         .seq-step.playing-step { border: 1px solid #38bdf8 !important; box-shadow: 0 0 6px #38bdf8; transform: scale(1.1); }
 
         .tab-nav { display: flex; gap: 6px; margin-bottom: 12px; border-bottom: 1px solid #3a3a3c; padding-bottom: 8px; flex-wrap: wrap; }
@@ -403,6 +571,117 @@
           display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
         }
         .lightbox-content { max-width: 90%; max-height: 90%; border-radius: 6px; border: 2px solid #38bdf8; }
+
+        /* Logic Pro 11 Dark Mode Glossary Tooltip */
+        .logic-glossary-tooltip {
+          position: fixed;
+          z-index: 999999;
+          background: #18181a;
+          color: #f3f4f6;
+          border: 1px solid #38bdf8;
+          border-radius: 6px;
+          padding: 10px 14px;
+          box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8), 0 0 14px rgba(56, 189, 248, 0.25);
+          pointer-events: none;
+          max-width: 300px;
+          opacity: 0;
+          display: none;
+          transform: translateY(4px);
+          transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+          font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+          user-select: none;
+        }
+        .logic-glossary-tooltip.visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .logic-glossary-tooltip .tooltip-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+          margin-bottom: 6px;
+          border-bottom: 1px solid #2e2e33;
+          padding-bottom: 4px;
+        }
+        .logic-glossary-tooltip .tooltip-badge {
+          background: #0284c7;
+          color: #f0f9ff;
+          font-size: 9px;
+          font-weight: 700;
+          padding: 1px 6px;
+          border-radius: 3px;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+        }
+        .logic-glossary-tooltip .tooltip-title {
+          font-size: 13px;
+          font-weight: 700;
+          color: #38bdf8;
+          letter-spacing: 0.3px;
+        }
+        .logic-glossary-tooltip .tooltip-body {
+          color: #e2e8f0;
+          font-size: 12px;
+          line-height: 1.45;
+        }
+        .logic-glossary-tooltip .tooltip-footer {
+          margin-top: 6px;
+          font-size: 9px;
+          color: #94a3b8;
+          font-style: italic;
+          text-align: right;
+        }
+
+        /* Logic Glossary Highlighted Term */
+        .logic-term {
+          border-bottom: 1px dashed rgba(56, 189, 248, 0.65);
+          cursor: help;
+          transition: color 0.15s ease, border-bottom-color 0.15s ease, background 0.15s ease;
+          position: relative;
+        }
+        .logic-term:hover {
+          color: #38bdf8;
+          border-bottom: 1px solid #38bdf8;
+          background: rgba(56, 189, 248, 0.12);
+          border-radius: 2px;
+        }
+        .toolbar button.glossary-btn { background: #0e7490; border-color: #06b6d4; color: #cffafe; }
+        .glossary-search-input {
+          width: 100%;
+          padding: 8px 12px;
+          background: #18181a;
+          border: 1px solid #3a3a3c;
+          border-radius: 4px;
+          color: #f3f4f6;
+          font-size: 12px;
+          box-sizing: border-box;
+          outline: none;
+          margin-bottom: 12px;
+        }
+        .glossary-search-input:focus { border-color: #38bdf8; }
+        .glossary-list-item {
+          background: #18181a;
+          border: 1px solid #3a3a3c;
+          border-radius: 6px;
+          padding: 10px;
+          margin-bottom: 8px;
+          transition: border-color 0.15s ease;
+        }
+        .glossary-list-item:hover {
+          border-color: #38bdf8;
+        }
+        .glossary-list-title {
+          font-weight: bold;
+          color: #38bdf8;
+          font-size: 13px;
+          margin-bottom: 4px;
+        }
+        .glossary-list-def {
+          color: #e2e8f0;
+          font-size: 12px;
+          line-height: 1.4;
+        }
       `;
       pipWindow.document.head.appendChild(style);
 
@@ -415,6 +694,7 @@
           <button id="openBpmBtn">⏱ BPM</button>
           <button id="openAiChatBtn" class="ai-btn">🤖 Ask AI</button>
           <button id="openPatternsBtn" class="patterns-btn">🥁 Patterns</button>
+          <button id="openGlossaryBtn" class="glossary-btn" title="Inspect Music Tech Dictionary">📖 Glossary</button>
         </div>
         <div class="control-group">
           <button id="loupeToggleBtn">🔍 Magnify</button>
@@ -461,6 +741,15 @@
         <div class="chat-messages" id="chatMessages">
           <div class="chat-msg assistant">Hello! I'm your Lane Tech Music Tech AI assistant. Ask me anything about Logic Pro 11, Soundtrap, EQ, compression, or your assignment!</div>
         </div>
+        <div class="emergency-pill-strip" id="emergencyPillStrip">
+          <button class="emergency-pill" data-pill="I can't hear anything">🔇 I can't hear anything</button>
+          <button class="emergency-pill" data-pill="MIDI keyboard isn't making sound">🎹 MIDI keyboard isn't making sound</button>
+          <button class="emergency-pill" data-pill="My track is greyed out">🌫️ My track is greyed out</button>
+          <button class="emergency-pill" data-pill="Mic isn't recording sound">🔴 Mic isn't recording sound</button>
+          <button class="emergency-pill" data-pill="Audio is distorted / crackling">⚡ Audio is distorted / crackling</button>
+          <button class="emergency-pill" data-pill="My regions moved off grid">📍 My regions moved off grid</button>
+          <button class="emergency-pill" data-pill="Where did Mixer / Inspector go?">🎛️ Where did Mixer / Inspector go?</button>
+        </div>
         <div class="chat-input-area">
           <input type="text" id="chatInput" placeholder="Ask about Logic Pro, EQ, shortcuts...">
           <button id="chatSendBtn">Send</button>
@@ -485,8 +774,9 @@
 
       closeChatBtn.addEventListener('click', () => { chatDrawer.style.display = 'none'; });
 
-      async function sendChatQuery() {
-        const promptText = chatInput.value.trim();
+      async function sendChatQuery(customPayload, displayOverride) {
+        const promptText = (customPayload !== undefined ? displayOverride : chatInput.value).trim();
+        const apiPayload = customPayload !== undefined ? customPayload : promptText;
         if (!promptText) return;
 
         const userMsg = pipWindow.document.createElement('div');
@@ -506,7 +796,7 @@
           const res = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: promptText, currentDocId: docId })
+            body: JSON.stringify({ prompt: apiPayload, currentDocId: docId })
           });
           const data = await res.json();
           if (data.reply) {
@@ -522,8 +812,17 @@
         chatMessages.scrollTop = chatMessages.scrollHeight;
       }
 
-      chatSendBtn.addEventListener('click', sendChatQuery);
+      chatSendBtn.addEventListener('click', () => sendChatQuery());
       chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChatQuery(); });
+
+      pipWindow.document.querySelectorAll('.emergency-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          const pillText = pill.getAttribute('data-pill');
+          chatInput.value = pillText;
+          const fullPrompt = `Emergency Logic Pro Troubleshooter request: The student clicked '${pillText}'. Give a clear, encouraging 3-step bulleted checklist using macOS keyboard shortcuts in bold to resolve this issue immediately.`;
+          sendChatQuery(fullPrompt, pillText);
+        });
+      });
 
       // Modal Overlay for Shortcuts, Mix Tips, BPM, and Patterns
       const modalOverlay = pipWindow.document.createElement('div');
@@ -649,42 +948,207 @@
         modal.style.display = 'none';
       });
 
-      // Patterns Modal Trigger with cachedPatterns & non-destructive search update
-      let cachedPatterns = null;
-      pipWindow.document.getElementById('openPatternsBtn').addEventListener('click', async () => {
+      // Patterns Modal Trigger with embedded patterns & MIDI export
+      const EMBEDDED_PATTERNS = [
+  {"id":"pocket-one-and-seven-and-five-and-thirteen","name":"Starter Groove 01","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"kick":[0,3],"snare":[2,6]},"meta":{"style":["basic","training"],"energy":1,"feel":"straight","section":"verse","family":"pocket-basic-patterns","bpmRange":[75,120]}},
+  {"id":"pocket-boots-n-cats","name":"Starter Groove 02","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,8],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,13]},"meta":{"style":["basic","training"],"energy":3,"feel":"straight","section":"verse","family":"pocket-basic-patterns","bpmRange":[75,120]}},
+  {"id":"pocket-tiny-house","name":"Starter Groove 03","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"hihatO":[1,3,5,7],"kick":[0,2,4,6]},"meta":{"style":["basic","training"],"energy":2,"feel":"straight","section":"verse","family":"pocket-basic-patterns","bpmRange":[75,120]}},
+  {"id":"pocket-good-to-go","name":"Starter Groove 04","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,6,10],"snare":[4,12]},"meta":{"style":["basic","training"],"energy":2,"feel":"straight","section":"verse","family":"pocket-basic-patterns","bpmRange":[75,120]}},
+  {"id":"pocket-hip-hop","name":"Starter Groove 05","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,6,7,14],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["basic","training"],"energy":4,"feel":"straight","section":"verse","family":"pocket-basic-patterns","bpmRange":[75,120]}},
+  {"id":"pocket-standard-break-1","name":"Break Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,10],"snare":[4,12],"hihatC":[0,2,4,6,8,9,10,12,14]},"meta":{"style":["breakbeat"],"energy":3,"feel":"straight","section":"verse","family":"pocket-standard-breaks","bpmRange":[85,115]}},
+  {"id":"pocket-standard-break-2","name":"Break Groove 02","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,10],"snare":[4,12],"hihatC":[0,2,4,6,7,8,10,14]},"meta":{"style":["breakbeat"],"energy":3,"feel":"straight","section":"verse","family":"pocket-standard-breaks","bpmRange":[85,115]}},
+  {"id":"pocket-rolling-break","name":"Break Groove 03","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,7,10],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["breakbeat"],"energy":3,"feel":"straight","section":"verse","family":"pocket-standard-breaks","bpmRange":[85,115]}},
+  {"id":"pocket-the-unknown-drummer","name":"Break Groove 04","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,6,10],"snare":[1,4,7,12],"hihatC":[1,2,4,5,7,13],"hihatO":[8,14]},"meta":{"style":["breakbeat"],"energy":4,"feel":"straight","section":"verse","family":"pocket-standard-breaks","bpmRange":[85,115]}},
+  {"id":"pocket-rock-1","name":"Rock Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,7,8,10],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["rock"],"energy":3,"feel":"straight","section":"verse","family":"pocket-rock","bpmRange":[85,125]}},
+  {"id":"pocket-rock-2","name":"Rock Groove 02","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,7,8,10],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["rock"],"energy":3,"feel":"straight","section":"verse","family":"pocket-rock","bpmRange":[85,125]}},
+  {"id":"pocket-rock-3","name":"Rock Groove 03","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,7,8,10],"snare":[4,12],"hihatO":[14],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["rock"],"energy":4,"feel":"straight","section":"verse","family":"pocket-rock","bpmRange":[85,125]}},
+  {"id":"pocket-rock-4","name":"Rock Groove 04","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,7,8,10],"snare":[4,12,14,15],"hihatO":[14],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["rock"],"energy":4,"feel":"straight","section":"verse","family":"pocket-rock","bpmRange":[85,125]}},
+  {"id":"pocket-electro-1-a","name":"Electro Groove 01","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"snare":[2,6],"kick":[0,3]},"meta":{"style":["electro","dance"],"energy":1,"feel":"straight","section":"verse","family":"pocket-electro","bpmRange":[90,125]}},
+  {"id":"pocket-electro-1-b","name":"Electro Groove 02","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"snare":[2,6],"kick":[0,3,5,7]},"meta":{"style":["electro","dance"],"energy":2,"feel":"straight","section":"verse","family":"pocket-electro","bpmRange":[90,125]}},
+  {"id":"pocket-electro-2-a","name":"Electro Groove 03","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"snare":[2,6],"kick":[0,3]},"meta":{"style":["electro","dance"],"energy":1,"feel":"straight","section":"verse","family":"pocket-electro","bpmRange":[90,125]}},
+  {"id":"pocket-electro-2-b","name":"Electro Groove 04","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"snare":[4,12],"kick":[0,10,13]},"meta":{"style":["electro","dance"],"energy":2,"feel":"straight","section":"verse","family":"pocket-electro","bpmRange":[90,125]}},
+  {"id":"pocket-electro-3-a","name":"Electro Groove 05","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"snare":[4,12],"kick":[0,6,11]},"meta":{"style":["electro","dance"],"energy":2,"feel":"straight","section":"verse","family":"pocket-electro","bpmRange":[90,125]}},
+  {"id":"pocket-electro-3-b","name":"Electro Groove 06","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"snare":[4,12],"kick":[0,6,11,13]},"meta":{"style":["electro","dance"],"energy":2,"feel":"straight","section":"verse","family":"pocket-electro","bpmRange":[90,125]}},
+  {"id":"pocket-electro-4","name":"Electro Groove 07","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"snare":[4,12],"kick":[0,6,10,13]},"meta":{"style":["electro","dance"],"energy":2,"feel":"straight","section":"verse","family":"pocket-electro","bpmRange":[90,125]}},
+  {"id":"pocket-siberian-nights","name":"Electro Groove 08","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"hihatC":[0,2,3,4,6,7,8,10,11,12,14,15],"snare":[4,12],"kick":[0,6]},"meta":{"style":["electro","dance"],"energy":4,"feel":"straight","section":"verse","family":"pocket-electro","bpmRange":[90,125]}},
+  {"id":"pocket-new-wave","name":"Electro Groove 09","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,6,8,9],"snare":[4,12],"hihatC":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"hihatO":[2]},"meta":{"style":["electro","dance"],"energy":5,"feel":"straight","section":"verse","family":"pocket-electro","bpmRange":[90,125]}},
+  {"id":"pocket-7","name":"Electro Groove 10","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"kick":[0,2,4,6],"snare":[2,6],"hihatC":[0],"hihatO":[1,3,5,7]},"meta":{"style":["electro","dance"],"energy":3,"feel":"straight","section":"verse","family":"pocket-electro","bpmRange":[90,125]}},
+  {"id":"pocket-house-2","name":"House Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,4,8,12],"snare":[4,12],"hihatC":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"hihatO":[2,5,10,13]},"meta":{"style":["house","dance"],"energy":5,"feel":"straight","section":"verse","family":"pocket-house","bpmRange":[110,130]}},
+  {"id":"pocket-brit-house","name":"House Groove 02","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,4,8,12],"snare":[4,12],"hihatC":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"hihatO":[2,6,10,14]},"meta":{"style":["house","dance"],"energy":5,"feel":"straight","section":"verse","family":"pocket-house","bpmRange":[110,130]}},
+  {"id":"pocket-french-house","name":"House Groove 03","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,4,8,12],"snare":[4,12],"hihatC":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"hihatO":[1,3,5,7,9,11,13,15]},"meta":{"style":["house","dance"],"energy":5,"feel":"straight","section":"verse","family":"pocket-house","bpmRange":[110,130]}},
+  {"id":"pocket-dirty-house","name":"House Groove 04","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,4,8,10,12,15],"snare":[2,4,8,10,12],"hihatC":[10,15],"hihatO":[2,10,14]},"meta":{"style":["house","dance"],"energy":4,"feel":"straight","section":"verse","family":"pocket-house","bpmRange":[110,130]}},
+  {"id":"pocket-deep-house","name":"House Groove 05","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,4,8,12],"snare":[4,12],"hihatC":[1,7,9],"hihatO":[2,6,10,14]},"meta":{"style":["house","dance"],"energy":3,"feel":"straight","section":"verse","family":"pocket-house","bpmRange":[110,130]}},
+  {"id":"pocket-deeper-house","name":"House Groove 06","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,4,8,12],"snare":[1,2,7,9,10],"hihatC":[3,8],"hihatO":[2,6,10,11,14]},"meta":{"style":["house","dance"],"energy":4,"feel":"straight","section":"verse","family":"pocket-house","bpmRange":[110,130]}},
+  {"id":"pocket-slow-deep-house","name":"House Groove 07","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,4,8,12],"snare":[4,12],"hihatC":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"hihatO":[2,3,6,7,9,10,12]},"meta":{"style":["house","dance"],"energy":5,"feel":"straight","section":"verse","family":"pocket-house","bpmRange":[110,130]}},
+  {"id":"pocket-footwork-a","name":"House Groove 08","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,6,8,11,14],"snare":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"hihatC":[2,10]},"meta":{"style":["house","dance"],"energy":5,"feel":"straight","section":"verse","family":"pocket-house","bpmRange":[110,130]}},
+  {"id":"pocket-footwork-b","name":"House Groove 09","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,6,8,11,14],"snare":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"hihatC":[2,6,7,10,14]},"meta":{"style":["house","dance"],"energy":5,"feel":"straight","section":"verse","family":"pocket-house","bpmRange":[110,130]}},
+  {"id":"pocket-miami-bass-a","name":"Miami Bass Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,6],"snare":[4,12],"hihatC":[0,2,3,4,6,7,8,10,11,12,14,15]},"meta":{"style":["miami-bass","electro","hip-hop"],"energy":4,"feel":"straight","section":"verse","family":"pocket-miami-bass","bpmRange":[95,130]}},
+  {"id":"pocket-miami-bass-b","name":"Miami Bass Groove 02","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,6,10,13],"snare":[4,12],"hihatC":[0,2,3,4,6,7,8,10,11,12,14,15]},"meta":{"style":["miami-bass","electro","hip-hop"],"energy":4,"feel":"straight","section":"verse","family":"pocket-miami-bass","bpmRange":[95,130]}},
+  {"id":"pocket-sally","name":"Miami Bass Groove 03","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"kick":[0,3,5,7],"snare":[0,2,3,5,6,7],"hihatC":[0,1,2,3,4,5,6,7]},"meta":{"style":["miami-bass","electro","hip-hop"],"energy":4,"feel":"straight","section":"verse","family":"pocket-miami-bass","bpmRange":[95,130]}},
+  {"id":"pocket-rock-the-planet","name":"Miami Bass Groove 04","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,6],"snare":[4,12],"hihatC":[0,2,3,4,6,7,8,10,11,12,13,14,15]},"meta":{"style":["miami-bass","electro","hip-hop"],"energy":4,"feel":"straight","section":"verse","family":"pocket-miami-bass","bpmRange":[95,130]}},
+  {"id":"pocket-hip-hop-1-a","name":"Hip-Hop Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,6,7,11,14],"snare":[4,12]},"meta":{"style":["hip-hop"],"energy":2,"feel":"straight","section":"verse","family":"pocket-hip-hop","bpmRange":[70,105]}},
+  {"id":"pocket-hip-hop-1-b","name":"Hip-Hop Groove 02","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,7,11],"snare":[4,12]},"meta":{"style":["hip-hop"],"energy":2,"feel":"straight","section":"verse","family":"pocket-hip-hop","bpmRange":[70,105]}},
+  {"id":"pocket-hip-hop-2-a","name":"Hip-Hop Groove 03","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,7,8,9,13,15],"snare":[4,12]},"meta":{"style":["hip-hop"],"energy":2,"feel":"straight","section":"verse","family":"pocket-hip-hop","bpmRange":[70,105]}},
+  {"id":"pocket-hip-hop-2-b","name":"Hip-Hop Groove 04","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,7,8,11],"snare":[4,9,12]},"meta":{"style":["hip-hop"],"energy":2,"feel":"straight","section":"verse","family":"pocket-hip-hop","bpmRange":[70,105]}},
+  {"id":"pocket-hip-hop-3-a","name":"Hip-Hop Groove 05","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"kick":[0,1,4,5],"snare":[2,6]},"meta":{"style":["hip-hop"],"energy":2,"feel":"straight","section":"verse","family":"pocket-hip-hop","bpmRange":[70,105]}},
+  {"id":"pocket-hip-hop-3-b","name":"Hip-Hop Groove 06","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,8,9,11],"snare":[4,12]},"meta":{"style":["hip-hop"],"energy":2,"feel":"straight","section":"verse","family":"pocket-hip-hop","bpmRange":[70,105]}},
+  {"id":"pocket-hip-hop-4-a","name":"Hip-Hop Groove 07","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,7,9,10,15],"snare":[4,12]},"meta":{"style":["hip-hop"],"energy":2,"feel":"straight","section":"verse","family":"pocket-hip-hop","bpmRange":[70,105]}},
+  {"id":"pocket-hip-hop-4-b","name":"Hip-Hop Groove 08","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,7,8,9,10],"snare":[4,12]},"meta":{"style":["hip-hop"],"energy":2,"feel":"straight","section":"verse","family":"pocket-hip-hop","bpmRange":[70,105]}},
+  {"id":"pocket-hip-hop-5","name":"Hip-Hop Groove 09","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,7,8,10,15],"snare":[4,12]},"meta":{"style":["hip-hop"],"energy":2,"feel":"straight","section":"verse","family":"pocket-hip-hop","bpmRange":[70,105]}},
+  {"id":"pocket-hip-hop-6","name":"Hip-Hop Groove 10","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,10,11,15],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["hip-hop"],"energy":4,"feel":"straight","section":"verse","family":"pocket-hip-hop","bpmRange":[70,105]}},
+  {"id":"pocket-hip-hop-7","name":"Hip-Hop Groove 11","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,7,10,13,15],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["hip-hop"],"energy":4,"feel":"straight","section":"verse","family":"pocket-hip-hop","bpmRange":[70,105]}},
+  {"id":"pocket-hip-hop-8","name":"Hip-Hop Groove 12","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,8,10,11],"snare":[4,12],"hihatC":[0,1,3,4,6,7,8,9,11,12,14,15],"hihatO":[5,13]},"meta":{"style":["hip-hop"],"energy":4,"feel":"straight","section":"verse","family":"pocket-hip-hop","bpmRange":[70,105]}},
+  {"id":"pocket-trap-a","name":"Hip-Hop Groove 13","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"kick":[0,3,6],"snare":[4],"hihatC":[0,1,2,3,4,5,6,7]},"meta":{"style":["hip-hop"],"energy":3,"feel":"straight","section":"verse","family":"pocket-hip-hop","bpmRange":[70,105]}},
+  {"id":"pocket-trap-b","name":"Hip-Hop Groove 14","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"kick":[1,2],"snare":[4],"hihatC":[1,2,3,4,5,7]},"meta":{"style":["hip-hop"],"energy":3,"feel":"straight","section":"verse","family":"pocket-hip-hop","bpmRange":[70,105]}},
+  {"id":"pocket-amen-break-a","name":"Funk-Soul Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,10,11],"snare":[4,7,9,12,15],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["funk","soul","breakbeat"],"energy":4,"feel":"straight","section":"verse","family":"pocket-funk-and-soul","bpmRange":[80,115]}},
+  {"id":"pocket-amen-break-b","name":"Funk-Soul Groove 02","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,10,11],"snare":[4,7,9,12,15],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["funk","soul","breakbeat"],"energy":4,"feel":"straight","section":"verse","family":"pocket-funk-and-soul","bpmRange":[80,115]}},
+  {"id":"pocket-amen-break-c","name":"Funk-Soul Groove 03","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,10],"snare":[7,9,12,14,15],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["funk","soul","breakbeat"],"energy":4,"feel":"straight","section":"verse","family":"pocket-funk-and-soul","bpmRange":[80,115]}},
+  {"id":"pocket-amen-break-d","name":"Funk-Soul Groove 04","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,10],"snare":[1,4,7,9,14],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["funk","soul","breakbeat"],"energy":4,"feel":"straight","section":"verse","family":"pocket-funk-and-soul","bpmRange":[80,115]}},
+  {"id":"pocket-the-funky-drummer","name":"Funk-Soul Groove 05","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,6,10,13],"snare":[4,7,9,11,12,15],"hihatC":[0,1,2,3,4,5,6,8,9,10,11,12,14,15],"hihatO":[7,13]},"meta":{"style":["funk","soul","breakbeat"],"energy":5,"feel":"straight","section":"verse","family":"pocket-funk-and-soul","bpmRange":[80,115]}},
+  {"id":"pocket-impeach-the-president","name":"Funk-Soul Groove 06","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,7,8,14],"snare":[4,12],"hihatC":[0,2,4,6,7,8,12,14],"hihatO":[10]},"meta":{"style":["funk","soul","breakbeat"],"energy":4,"feel":"straight","section":"verse","family":"pocket-funk-and-soul","bpmRange":[80,115]}},
+  {"id":"pocket-when-the-levee-breaks","name":"Funk-Soul Groove 07","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,1,7,10,11],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["funk","soul","breakbeat"],"energy":4,"feel":"straight","section":"verse","family":"pocket-funk-and-soul","bpmRange":[80,115]}},
+  {"id":"pocket-it-s-a-new-day","name":"Funk-Soul Groove 08","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,10,11,15],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["funk","soul","breakbeat"],"energy":4,"feel":"straight","section":"verse","family":"pocket-funk-and-soul","bpmRange":[80,115]}},
+  {"id":"pocket-the-big-beat","name":"Funk-Soul Groove 09","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,6,8],"snare":[4,12]},"meta":{"style":["funk","soul","breakbeat"],"energy":2,"feel":"straight","section":"verse","family":"pocket-funk-and-soul","bpmRange":[80,115]}},
+  {"id":"pocket-ashley-s-roachclip","name":"Funk-Soul Groove 10","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,2,6,8,9],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,14],"hihatO":[10]},"meta":{"style":["funk","soul","breakbeat"],"energy":4,"feel":"straight","section":"verse","family":"pocket-funk-and-soul","bpmRange":[80,115]}},
+  {"id":"pocket-son-clave","name":"Afro-Cuban Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,4,7,8,11,12,15],"snare":[0,3,6,10,12],"hihatC":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]},"meta":{"style":["afro-cuban","latin"],"energy":5,"feel":"straight","section":"verse","family":"pocket-afro-cuban","bpmRange":[85,120]}},
+  {"id":"pocket-rumba","name":"Afro-Cuban Groove 02","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,4,7,8,11,12,15],"snare":[0,3,7,10,12],"hihatC":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]},"meta":{"style":["afro-cuban","latin"],"energy":5,"feel":"straight","section":"verse","family":"pocket-afro-cuban","bpmRange":[85,120]}},
+  {"id":"pocket-bossa-nova","name":"Afro-Cuban Groove 03","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,4,7,8,11,12,15],"snare":[0,3,6,10,13],"hihatC":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]},"meta":{"style":["afro-cuban","latin"],"energy":5,"feel":"straight","section":"verse","family":"pocket-afro-cuban","bpmRange":[85,120]}},
+  {"id":"pocket-drum-and-bass-1-a","name":"Drum & Bass Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,3,7,9,10,15],"snare":[4,12],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["drum-and-bass","jungle","breakbeat"],"energy":4,"feel":"straight","section":"verse","family":"pocket-drum-and-bass","bpmRange":[150,180]}},
+  {"id":"pocket-techno","name":"Electronic Groove 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,4,8,12,14],"snare":[4,12],"hihatC":[9],"hihatO":[2,6,10,14]},"meta":{"style":["edm","dance"],"energy":3,"feel":"straight","section":"verse","family":"pocket-edm","bpmRange":[120,150]}},
+  {"id":"pocket-dubstep-a","name":"Electronic Groove 02","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,10],"snare":[8],"hihatC":[1,2,6,11,14],"hihatO":[4,13]},"meta":{"style":["edm","dance"],"energy":3,"feel":"straight","section":"verse","family":"pocket-edm","bpmRange":[120,150]}},
+  {"id":"pocket-half-drop","name":"Dub Groove 01","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"kick":[0],"snare":[4],"hihatC":[0,1,2,3,4,5,6,7]},"meta":{"style":["dub","reggae"],"energy":3,"feel":"straight","section":"verse","family":"pocket-dub","bpmRange":[65,95]}},
+  {"id":"pocket-one-drop","name":"Dub Groove 02","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"kick":[4],"snare":[4],"hihatC":[0,1,2,3,4,5,6,7]},"meta":{"style":["dub","reggae"],"energy":3,"feel":"straight","section":"verse","family":"pocket-dub","bpmRange":[65,95]}},
+  {"id":"pocket-two-drop","name":"Dub Groove 03","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"kick":[0,4],"snare":[4],"hihatC":[0,1,2,3,4,5,6,7]},"meta":{"style":["dub","reggae"],"energy":3,"feel":"straight","section":"verse","family":"pocket-dub","bpmRange":[65,95]}},
+  {"id":"pocket-steppers","name":"Dub Groove 04","stepsPerBeat":2,"beats":4,"bars":1,"voices":{"kick":[0,2,4,6],"snare":[4],"hihatC":[0,1,2,3,4,5,6,7]},"meta":{"style":["dub","reggae"],"energy":3,"feel":"straight","section":"verse","family":"pocket-dub","bpmRange":[65,95]}},
+  {"id":"pocket-reggaeton","name":"Dub Groove 05","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[0,4,8,12],"snare":[3,6,11,14],"hihatC":[0,2,4,6,8,10,12,14]},"meta":{"style":["dub","reggae"],"energy":4,"feel":"straight","section":"verse","family":"pocket-dub","bpmRange":[65,95]}},
+  {"id":"pocket-drum-roll-1","name":"Drum Roll Study 01","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"snare":[0,1,4,8,9,10,12,13,15],"hihatO":[0],"hihatC":[0]},"meta":{"style":["fill","drum-roll"],"energy":5,"feel":"straight","section":"bridge","family":"pocket-drum-rolls","bpmRange":[80,140]}},
+  {"id":"pocket-drum-roll-2","name":"Drum Roll Study 02","stepsPerBeat":4,"beats":4,"bars":1,"voices":{"kick":[12,14],"snare":[0,2,3,4,6,8,9,10,11]},"meta":{"style":["fill","drum-roll"],"energy":5,"feel":"straight","section":"bridge","family":"pocket-drum-rolls","bpmRange":[80,140]}}
+];
+      let cachedPatterns = EMBEDDED_PATTERNS;
+
+      function writeVarLength(value) {
+        const buffer = [];
+        let v = value & 0x7F;
+        while ((value >>= 7) > 0) {
+          buffer.unshift((value & 0x7F) | 0x80);
+        }
+        buffer.push(v);
+        return buffer;
+      }
+
+      function generatePatternMidiBlob(pat) {
+        const ticksPerBeat = 480;
+        const stepsPerBeat = pat.stepsPerBeat || 4;
+        const ticksPerStep = Math.round(ticksPerBeat / stepsPerBeat);
+        const bpm = (pat.meta && pat.meta.bpmRange && pat.meta.bpmRange[0]) ? pat.meta.bpmRange[0] : 120;
+        const usPerQuarter = Math.round(60000000 / bpm);
+
+        const DRUM_MAP = {
+          kick: 36,     // C1
+          snare: 38,    // D1
+          hihatC: 42,   // F#1
+          hihatO: 46    // A#1
+        };
+
+        const events = [];
+        const voices = pat.voices || {};
+
+        for (const [voiceKey, noteNumber] of Object.entries(DRUM_MAP)) {
+          const activeSteps = voices[voiceKey] || [];
+          for (const step of activeSteps) {
+            const startTime = step * ticksPerStep;
+            const dur = voiceKey === 'hihatO' ? ticksPerStep * 2 : Math.max(1, ticksPerStep - 10);
+            events.push({ time: startTime, type: 'on', note: noteNumber, vel: 100 });
+            events.push({ time: startTime + dur, type: 'off', note: noteNumber, vel: 0 });
+          }
+        }
+
+        events.sort((a, b) => a.time === b.time ? (a.type === 'off' ? -1 : 1) : a.time - b.time);
+
+        const trackBytes = [];
+        const nameStr = pat.name || 'Drum Pattern';
+        const nameBytes = [];
+        for (let i = 0; i < nameStr.length; i++) nameBytes.push(nameStr.charCodeAt(i));
+        trackBytes.push(0x00, 0xFF, 0x03, nameBytes.length, ...nameBytes);
+        trackBytes.push(0x00, 0xFF, 0x51, 0x03, (usPerQuarter >> 16) & 0xFF, (usPerQuarter >> 8) & 0xFF, usPerQuarter & 0xFF);
+        trackBytes.push(0x00, 0xFF, 0x58, 0x04, 0x04, 0x02, 0x18, 0x08);
+
+        let lastTime = 0;
+        for (const ev of events) {
+          const deltaTime = ev.time - lastTime;
+          lastTime = ev.time;
+          trackBytes.push(...writeVarLength(deltaTime));
+          if (ev.type === 'on') {
+            trackBytes.push(0x99, ev.note, ev.vel);
+          } else {
+            trackBytes.push(0x89, ev.note, 0);
+          }
+        }
+
+        trackBytes.push(0x00, 0xFF, 0x2F, 0x00);
+
+        const header = [
+          0x4D, 0x54, 0x68, 0x64,
+          0x00, 0x00, 0x00, 0x06,
+          0x00, 0x00,
+          0x00, 0x01,
+          (ticksPerBeat >> 8) & 0xFF, ticksPerBeat & 0xFF
+        ];
+
+        const trackLen = trackBytes.length;
+        const trackHeader = [
+          0x4D, 0x54, 0x72, 0x6B,
+          (trackLen >> 24) & 0xFF,
+          (trackLen >> 16) & 0xFF,
+          (trackLen >> 8) & 0xFF,
+          trackLen & 0xFF
+        ];
+
+        const midiData = new Uint8Array([...header, ...trackHeader, ...trackBytes]);
+        return new Blob([midiData], { type: 'audio/midi' });
+      }
+
+      function exportPatternMidi(pat) {
+        const blob = generatePatternMidiBlob(pat);
+        const nameStr = pat.name || 'Drum Pattern';
+        const url = URL.createObjectURL(blob);
+        const a = pipWindow.document.createElement('a');
+        a.href = url;
+        a.download = `${nameStr.replace(/[^a-zA-Z0-9_-]/g, '_')}.mid`;
+        pipWindow.document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          pipWindow.document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 150);
+      }
+
+      pipWindow.document.getElementById('openPatternsBtn').addEventListener('click', () => {
         modalTitle.textContent = "🥁 DRUM PATTERN DATABASE";
         
         modalBody.innerHTML = `
           <div class="drum-controls">
-            <input type="text" id="drumSearch" class="drum-search" placeholder="Search pattern name or style (e.g. electro, house)...">
+            <input type="text" id="drumSearch" class="drum-search" placeholder="Search pattern name or style (e.g. electro, house, rock)...">
             <select id="drumStyleFilter" class="drum-filter">
               <option value="all">All Styles & Genres</option>
+              <option value="favorites">⭐ Favorites Only</option>
             </select>
           </div>
-          <div class="drum-grid" id="drumGridContainer">
-            <div style="text-align:center; color:#9ca3af; padding:20px;">Loading drum patterns...</div>
-          </div>
+          <div class="drum-grid" id="drumGridContainer"></div>
         `;
         modal.style.display = 'flex';
-
-        if (!cachedPatterns) {
-          try {
-            const res = await fetch('/patterns.json');
-            cachedPatterns = await res.json();
-          } catch (e) {
-            cachedPatterns = [];
-          }
-        }
 
         const searchInput = pipWindow.document.getElementById('drumSearch');
         const styleSelect = pipWindow.document.getElementById('drumStyleFilter');
         const gridContainer = pipWindow.document.getElementById('drumGridContainer');
 
+        let memFavs = [];
         const getFavorites = () => {
           try {
-            return JSON.parse(localStorage.getItem('floatdoc_favorite_patterns') || '[]');
+            const raw = (window.localStorage || localStorage).getItem('floatdoc_favorite_patterns');
+            return raw ? JSON.parse(raw) : memFavs;
           } catch(e) {
-            return [];
+            return memFavs;
           }
         };
 
@@ -695,18 +1159,19 @@
           } else {
             favs.push(cardId);
           }
+          memFavs = favs;
           try {
-            localStorage.setItem('floatdoc_favorite_patterns', JSON.stringify(favs));
+            (window.localStorage || localStorage).setItem('floatdoc_favorite_patterns', JSON.stringify(favs));
           } catch(e) {}
           updateGrid();
         };
 
-        styleSelect.innerHTML = `<option value="all">All Styles & Genres</option><option value="favorites">⭐ Favorites Only</option>`;
-        const allStyles = [...new Set(cachedPatterns.flatMap(p => p.meta.style))];
+        // Populate all genres & styles in the drop-down on the right
+        const allStyles = [...new Set(cachedPatterns.flatMap(p => (p.meta && p.meta.style) ? p.meta.style : []))].sort();
         allStyles.forEach(s => {
           const opt = pipWindow.document.createElement('option');
           opt.value = s;
-          opt.textContent = s;
+          opt.textContent = s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('-');
           styleSelect.appendChild(opt);
         });
 
@@ -717,25 +1182,31 @@
           const favs = getFavorites();
 
           const filtered = cachedPatterns.filter((p, idx) => {
-            const cardId = p.id || `pat-${idx}`;
-            const matchesSearch = !filterText || p.name.toLowerCase().includes(filterText) || p.meta.style.some(s => s.toLowerCase().includes(filterText));
+            const cardId = p.id || ('pat-' + idx);
+            const styles = (p.meta && p.meta.style) ? p.meta.style : [];
+            const matchesSearch = !filterText ||
+              p.name.toLowerCase().includes(filterText) ||
+              styles.some(s => s.toLowerCase().includes(filterText)) ||
+              (p.meta && p.meta.feel && p.meta.feel.toLowerCase().includes(filterText));
+            
             let matchesStyle = true;
             if (styleFilter === 'favorites') {
               matchesStyle = favs.includes(cardId);
             } else if (styleFilter !== 'all') {
-              matchesStyle = p.meta.style.includes(styleFilter) || p.meta.feel === styleFilter || p.meta.family === styleFilter;
+              matchesStyle = styles.includes(styleFilter) ||
+                (p.meta && (p.meta.feel === styleFilter || p.meta.family === styleFilter));
             }
             return matchesSearch && matchesStyle;
           });
 
           if (filtered.length === 0) {
-            gridContainer.innerHTML = `<div style="text-align:center; color:#9ca3af; padding:20px;">No drum patterns found matching your search.</div>`;
+            gridContainer.innerHTML = `<div style="text-align:center; color:#9ca3af; padding:30px;">No drum patterns found matching your search.</div>`;
             return;
           }
 
           let gridHtml = '';
           filtered.forEach((pat, idx) => {
-            const cardId = pat.id || `pat-${idx}`;
+            const cardId = pat.id || ('pat-' + idx);
             const isFav = favs.includes(cardId);
             const totalSteps = (pat.stepsPerBeat || 4) * (pat.beats || 4) * (pat.bars || 1);
             const voices = pat.voices || {};
@@ -757,19 +1228,23 @@
             };
 
             gridHtml += `
-              <div class="drum-card" id="drum-card-${cardId}">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                  <div class="drum-card-title" style="margin-bottom:0;">${pat.name}</div>
+              <div class="drum-card" id="drum-card-${cardId}" draggable="true" data-card-id="${cardId}">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span class="drum-drag-handle" title="Drag MIDI directly into Logic Pro, DAW, or desktop">⋮⋮ Drag</span>
+                    <div class="drum-card-title" style="margin-bottom:0;">${pat.name}</div>
+                  </div>
                   <div style="display:flex; gap:6px; align-items:center;">
-                    <button class="drum-fav-btn" data-card-id="${cardId}" title="Toggle Favorite">${isFav ? '★' : '☆'}</button>
+                    <button class="drum-fav-btn ${isFav ? 'is-fav' : ''}" data-card-id="${cardId}" title="${isFav ? 'Remove Favorite' : 'Add to Favorites'}">${isFav ? '★' : '☆'}</button>
+                    <button class="drum-midi-btn" data-card-id="${cardId}" title="Export MIDI file for Logic Pro / Soundtrap">⬇ MIDI</button>
                     <button class="drum-play-btn" id="play-btn-${cardId}" data-card-id="${cardId}">▶ Play</button>
                   </div>
                 </div>
                 <div class="drum-tags">
-                  ${pat.meta.style.map(st => `<span class="drum-tag">${st}</span>`).join('')}
-                  <span class="drum-tag">Feel: ${pat.meta.feel}</span>
-                  <span class="drum-tag">Section: ${pat.meta.section}</span>
-                  <span class="drum-tag">Energy: ${pat.meta.energy}/5</span>
+                  ${(pat.meta && pat.meta.style ? pat.meta.style : []).map(st => `<span class="drum-tag">${st}</span>`).join('')}
+                  ${pat.meta && pat.meta.feel ? `<span class="drum-tag">Feel: ${pat.meta.feel}</span>` : ''}
+                  ${pat.meta && pat.meta.section ? `<span class="drum-tag">Section: ${pat.meta.section}</span>` : ''}
+                  ${pat.meta && pat.meta.energy ? `<span class="drum-tag">Energy: ${pat.meta.energy}/5</span>` : ''}
                 </div>
                 <div class="sequencer-table">
                   ${renderVoiceRow('hihatO', 'Hi-Hat O', 'active-hihatO')}
@@ -782,6 +1257,37 @@
           });
           gridContainer.innerHTML = gridHtml;
 
+          gridContainer.querySelectorAll('.drum-card').forEach(card => {
+            card.addEventListener('dragstart', (e) => {
+              if (e.target.closest('button')) {
+                e.preventDefault();
+                return;
+              }
+              const cardId = card.getAttribute('data-card-id');
+              const pat = filtered.find(p => (p.id || ('pat-' + filtered.indexOf(p))) === cardId);
+              if (!pat) return;
+
+              const blob = generatePatternMidiBlob(pat);
+              const blobUrl = URL.createObjectURL(blob);
+              card._dragBlobUrl = blobUrl;
+
+              const midiFileName = `${pat.name.replace(/\s+/g, '_')}.mid`;
+              e.dataTransfer.setData('DownloadURL', `audio/midi:${midiFileName}:${blobUrl}`);
+              e.dataTransfer.setData('text/plain', midiFileName);
+              e.dataTransfer.effectAllowed = 'copy';
+
+              card.classList.add('is-dragging');
+            });
+
+            card.addEventListener('dragend', () => {
+              card.classList.remove('is-dragging');
+              if (card._dragBlobUrl) {
+                URL.revokeObjectURL(card._dragBlobUrl);
+                card._dragBlobUrl = null;
+              }
+            });
+          });
+
           gridContainer.querySelectorAll('.drum-fav-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
               e.stopPropagation();
@@ -790,10 +1296,19 @@
             });
           });
 
+          gridContainer.querySelectorAll('.drum-midi-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const cardId = btn.getAttribute('data-card-id');
+              const pat = filtered.find(p => (p.id || ('pat-' + filtered.indexOf(p))) === cardId);
+              if (pat) exportPatternMidi(pat);
+            });
+          });
+
           gridContainer.querySelectorAll('.drum-play-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
               const cardId = btn.getAttribute('data-card-id');
-              const pat = filtered.find(p => (p.id || `pat-${filtered.indexOf(p)}`) === cardId);
+              const pat = filtered.find(p => (p.id || ('pat-' + filtered.indexOf(p))) === cardId);
               if (!pat) return;
 
               if (currentPlayingCardId === cardId) {
@@ -813,13 +1328,13 @@
               }
               currentSynth = new DrumSynth(currentAudioCtx);
 
-              const bpm = (pat.meta.bpmRange && pat.meta.bpmRange[0]) ? pat.meta.bpmRange[0] : 120;
+              const bpm = (pat.meta && pat.meta.bpmRange && pat.meta.bpmRange[0]) ? pat.meta.bpmRange[0] : 120;
               const stepTime = (60 / bpm) / 4;
               const totalSteps = (pat.stepsPerBeat || 4) * (pat.beats || 4) * (pat.bars || 1);
               const voices = pat.voices || {};
 
               let currentStep = 0;
-              const cardEl = pipWindow.document.getElementById(`drum-card-${cardId}`);
+              const cardEl = pipWindow.document.getElementById('drum-card-' + cardId);
 
               const scheduleStep = () => {
                 if (!currentAudioCtx || currentAudioCtx.state === 'closed') return;
@@ -832,7 +1347,7 @@
 
                 if (cardEl) {
                   cardEl.querySelectorAll('.seq-step').forEach(s => s.classList.remove('playing-step'));
-                  cardEl.querySelectorAll(`.step-index-${currentStep}`).forEach(s => s.classList.add('playing-step'));
+                  cardEl.querySelectorAll('.step-index-' + currentStep).forEach(s => s.classList.add('playing-step'));
                 }
 
                 currentStep = (currentStep + 1) % totalSteps;
@@ -860,6 +1375,7 @@
           });
         });
         modalBody.innerHTML = html;
+        if (pipWindow.annotateGlossaryTerms) pipWindow.annotateGlossaryTerms(modalBody);
         modal.style.display = 'flex';
       });
 
@@ -914,7 +1430,11 @@
           pipWindow.document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
           pipWindow.document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
           event.target.classList.add('active');
-          pipWindow.document.getElementById(tabId).classList.add('active');
+          const pane = pipWindow.document.getElementById(tabId);
+          if (pane) {
+            pane.classList.add('active');
+            if (pipWindow.annotateGlossaryTerms) pipWindow.annotateGlossaryTerms(pane);
+          }
         };
 
         pipWindow.openLightbox = (imgSrc) => {
@@ -924,7 +1444,47 @@
           lb.style.display = 'flex';
         };
 
+        if (pipWindow.annotateGlossaryTerms) pipWindow.annotateGlossaryTerms(modalBody);
         modal.style.display = 'flex';
+      });
+
+      pipWindow.document.getElementById('openGlossaryBtn').addEventListener('click', () => {
+        modalTitle.textContent = "📖 LOGIC PRO & MUSIC TECH GLOSSARY";
+        modalBody.innerHTML = `
+          <input type="text" id="glossarySearch" class="glossary-search-input" placeholder="Search terms (e.g. Sidechain, Bus, Bounce, EQ, Latency)...">
+          <div style="font-size: 11px; color: #9ca3af; margin-bottom: 10px;">
+            💡 <em>Hover over any term for &gt;300ms or double-click / highlight text in any window to view its definition!</em>
+          </div>
+          <div id="glossaryListContainer" style="max-height: 55vh; overflow-y: auto;"></div>
+        `;
+        const searchInput = pipWindow.document.getElementById('glossarySearch');
+        const listContainer = pipWindow.document.getElementById('glossaryListContainer');
+
+        const renderGlossaryList = (query = '') => {
+          const q = query.trim().toLowerCase();
+          const entries = Object.entries(LOGIC_GLOSSARY)
+            .sort((a, b) => a[0].localeCompare(b[0]))
+            .filter(([term, def]) => !q || term.toLowerCase().includes(q) || def.toLowerCase().includes(q));
+
+          if (entries.length === 0) {
+            listContainer.innerHTML = `<div style="text-align:center; color:#9ca3af; padding:20px;">No matching glossary terms found.</div>`;
+            return;
+          }
+
+          listContainer.innerHTML = entries.map(([term, def]) => `
+            <div class="glossary-list-item">
+              <div class="glossary-list-title"><span class="logic-term" data-term="${term}">${term}</span></div>
+              <div class="glossary-list-def">${def}</div>
+            </div>
+          `).join('');
+
+          if (pipWindow.annotateGlossaryTerms) pipWindow.annotateGlossaryTerms(listContainer);
+        };
+
+        searchInput.addEventListener('input', (e) => renderGlossaryList(e.target.value));
+        renderGlossaryList();
+        modal.style.display = 'flex';
+        searchInput.focus();
       });
 
       pipWindow.document.getElementById('openBpmBtn').addEventListener('click', () => {
@@ -1021,6 +1581,12 @@
         loupeIframe.style.top = `${radius - (mouseY * zoomFactor)}px`;
       });
 
+      // Initialize Logic Glossary & Inspector in the PiP Window
+      initGlossary(pipWindow.document, pipWindow);
+      if (pipWindow.annotateGlossaryTerms) {
+        pipWindow.annotateGlossaryTerms(toolbar);
+      }
+
     } catch (err) {
       alert('Error opening window: ' + err.message);
     }
@@ -1044,7 +1610,647 @@
         launchFloater(docParam);
       }, 500);
     }
+    // Initialize glossary annotation on main launcher card
+    if (window.annotateGlossaryTerms) {
+      const card = document.querySelector('.card');
+      if (card) window.annotateGlossaryTerms(card);
+    }
   });
+
+  // ==========================================
+  // LOGIC PRO 11 & AUDIO TECH GLOSSARY DICTIONARY (USER GUIDE PG. 1296-1323)
+  // ==========================================
+  const LOGIC_GLOSSARY = {
+    "AI Mastering": "An automated mastering processor in Logic Pro that analyzes a mix and applies EQ, compression, and stereo imaging tailored to commercial standards.",
+    "Alias": "A linked reference to an existing MIDI region that automatically reflects any edits made to the original parent region.",
+    "Anchor": "The fixed temporal reference point within an audio region used for timeline snapping and positioning in the Tracks Area.",
+    "Apple Loops": "Prerecorded audio or MIDI files containing tempo, pitch, and genre metadata that conform automatically to any project's tempo.",
+    "Armed Track": "A track placed in record-ready status by engaging its red 'R' record enable button.",
+    "Arrangement Marker": "A colored section block in the global Arrangement Track used to quickly organize, move, and duplicate whole song sections.",
+    "Attack": "The duration of time it takes for an audio processor, filter, or synthesizer envelope to reach full initial level after crossing a threshold.",
+    "Audio Interface": "A dedicated hardware unit that converts analog signals from microphones and instruments into digital data for your computer and vice versa.",
+    "Audio Region": "A bounded segment of recorded or imported digital audio positioned on an audio track in the Tracks Area.",
+    "Audio Track": "A horizontal timeline lane in the Tracks Area designed specifically for recording, editing, and playing back linear audio waveforms.",
+    "Autofilter": "A dynamic filter plugin that modulates cutoff frequencies using an LFO or audio envelope follower.",
+    "Automation": "The programmed recording and playback of parameter changes over time for volume faders, pan pots, and plugin settings.",
+    "Autosave": "A background safety mechanism in Logic Pro that preserves recent project edits to prevent data loss during unexpected crashes.",
+    "Auxiliary Channel Strip (Aux)": "A mixer channel strip used for submixing multiple audio tracks or hosting shared send effects like reverb and delay.",
+    "Bar": "A rhythmic measure of musical time defined by the project's time signature and tempo.",
+    "Bit Depth": "The number of binary bits used to encode the amplitude resolution and dynamic range of each digitized audio sample.",
+    "Bounce": "Rendering or exporting an entire arrangement, selected tracks, or regions into a finalized stereo or multichannel audio file.",
+    "Buffer Size": "The allocated audio processing memory determining audio roundtrip latency and CPU load during recording and playback.",
+    "Bus": "An internal signal routing path that collects audio from multiple channel strips and directs them to an auxiliary strip or submix.",
+    "Catch Mode": "A display setting that causes the visible timeline window to scroll continuously to follow the moving playhead.",
+    "Channel Strip": "A modular mixer column containing gain controls, volume faders, pan pots, mute, solo, plugin inserts, and auxiliary sends.",
+    "Chorus": "A modulation effect that thickens sound by duplicating the audio signal, slightly detuning it, and adding subtle time delay.",
+    "Click Track": "An audible rhythmic pulse used to guide performers and maintain consistent project tempo during recording.",
+    "Clipping": "A harsh form of digital distortion that occurs when an audio waveform exceeds the absolute maximum ceiling of 0 dBFS.",
+    "Comping (Composite Take)": "The process of assembling the best phrases from multiple recorded passes in a Take Folder into one seamless master take.",
+    "Compressor": "A dynamics processor that attenuates audio signals exceeding a designated threshold to reduce dynamic range and enhance punch.",
+    "Control Bar": "The customizable top interface banner hosting playback transports, project display readouts, and mode toggles.",
+    "Crossfade": "A smooth overlapping transition where one audio region fades out while an adjacent region fades in simultaneously to avoid clicks.",
+    "Cycle Mode": "A timeline playback loop that continuously repeats playback between user-defined left and right locators.",
+    "DAW (Digital Audio Workstation)": "A computer system and software environment used for recording, editing, arranging, mixing, and mastering audio.",
+    "Decibel (dB)": "A logarithmic unit of measurement used to express relative audio signal amplitude, gain, and sound pressure levels.",
+    "De-Esser": "A frequency-selective compressor designed to attenuate harsh sibilant 's' and 't' sounds in vocal recordings.",
+    "Delay": "A time-based audio effect that repeats an incoming signal after a set rhythmic interval to create distinct echoes.",
+    "Dither": "Low-level randomized noise added during bit-depth reduction (such as 24-bit to 16-bit) to eliminate truncation distortion.",
+    "Drum Machine Designer": "An interactive instrument interface that lets you build, customize, and mix multi-pad drum kits with individual channel strips.",
+    "Drummer": "An intelligent virtual session player in Logic Pro that generates responsive, genre-specific acoustic and electronic drum performances.",
+    "Dry / Wet": "The ratio balance between the unprocessed original audio signal (dry) and the effect-processed audio signal (wet).",
+    "Dynamic Range": "The decibel difference between the quietest noise floor and the loudest undistorted peak of an audio recording.",
+    "Envelope": "The continuous contour governing how a synthesizer parameter or volume level changes over time (typically Attack, Decay, Sustain, and Release).",
+    "EQ (Equalizer)": "A frequency processor used to cut or boost specific frequency ranges across the audible audio spectrum (20 Hz to 20 kHz).",
+    "Equalization": "The practice of balancing and shaping frequency components to remove unwanted resonance and improve mix clarity.",
+    "Event List": "A numeric editor that displays detailed MIDI note pitch, start time, duration, and velocity values in an editable list.",
+    "Expander": "A dynamics processor that increases dynamic range by attenuating audio signals that drop below a set threshold.",
+    "Fade": "A gradual increase or decrease in audio amplitude applied to region boundaries to ensure smooth entries and exits without clicks.",
+    "Fader": "A vertical slider on a mixer channel strip used to control signal output amplitude and track listening balance.",
+    "Filter": "An audio circuit or plugin algorithm that attenuates specific frequency bands while letting other frequencies pass unaltered.",
+    "Flanger": "A modulation effect created by mixing an audio signal with a slightly delayed, pitch-modulated copy, producing a sweeping comb-filter sound.",
+    "Flex Pitch": "Logic Pro's monophonic pitch editor that lets you adjust note tuning, pitch drift, vibrato, and vocal formants directly in the timeline.",
+    "Flex Time": "Logic Pro's elastic audio engine that lets you stretch, compress, and quantize audio transients without slicing the underlying file.",
+    "Freeze": "A CPU-saving function that temporarily renders a track and all its active plugins to an invisible audio file, freeing system processing power.",
+    "Fundamental Frequency": "The lowest and primary resonant frequency of a musical pitch that establishes its perceived note.",
+    "Gain": "The measure of amplification applied to an electrical or digital audio signal, primarily adjusted at the input stage.",
+    "Gain Staging": "The disciplined management of signal levels across each processing stage to prevent clipping and maintain healthy headroom.",
+    "Gate (Noise Gate)": "A dynamic processor that silences audio below a set threshold to eliminate unwanted background room noise and mic bleed.",
+    "Global Tracks": "Dedicated horizontal timeline lanes showing project-wide parameters including Tempo, Markers, Arrangement, and Time Signatures.",
+    "Groove Track": "A designated reference track whose rhythmic timing and swing feel are automatically copied to other matched tracks in the project.",
+    "Harmonics": "Overtone frequencies that occur at whole-number multiples above the fundamental frequency, defining an instrument's unique timbre.",
+    "Headroom": "The safety buffer of decibels between an audio signal's highest peak and the absolute clipping threshold of 0 dBFS.",
+    "High-Pass Filter (Low Cut)": "An EQ filter that allows high frequencies to pass through while attenuating frequencies below a chosen cutoff point.",
+    "Input Monitoring": "A mode (enabled by the 'I' button) that routes live audio input through channel strip plugins and faders without recording.",
+    "Insert": "A channel strip slot used to load series audio effect or instrument plugins directly into the channel's signal path.",
+    "Inspector": "The contextual left-hand panel that displays detailed parameters for the currently selected region, track, and channel strips.",
+    "Interleaved Audio": "A single stereo audio file that contains both left and right channel data combined in a single stream.",
+    "Join": "A timeline command (⌘ + J) that merges adjacent or selected audio or MIDI regions into a single consolidated region.",
+    "Key Command": "A keyboard shortcut assigned to trigger a specific Logic Pro function, navigation step, or editing tool.",
+    "Key Signature": "The musical key and scale assigned to a project or section, displaying appropriate sharps or flats on notation views.",
+    "Latency": "The roundtrip time delay between an audio signal entering your hardware interface and being reproduced through your monitor speakers or headphones.",
+    "LFO (Low Frequency Oscillator)": "An oscillator vibrating below audible frequencies (typically <20 Hz) used to modulate synth parameters like vibrato and tremolo.",
+    "Library": "A browser drawer holding categorized presets, software instrument patches, and channel strip configurations.",
+    "Limiter": "An extreme dynamic compressor with a fast attack and high ratio that strictly prevents audio signals from exceeding a predefined ceiling.",
+    "Live Loops": "A non-linear grid interface in Logic Pro for triggering audio and MIDI loops, cells, and patterns in real-time.",
+    "Locator": "Boundary markers designating the left and right borders of a Cycle playback loop or punch-in range.",
+    "Loop": "A repeating audio or MIDI region configured to cycle continuously and seamlessly across a musical timeline.",
+    "Low-Pass Filter (High Cut)": "An EQ filter that allows low frequencies to pass through while attenuating frequencies above a chosen cutoff point.",
+    "Marquee Tool": "A versatile crosshair selection tool used to highlight, slice, copy, and delete portions of regions across the timeline.",
+    "Marker": "A timeline indicator used to label and quickly navigate to song sections such as Intro, Verse, Chorus, and Bridge.",
+    "Mastering": "The final stage of audio production where a completed mix is polished, balanced, and brought to commercial loudness and distribution standards.",
+    "Master Track (Stereo Out)": "The ultimate summing channel strip in the mixer where all audio paths converge before reaching the hardware outputs.",
+    "Metronome": "An audible click generator that marks musical tempo and beats during project playback and recording.",
+    "MIDI (Musical Instrument Digital Interface)": "The universal digital protocol communicating note pitch, velocity, timing, and control commands between instruments and DAWs.",
+    "Mixer": "The software console screen displaying all track channel strips, volume faders, pans, inserts, buses, and output meters.",
+    "Monophonic": "Capable of generating or processing only one single musical note or voice at a time.",
+    "Mute": "Silencing a track, region, or channel strip without deleting it from the project arrangement.",
+    "Normalization": "A digital processing technique that scales an audio waveform's peak or loudness level to a specified target (such as 0 dBFS or -1 dBFS).",
+    "Note Repeat": "A MIDI performance tool that continuously triggers notes at a designated rhythmic subdivision when a key or pad is held.",
+    "Oscillator": "An electronic sound generator that produces periodic waveforms (like sine, triangle, saw, and square waves) in synthesizers.",
+    "Overdub": "Recording new musical parts on a track while listening to existing recorded material playing back in synchronization.",
+    "Pan (Panoramic Potentiometer)": "The control used to position an audio signal across the stereo soundstage between the left and right speakers.",
+    "Parametric EQ": "An equalizer featuring adjustable frequency bands with variable center frequency, boost/cut gain, and Q (bandwidth) controls.",
+    "Phantom Power (+48V)": "A 48-volt direct current sent through an XLR cable to power active electronics in condenser microphones and DI boxes.",
+    "Phase": "The time relationship between two or more interacting audio sound waves, where out-of-phase signals can cancel out frequencies.",
+    "Piano Roll": "A visual MIDI editor where notes are drawn as horizontal rectangles on a pitch grid paired with a vertical piano keyboard.",
+    "Ping-Pong Delay": "A stereo delay effect where echoed repeats alternate rhythmically between the left and right channels.",
+    "Pitch Bend": "A MIDI wheel or continuous controller message that smoothly shifts note pitch upward or downward in real time.",
+    "Playhead": "The vertical line on the timeline indicating the current playback, recording, or editing position.",
+    "Plug-in": "A third-party or built-in software module (instrument, effect, or utility) that runs inside Logic Pro to process sound.",
+    "Polyphonic": "Capable of producing and playing multiple musical notes or voices simultaneously (such as chords).",
+    "Pre-Fader / Post-Fader": "A routing designation determining whether an auxiliary send signal is tapped before or after the channel volume fader.",
+    "Punch In / Punch Out": "Automatically initiating and terminating audio recording at designated timeline markers while playback continues uninterrupted.",
+    "Quantize": "The process of automatically snapping MIDI notes or audio transients to the nearest musical grid subdivision to correct rhythmic timing.",
+    "Quick Sampler": "A single-sample instrument plugin in Logic Pro for quickly loading, pitching, slicing, and looping audio samples.",
+    "Ratio": "The proportion determining how much gain reduction a compressor applies to signals that exceed the set threshold (e.g., 4:1).",
+    "Region": "A discrete block of audio or MIDI data positioned on a track in the Tracks Area.",
+    "Release": "The duration of time it takes for a compressor or synthesizer envelope to return to resting state after the signal drops below threshold.",
+    "Remix FX": "A multi-effects plugin offering real-time DJ-style effects like stutters, tape stops, filters, and repeaters.",
+    "Reverb": "An acoustic spatial effect simulating sound reflections bouncing off physical room walls to create depth and dimension.",
+    "Ripple Delete": "An editing mode that closes the resulting timeline gap automatically whenever a region or section is removed.",
+    "Sample": "A single digital measurement of an audio waveform's amplitude, or a recorded snippet of sound used as an instrument element.",
+    "Sample Rate": "The number of audio snapshots taken per second when digitizing analog sound (commonly 44.1 kHz, 48 kHz, or 96 kHz).",
+    "Sampler": "A software instrument that maps recorded audio recordings across keyboard notes and velocities for realistic or synthetic playback.",
+    "Scrubbing": "Manually dragging the playhead forward or backward across the timeline to audition audio and find edit points.",
+    "Send": "An auxiliary bus output routing a portion of a channel's signal to an auxiliary channel strip for parallel effect processing.",
+    "Sidechain": "An auxiliary input that uses audio from an external track to trigger a dynamic effect (such as compressor ducking) on another track.",
+    "Signal Flow": "The sequential path an audio or MIDI signal travels from its sound source through processors, faders, and outputs.",
+    "Smart Controls": "A customizable macro panel providing simplified knobs and buttons mapped to multiple underlying plugin parameters.",
+    "Smart Tempo": "Logic Pro's tempo engine that automatically detects, conforms, and syncs recording tempos across un-clicked audio tracks.",
+    "Snap": "A timeline alignment tool that forces cursor edits, cuts, and region movements to align with designated rhythmic divisions.",
+    "Solo": "A button that isolates one or more selected tracks during playback while temporarily muting all non-soloed tracks.",
+    "Soundtrap": "A collaborative browser-based digital audio workstation used for foundational audio recording and beat production.",
+    "Spatial Audio": "An immersive multichannel audio format (such as Dolby Atmos) that positions sound in a three-dimensional sphere around the listener.",
+    "Split": "Dividing a region into two separate parts at the playhead or across a marquee selection.",
+    "Step Sequencer": "A grid-based pattern editor for composing repeating drum rhythms, basslines, and melodic sequences with step-by-step velocity and note controls.",
+    "Stem": "A consolidated stereo submix of related tracks (such as all drums, all vocals, or all guitars) exported for mixing or remixing.",
+    "Stereo": "Two-channel audio consisting of distinct left and right channels creating an auditory sense of width and spatial location.",
+    "Strip Silence": "A utility that scans an audio region and automatically cuts and deletes silent passages below a specified amplitude threshold.",
+    "Sub-Bass": "The ultra-low frequency spectrum ranging from 20 Hz to 60 Hz that is felt physically as much as it is heard.",
+    "Surround Sound": "Multichannel audio formats (such as 5.1 or 7.1) designed to route audio through front, side, and rear speaker arrays.",
+    "Take Folder": "A container track that groups multiple recorded passes together, facilitating seamless comping between takes.",
+    "Tempo": "The playback speed of a project measured in musical beats per minute (BPM).",
+    "Threshold": "The decibel level that an audio signal must cross before a dynamic processor (like a compressor or gate) activates.",
+    "Time Signature": "The musical meter of a composition indicating the number of beats per measure and which note value constitutes a beat.",
+    "Track": "A horizontal lane in the Tracks Area containing recorded or arranged audio, MIDI, or automation data.",
+    "Track Header": "The leftmost portion of a track lane containing track name, icon, mute, solo, record enable, and automation controls.",
+    "Track Stack": "A container feature grouping multiple tracks into a Folder Stack (for organization) or Summing Stack (for submixing and shared processing).",
+    "Transient": "The initial high-amplitude, short-duration peak at the attack onset of a percussive or plucked sound wave.",
+    "Transport": "The section of the Control Bar containing playback, recording, rewind, fast-forward, and cycle navigation controls.",
+    "Undo / Redo": "Commands (⌘ + Z and ⌘ + Shift + Z) that reverse or reapply the most recent editing actions.",
+    "VCA Group": "A fader assignment that scales the relative volume levels of assigned channel strips without routing their audio through an auxiliary bus.",
+    "Velocity": "A MIDI data value (0 to 127) indicating how hard or fast a note key or drum pad was struck.",
+    "Virtual Instrument (Software Instrument)": "A digital software synthesizer, sampler, or drum machine that generates audio from MIDI performances.",
+    "Vocoder": "A classic synthesizer effect that superimposes the frequency formants of a human voice onto a synthesized carrier wave.",
+    "Waveform": "A visual graphical representation of an audio signal's sound wave showing amplitude changes over time.",
+    "White Noise": "A random audio signal that contains equal energy per cycle across all audible frequencies.",
+    "Zero Crossing": "A point along an audio waveform where the signal amplitude crosses the 0 dB center line, ideal for splice edits without clicks.",
+    "Zoom Tool": "A navigation tool used to magnify or reduce the visible scale of tracks and regions horizontally and vertically."
+  };
+
+  // Build normalized index and alias mappings for flexible term matching
+  const GLOSSARY_INDEX = new Map();
+  const GLOSSARY_ALIASES = {
+    "aliases": "Alias",
+    "apple loop": "Apple Loops",
+    "arm": "Armed Track",
+    "arming": "Armed Track",
+    "arrangement": "Arrangement Marker",
+    "attacks": "Attack",
+    "audio interfaces": "Audio Interface",
+    "interface": "Audio Interface",
+    "interfaces": "Audio Interface",
+    "audio regions": "Audio Region",
+    "audio tracks": "Audio Track",
+    "automations": "Automation",
+    "automating": "Automation",
+    "automated": "Automation",
+    "aux": "Auxiliary Channel Strip (Aux)",
+    "auxes": "Auxiliary Channel Strip (Aux)",
+    "auxiliary": "Auxiliary Channel Strip (Aux)",
+    "bars": "Bar",
+    "bit depths": "Bit Depth",
+    "bounces": "Bounce",
+    "bouncing": "Bounce",
+    "bounced": "Bounce",
+    "buffer": "Buffer Size",
+    "buffers": "Buffer Size",
+    "buffersize": "Buffer Size",
+    "buses": "Bus",
+    "busses": "Bus",
+    "bussing": "Bus",
+    "busing": "Bus",
+    "bus compression": "Bus",
+    "channel strips": "Channel Strip",
+    "clicks": "Click Track",
+    "click": "Click Track",
+    "clips": "Clipping",
+    "clipped": "Clipping",
+    "comp": "Comping (Composite Take)",
+    "comps": "Comping (Composite Take)",
+    "comping": "Comping (Composite Take)",
+    "compressors": "Compressor",
+    "compression": "Compressor",
+    "compressing": "Compressor",
+    "crossfades": "Crossfade",
+    "crossfading": "Crossfade",
+    "cycles": "Cycle Mode",
+    "cycle": "Cycle Mode",
+    "cycling": "Cycle Mode",
+    "daws": "DAW (Digital Audio Workstation)",
+    "daw": "DAW (Digital Audio Workstation)",
+    "db": "Decibel (dB)",
+    "decibels": "Decibel (dB)",
+    "deesser": "De-Esser",
+    "de-essing": "De-Esser",
+    "delays": "Delay",
+    "echo": "Delay",
+    "dithering": "Dither",
+    "dmd": "Drum Machine Designer",
+    "drummer track": "Drummer",
+    "envelopes": "Envelope",
+    "eq": "EQ (Equalizer)",
+    "eqs": "EQ (Equalizer)",
+    "equalizer": "EQ (Equalizer)",
+    "equalize": "Equalization",
+    "equalizing": "Equalization",
+    "events": "Event List",
+    "expanders": "Expander",
+    "expanding": "Expander",
+    "fades": "Fade",
+    "fade in": "Fade",
+    "fade out": "Fade",
+    "faders": "Fader",
+    "filters": "Filter",
+    "flanging": "Flanger",
+    "flextime": "Flex Time",
+    "flex-time": "Flex Time",
+    "flexpitch": "Flex Pitch",
+    "flex-pitch": "Flex Pitch",
+    "freezing": "Freeze",
+    "froze": "Freeze",
+    "gain stage": "Gain Staging",
+    "gain-staging": "Gain Staging",
+    "gates": "Gate (Noise Gate)",
+    "gating": "Gate (Noise Gate)",
+    "noise gate": "Gate (Noise Gate)",
+    "harmonics": "Harmonics",
+    "harmonic": "Harmonics",
+    "headrooms": "Headroom",
+    "high pass": "High-Pass Filter (Low Cut)",
+    "high pass filter": "High-Pass Filter (Low Cut)",
+    "high-pass filter": "High-Pass Filter (Low Cut)",
+    "hpf": "High-Pass Filter (Low Cut)",
+    "low cut": "High-Pass Filter (Low Cut)",
+    "low cut filter": "High-Pass Filter (Low Cut)",
+    "inserts": "Insert",
+    "inspectors": "Inspector",
+    "joining": "Join",
+    "keys command": "Key Command",
+    "shortcuts": "Key Command",
+    "shortcut": "Key Command",
+    "key signatures": "Key Signature",
+    "latencies": "Latency",
+    "lfos": "LFO (Low Frequency Oscillator)",
+    "limiters": "Limiter",
+    "limiting": "Limiter",
+    "locators": "Locator",
+    "loops": "Loop",
+    "looping": "Loop",
+    "low pass": "Low-Pass Filter (High Cut)",
+    "low pass filter": "Low-Pass Filter (High Cut)",
+    "low-pass filter": "Low-Pass Filter (High Cut)",
+    "lpf": "Low-Pass Filter (High Cut)",
+    "high cut": "Low-Pass Filter (High Cut)",
+    "high cut filter": "Low-Pass Filter (High Cut)",
+    "marquee": "Marquee Tool",
+    "markers": "Marker",
+    "master": "Master Track (Stereo Out)",
+    "master fader": "Master Track (Stereo Out)",
+    "stereo out": "Master Track (Stereo Out)",
+    "metronomes": "Metronome",
+    "mixers": "Mixer",
+    "mixing": "Mixer",
+    "mutes": "Mute",
+    "muted": "Mute",
+    "muting": "Mute",
+    "normalizing": "Normalization",
+    "normalized": "Normalization",
+    "oscillators": "Oscillator",
+    "overdubbing": "Overdub",
+    "panning": "Pan (Panoramic Potentiometer)",
+    "pans": "Pan (Panoramic Potentiometer)",
+    "pan": "Pan (Panoramic Potentiometer)",
+    "phantom": "Phantom Power (+48V)",
+    "phantom power": "Phantom Power (+48V)",
+    "+48v": "Phantom Power (+48V)",
+    "48v": "Phantom Power (+48V)",
+    "piano rolls": "Piano Roll",
+    "plugins": "Plug-in",
+    "plugin": "Plug-in",
+    "pre fader": "Pre-Fader / Post-Fader",
+    "post fader": "Pre-Fader / Post-Fader",
+    "punch in": "Punch In / Punch Out",
+    "punch out": "Punch In / Punch Out",
+    "punching": "Punch In / Punch Out",
+    "quantize": "Quantize",
+    "quantizing": "Quantize",
+    "quantization": "Quantize",
+    "quantized": "Quantize",
+    "sampler": "Quick Sampler",
+    "samplers": "Quick Sampler",
+    "quick-sampler": "Quick Sampler",
+    "ratios": "Ratio",
+    "regions": "Region",
+    "releases": "Release",
+    "reverbs": "Reverb",
+    "reverberation": "Reverb",
+    "samples": "Sample",
+    "sampling": "Sample",
+    "sample rates": "Sample Rate",
+    "samplerate": "Sample Rate",
+    "sends": "Send",
+    "sending": "Send",
+    "sidechains": "Sidechain",
+    "sidechaining": "Sidechain",
+    "side-chain": "Sidechain",
+    "smart control": "Smart Controls",
+    "snapping": "Snap",
+    "solos": "Solo",
+    "soloed": "Solo",
+    "soloing": "Solo",
+    "spatial": "Spatial Audio",
+    "splits": "Split",
+    "splitting": "Split",
+    "step sequencer": "Step Sequencer",
+    "sequencer": "Step Sequencer",
+    "stems": "Stem",
+    "take folders": "Take Folder",
+    "takes": "Take Folder",
+    "tempos": "Tempo",
+    "bpm": "Tempo",
+    "thresholds": "Threshold",
+    "time signatures": "Time Signature",
+    "tracks": "Track",
+    "track stacks": "Track Stack",
+    "summing stack": "Track Stack",
+    "folder stack": "Track Stack",
+    "transients": "Transient",
+    "transient": "Transient",
+    "vca": "VCA Group",
+    "vcas": "VCA Group",
+    "velocities": "Velocity",
+    "software instrument": "Virtual Instrument (Software Instrument)",
+    "virtual instruments": "Virtual Instrument (Software Instrument)",
+    "vocoders": "Vocoder",
+    "waveforms": "Waveform",
+    "zero crossings": "Zero Crossing",
+    "zooming": "Zoom Tool"
+  };
+
+  for (const [term, def] of Object.entries(LOGIC_GLOSSARY)) {
+    GLOSSARY_INDEX.set(term.toLowerCase(), { term, def });
+  }
+  for (const [alias, canonical] of Object.entries(GLOSSARY_ALIASES)) {
+    if (LOGIC_GLOSSARY[canonical]) {
+      GLOSSARY_INDEX.set(alias.toLowerCase(), { term: canonical, def: LOGIC_GLOSSARY[canonical] });
+    }
+  }
+
+  function resolveGlossaryTerm(rawText) {
+    if (!rawText) return null;
+    let clean = rawText.trim().replace(/^[^a-zA-Z0-9+#]+|[^a-zA-Z0-9+#]+$/g, '').toLowerCase();
+    if (GLOSSARY_INDEX.has(clean)) {
+      return GLOSSARY_INDEX.get(clean);
+    }
+    if (clean.endsWith('ing') && GLOSSARY_INDEX.has(clean.slice(0, -3))) {
+      return GLOSSARY_INDEX.get(clean.slice(0, -3));
+    }
+    if (clean.endsWith('es') && GLOSSARY_INDEX.has(clean.slice(0, -2))) {
+      return GLOSSARY_INDEX.get(clean.slice(0, -2));
+    }
+    if (clean.endsWith('s') && GLOSSARY_INDEX.has(clean.slice(0, -1))) {
+      return GLOSSARY_INDEX.get(clean.slice(0, -1));
+    }
+    return null;
+  }
+
+  function annotateGlossaryTermsIn(container, doc) {
+    if (!container || !doc) return;
+    const keys = Object.keys(LOGIC_GLOSSARY).sort((a, b) => b.length - a.length);
+    const escaped = keys.map(k => k.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|');
+    const regex = new RegExp(`\\b(${escaped})(?:s|es|ing|ed)?\\b`, 'gi');
+
+    const textNodes = [];
+    const walk = (node) => {
+      if (!node) return;
+      if (node.nodeType === 3) {
+        if (node.nodeValue && node.nodeValue.trim().length > 0 && regex.test(node.nodeValue)) {
+          regex.lastIndex = 0;
+          textNodes.push(node);
+        }
+        return;
+      }
+      if (node.nodeType === 1) {
+        const tag = node.tagName.toUpperCase();
+        if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA' || tag === 'IFRAME') {
+          return;
+        }
+        if (node.classList && (node.classList.contains('logic-term') || node.classList.contains('logic-glossary-tooltip') || node.classList.contains('drum-drag-handle'))) {
+          return;
+        }
+        for (let child = node.firstChild; child; child = child.nextSibling) {
+          walk(child);
+        }
+      }
+    };
+
+    walk(container);
+
+    for (const node of textNodes) {
+      const parent = node.parentNode;
+      if (!parent) continue;
+      const text = node.nodeValue;
+      regex.lastIndex = 0;
+
+      const frag = doc.createDocumentFragment();
+      let lastIndex = 0;
+      let match;
+      while ((match = regex.exec(text)) !== null) {
+        const matchStart = match.index;
+        const matchEnd = regex.lastIndex;
+        if (matchStart > lastIndex) {
+          frag.appendChild(doc.createTextNode(text.substring(lastIndex, matchStart)));
+        }
+
+        const matchedText = match[0];
+        const canonical = resolveGlossaryTerm(matchedText) || resolveGlossaryTerm(match[1]);
+        const span = doc.createElement('span');
+        span.className = 'logic-term';
+        span.setAttribute('data-term', canonical ? canonical.term : matchedText);
+        span.textContent = matchedText;
+        frag.appendChild(span);
+
+        lastIndex = matchEnd;
+      }
+
+      if (lastIndex < text.length) {
+        frag.appendChild(doc.createTextNode(text.substring(lastIndex)));
+      }
+
+      parent.replaceChild(frag, node);
+    }
+  }
+
+  function initGlossary(doc, win) {
+    if (!doc || !win) return;
+    if (doc.__logicGlossaryInitialized) return;
+    doc.__logicGlossaryInitialized = true;
+
+    // Create Tooltip DOM Element
+    const tooltip = doc.createElement('div');
+    tooltip.className = 'logic-glossary-tooltip';
+    tooltip.id = 'logicGlossaryTooltip';
+    tooltip.innerHTML = `
+      <div class="tooltip-header">
+        <span class="tooltip-title" id="glossaryTooltipTitle"></span>
+        <span class="tooltip-badge">LOGIC PRO 11</span>
+      </div>
+      <div class="tooltip-body" id="glossaryTooltipBody"></div>
+      <div class="tooltip-footer">Music Tech Dictionary • Lane Tech HS</div>
+    `;
+    doc.body.appendChild(tooltip);
+
+    const titleEl = tooltip.querySelector('#glossaryTooltipTitle');
+    const bodyEl = tooltip.querySelector('#glossaryTooltipBody');
+
+    let hoverTimer = null;
+    let activeHoverElement = null;
+    let currentTrigger = null; // 'hover' or 'selection'
+
+    function showTooltip(term, def, x, y, trigger) {
+      currentTrigger = trigger;
+      titleEl.textContent = term;
+      bodyEl.textContent = def;
+
+      tooltip.style.display = 'block';
+      tooltip.classList.add('visible');
+
+      const tipRect = tooltip.getBoundingClientRect();
+      const tipWidth = tipRect.width || 280;
+      const tipHeight = tipRect.height || 85;
+      const winW = win.innerWidth || doc.documentElement.clientWidth;
+      const winH = win.innerHeight || doc.documentElement.clientHeight;
+
+      let top = y - tipHeight - 12;
+      let left = x - (tipWidth / 2);
+
+      if (top < 10) {
+        top = y + 20;
+      }
+      if (left < 10) left = 10;
+      if (left + tipWidth > winW - 10) {
+        left = winW - tipWidth - 10;
+      }
+      if (top + tipHeight > winH - 10) {
+        top = winH - tipHeight - 10;
+      }
+
+      tooltip.style.left = `${Math.round(left)}px`;
+      tooltip.style.top = `${Math.round(top)}px`;
+    }
+
+    function showTooltipAtRange(term, def, rect) {
+      currentTrigger = 'selection';
+      titleEl.textContent = term;
+      bodyEl.textContent = def;
+
+      tooltip.style.display = 'block';
+      tooltip.classList.add('visible');
+
+      const tipRect = tooltip.getBoundingClientRect();
+      const tipWidth = tipRect.width || 280;
+      const tipHeight = tipRect.height || 85;
+      const winW = win.innerWidth || doc.documentElement.clientWidth;
+      const winH = win.innerHeight || doc.documentElement.clientHeight;
+
+      let top = rect.top - tipHeight - 10;
+      let left = rect.left + (rect.width / 2) - (tipWidth / 2);
+
+      if (top < 10) {
+        top = rect.bottom + 10;
+      }
+      if (left < 10) left = 10;
+      if (left + tipWidth > winW - 10) {
+        left = winW - tipWidth - 10;
+      }
+      if (top + tipHeight > winH - 10) {
+        top = winH - tipHeight - 10;
+      }
+
+      tooltip.style.left = `${Math.round(left)}px`;
+      tooltip.style.top = `${Math.round(top)}px`;
+    }
+
+    function hideTooltip(trigger) {
+      if (trigger && currentTrigger && currentTrigger !== trigger) {
+        return;
+      }
+      tooltip.classList.remove('visible');
+      tooltip.style.display = 'none';
+      currentTrigger = null;
+    }
+
+    // 1. MOUSEOVER HOVER LISTENER (>300ms hover delay)
+    doc.addEventListener('mouseover', (e) => {
+      const termEl = e.target.closest('[data-term], .logic-term');
+      if (!termEl) return;
+      if (activeHoverElement === termEl) return;
+
+      const rawTerm = termEl.getAttribute('data-term') || termEl.textContent;
+      const matched = resolveGlossaryTerm(rawTerm);
+      if (!matched) return;
+
+      clearTimeout(hoverTimer);
+      activeHoverElement = termEl;
+
+      let mouseX = e.clientX;
+      let mouseY = e.clientY;
+
+      const onMouseMove = (ev) => {
+        mouseX = ev.clientX;
+        mouseY = ev.clientY;
+      };
+      termEl.addEventListener('mousemove', onMouseMove);
+
+      hoverTimer = setTimeout(() => {
+        showTooltip(matched.term, matched.def, mouseX, mouseY, 'hover');
+      }, 300);
+
+      const onMouseLeave = () => {
+        clearTimeout(hoverTimer);
+        termEl.removeEventListener('mousemove', onMouseMove);
+        termEl.removeEventListener('mouseleave', onMouseLeave);
+        if (activeHoverElement === termEl) {
+          activeHoverElement = null;
+          hideTooltip('hover');
+        }
+      };
+      termEl.addEventListener('mouseleave', onMouseLeave);
+    });
+
+    // 2. TEXT SELECTION LISTENER (selectionchange / mouseup)
+    function handleSelectionCheck() {
+      const selection = win.getSelection();
+      if (!selection || selection.isCollapsed) {
+        if (currentTrigger === 'selection') {
+          hideTooltip('selection');
+        }
+        return;
+      }
+
+      const text = selection.toString().trim();
+      if (!text || text.length > 50) {
+        if (currentTrigger === 'selection') {
+          hideTooltip('selection');
+        }
+        return;
+      }
+
+      const matched = resolveGlossaryTerm(text);
+      if (matched) {
+        try {
+          const range = selection.getRangeAt(0);
+          const rect = range.getBoundingClientRect();
+          if (rect && (rect.width > 0 || rect.height > 0)) {
+            showTooltipAtRange(matched.term, matched.def, rect);
+          }
+        } catch (err) {}
+      } else if (currentTrigger === 'selection') {
+        hideTooltip('selection');
+      }
+    }
+
+    doc.addEventListener('mouseup', handleSelectionCheck);
+    let selTimer = null;
+    doc.addEventListener('selectionchange', () => {
+      clearTimeout(selTimer);
+      selTimer = setTimeout(handleSelectionCheck, 120);
+    });
+
+    doc.addEventListener('mousedown', (e) => {
+      if (currentTrigger === 'selection' && !e.target.closest('#logicGlossaryTooltip')) {
+        setTimeout(handleSelectionCheck, 60);
+      }
+    });
+
+    win.annotateGlossaryTerms = (container) => {
+      annotateGlossaryTermsIn(container, doc);
+    };
+  }
+
+  // Initialize for main launcher window
+  initGlossary(document, window);
 </script>
 
 </body>

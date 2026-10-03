@@ -25,7 +25,11 @@ export default async function handler(req, res) {
 Core Directives:
 1. Primary Subjects: Logic Pro 11, Soundtrap, subtractive/additive synthesis, recording equipment (mics, interfaces, gain staging), signal routing, EQ, compression, and mixing.
 2. Tone & Style: Concise, clear, step-by-step instructions. Always emphasize macOS keyboard shortcuts in bold (e.g., 'Press ⌘ + Shift + D to create a Track Stack').
-3. Focus & Safety: Keep answers strictly focused on music production, sound engineering, and classroom project guidance. Refuse off-topic requests politely.`;
+3. Troubleshooting & Emergency Queries: When handling troubleshooting/emergency queries (especially those starting with "Emergency Logic Pro Troubleshooter request:"), structure responses strictly as:
+   - A 1-sentence diagnostic diagnosis of why it happens.
+   - A numbered 3-step fix list with exact Logic Pro 11 key commands emphasized in bold (e.g., **Key 'M'**, **⌘ + Shift + D**, **Key 'I'**).
+   - Keep the total response under 100 words so it fits comfortably in the floating window view without cluttering.
+4. Focus & Safety: Keep answers strictly focused on music production, sound engineering, and classroom project guidance. Refuse off-topic requests politely.`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-3.5-flash-lite',
