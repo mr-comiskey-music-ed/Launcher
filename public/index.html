@@ -375,8 +375,15 @@
     let iframeSrc = '';
     let directUrl = '';
     if (selectedDocId.startsWith('http://') || selectedDocId.startsWith('https://')) {
-      iframeSrc = selectedDocId;
       directUrl = selectedDocId;
+      if (selectedDocId.includes('drive.google.com/file/d/')) {
+        iframeSrc = selectedDocId.replace(/\/view.*$/, '/preview').replace(/\/edit.*$/, '/preview');
+        if (!iframeSrc.includes('/preview')) iframeSrc += '/preview';
+      } else if (selectedDocId.includes('docs.google.com/document/d/')) {
+        iframeSrc = selectedDocId.replace(/\/view.*$/, '/preview?rm=minimal&authuser=0').replace(/\/edit.*$/, '/preview?rm=minimal&authuser=0');
+      } else {
+        iframeSrc = selectedDocId;
+      }
     } else {
       let docId = selectedDocId.replace(/[\/%\s]+$/, '');
       const match = docId.match(/\/d\/(e\/[a-zA-Z0-9-_]+|[a-zA-Z0-9-_]+)/);

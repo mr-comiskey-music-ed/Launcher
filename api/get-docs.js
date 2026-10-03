@@ -27,14 +27,14 @@ export default async function handler(req, res) {
 
   try {
     const fetchFolder = async (folderId) => {
-      const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&key=${apiKey}&fields=files(id,name)&orderBy=name`;
+      const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&key=${apiKey}&fields=files(id,name,webViewLink)&orderBy=name`;
       const response = await fetch(url);
       if (!response.ok) throw new Error(`Google Drive API error: ${response.statusText}`);
       const data = await response.json();
       return (data.files || []).map(f => ({
         title: f.name,
         id: f.id,
-        webViewLink: `https://docs.google.com/document/d/${f.id}/view`
+        webViewLink: f.webViewLink || `https://drive.google.com/file/d/${f.id}/view`
       })).sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' }));
     };
 
