@@ -773,11 +773,6 @@
         <div class="control-group">
           <a href="${directUrl}" target="_blank" style="background: #0284c7; color: #fff; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">↗️ Open Doc</a>
           <button id="loupeToggleBtn">🔍 Magnify</button>
-          <span>Zoom:</span>
-          <button id="zoomOut">-</button>
-          <span id="zoomVal">100%</span>
-          <button id="zoomIn">+</button>
-          <button id="zoomReset">Reset</button>
         </div>
       `;
       pipWindow.document.body.appendChild(toolbar);
@@ -1588,17 +1583,6 @@
         modal.style.display = 'flex';
       });
 
-      let currentZoom = 1.0;
-      const setZoom = (newZoom) => {
-        currentZoom = Math.round(Math.max(0.5, Math.min(2.5, newZoom)) * 10) / 10;
-        docWrapper.style.zoom = currentZoom;
-        pipWindow.document.getElementById('zoomVal').textContent = `${Math.round(currentZoom * 100)}%`;
-      };
-
-      pipWindow.document.getElementById('zoomIn').addEventListener('click', () => setZoom(currentZoom + 0.1));
-      pipWindow.document.getElementById('zoomOut').addEventListener('click', () => setZoom(currentZoom - 0.1));
-      pipWindow.document.getElementById('zoomReset').addEventListener('click', () => setZoom(1.0));
-
       let loupeActive = false;
       const loupeBtn = pipWindow.document.getElementById('loupeToggleBtn');
 
@@ -2208,6 +2192,7 @@
     doc.addEventListener('mouseover', (e) => {
       const termEl = e.target.closest('[data-term], .logic-term');
       if (!termEl) return;
+      if (!termEl.closest('.viewport-area, .doc-wrapper')) return;
       if (activeHoverElement === termEl) return;
 
       const rawTerm = termEl.getAttribute('data-term') || termEl.textContent;
