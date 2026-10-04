@@ -75,21 +75,26 @@ async function startServer() {
     }
 
     try {
-      const { prompt } = req.body || {};
+      const { prompt, currentDocId } = req.body || {};
       if (!prompt) {
         return res.status(400).json({ error: 'Prompt is required.' });
       }
 
       const ai = new GoogleGenAI({ apiKey });
-      const systemInstruction = `You are an encouraging, highly practical High School Music Technology AI assistant for Mr. Comiskey's Sound Engineering and Advanced Music Production classes at Lane Tech High School.
+      const systemInstruction = `You operate inside a small, floating side panel while students actively work in Logic Pro 11. 
 
-Core Directives:
-1. Primary Subjects: Logic Pro 11, Soundtrap, subtractive/additive synthesis, recording equipment (mics, interfaces, gain staging), signal routing, EQ, compression, and mixing.
-2. Tone & Style: Concise, clear, step-by-step instructions. Always emphasize macOS keyboard shortcuts in bold (e.g., 'Press ⌘ + Shift + D to create a Track Stack').
-3. Focus & Safety: Keep answers strictly focused on music production, sound engineering, and classroom project guidance. Refuse off-topic requests politely.`;
+FORMATTING RULES:
+1. MAX LENGTH: 125 words total. Never write long introductory paragraphs or background essays.
+2. ACTION-FIRST: Start immediately with the answer or keyboard shortcut.
+3. STRUCTURE: Use maximum 4 bullet points. 
+4. BOLD KEY COMMANDS: Always put exact macOS key commands in bold (e.g., **⌘B**, **Option-C**).
+5. NO FLUFF: Skip introductory greetings (e.g., 'Here is what you need to know...') and go straight to the solution.
+
+# System Instructions: Music Tech AI Assistant
+You are an encouraging, highly practical High School Music Technology AI assistant for Mr. Comiskey's Sound Engineering and Advanced Music Production classes at Lane Tech High School. Base DAW functionality on Logic Pro 11 and Soundtrap. Always emphasize macOS keyboard shortcuts in bold.`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash',
+        model: 'gemini-3.8-flash',
         contents: prompt,
         config: {
           systemInstruction,
@@ -98,7 +103,7 @@ Core Directives:
       });
 
       const reply = response.text || 'I am here to help with your music tech project!';
-      res.json({ reply });
+      res.json({ reply, text: reply, message: reply, response: reply });
     } catch (err: any) {
       console.error('Chat API Error:', err);
       res.status(500).json({ error: err.message || 'Internal server error' });

@@ -9,6 +9,7 @@
   <meta property="og:description" content="Logic Pro Floating Doc Launcher for Audio Engineering Students">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     /* Logic Pro Dark Aesthetic */
     body {
@@ -374,8 +375,13 @@
   async function launchFloater(selectedDocId) {
     let iframeSrc = '';
     let directUrl = '';
+    let docId = '';
+
     if (selectedDocId.startsWith('http://') || selectedDocId.startsWith('https://')) {
       directUrl = selectedDocId;
+      const match = selectedDocId.match(/\/d\/(e\/[a-zA-Z0-9-_]+|[a-zA-Z0-9-_]+)/);
+      if (match && match[1]) docId = match[1];
+
       if (selectedDocId.includes('drive.google.com/file/d/')) {
         iframeSrc = selectedDocId.replace(/\/view.*$/, '/preview').replace(/\/edit.*$/, '/preview');
         if (!iframeSrc.includes('/preview')) iframeSrc += '/preview';
@@ -385,7 +391,7 @@
         iframeSrc = selectedDocId;
       }
     } else {
-      let docId = selectedDocId.replace(/[\/%\s]+$/, '');
+      docId = selectedDocId.replace(/[\/%\s]+$/, '');
       const match = docId.match(/\/d\/(e\/[a-zA-Z0-9-_]+|[a-zA-Z0-9-_]+)/);
       if (match && match[1]) docId = match[1];
 
@@ -868,20 +874,27 @@
             body: JSON.stringify({ prompt: apiPayload, currentDocId: docId })
           });
           const data = await res.json();
-          const replyText = data.reply || data.text || data.message || data.response;
-          if (replyText) {
-            if (pipWindow.marked && typeof pipWindow.marked.parse === 'function') {
-              thinkingMsg.innerHTML = pipWindow.marked.parse(replyText);
-            } else {
-              thinkingMsg.textContent = replyText;
-            }
-          } else if (data.error) {
-            thinkingMsg.textContent = 'Error: ' + data.error;
+          if (!res.ok || data.error) {
+            thinkingMsg.textContent = 'Server Error (' + res.status + '): ' + (data.error || JSON.stringify(data));
+            console.error('Chat API Error Response:', data);
           } else {
-            thinkingMsg.textContent = 'Sorry, I encountered an error answering that.';
+            const replyText = data.reply || data.text || data.message || data.response;
+            if (replyText) {
+              const parser = (pipWindow.marked && typeof pipWindow.marked.parse === 'function')
+                ? pipWindow.marked
+                : (window.marked && typeof window.marked.parse === 'function' ? window.marked : null);
+              if (parser) {
+                thinkingMsg.innerHTML = parser.parse(replyText);
+              } else {
+                thinkingMsg.textContent = replyText;
+              }
+            } else {
+              thinkingMsg.textContent = 'Error: Empty response received from AI assistant.';
+            }
           }
         } catch (e) {
-          thinkingMsg.textContent = 'Connection error. Please check your network.';
+          console.error('Chat connection error:', e);
+          thinkingMsg.textContent = 'Network/Fetch Error: ' + (e && e.message ? e.message : 'Please check console for details.');
         }
         chatMessages.scrollTop = chatMessages.scrollHeight;
       }
@@ -1577,10 +1590,8 @@
 
       let currentZoom = 1.0;
       const setZoom = (newZoom) => {
-        currentZoom = Math.round(Math.max(0.5, Math.min(2.0, newZoom)) * 10) / 10;
-        docWrapper.style.transform = `scale(${currentZoom})`;
-        docWrapper.style.width = `${100 / currentZoom}%`;
-        docWrapper.style.height = `${100 / currentZoom}%`;
+        currentZoom = Math.round(Math.max(0.5, Math.min(2.5, newZoom)) * 10) / 10;
+        docWrapper.style.zoom = currentZoom;
         pipWindow.document.getElementById('zoomVal').textContent = `${Math.round(currentZoom * 100)}%`;
       };
 

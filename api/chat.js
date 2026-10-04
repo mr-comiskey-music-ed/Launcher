@@ -92,10 +92,17 @@ When a student needs visual or audio demonstrations beyond text steps:
 2. **Provide Search Phrases:** Give exact search phrases to paste into YouTube (e.g., *"Search YouTube for: 'Logic Pro Flex Pitch MusicTechHelpGuy'"*).`;
 
     // Initialize using the new @google/genai SDK
-    const ai = new GoogleGenAI({ apiKey });
+    const ai = new GoogleGenAI({ 
+      apiKey,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        }
+      }
+    });
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.8-flash",
       contents: prompt,
       config: {
         systemInstruction: systemInstruction,
