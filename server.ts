@@ -18,6 +18,7 @@ async function startServer() {
     const AMP_FOLDER_ID = '1EvIPUXvf5PiSenapOKapb_N8QWUDuxMp';
 
     const FALLBACK_SE = [
+      { title: "Mixing Help #1: Hip Hop", id: "mixing-help-hiphop-1", webViewLink: "https://docs.google.com/document/d/e/2PACX-1vRRcCwNyh2Etl3FnDP90h3PBPXqvKwM-2LbLebpw6B6j0CmIS4CJb5G46PGvYYsFC7GdxA3jjArVzSp/pub" },
       { title: "Project #1: Loops in Soundtrap", id: "1HOLjorJv6ONr7ACmGEcJq6CFbhi_Rr41dNDNvRFtngE", webViewLink: "https://docs.google.com/document/d/1HOLjorJv6ONr7ACmGEcJq6CFbhi_Rr41dNDNvRFtngE/view" },
       { title: "Project #2: My Musical Life", id: "1Tiy5EIDgB1-_XDSe1aX0pLpIYnL2YYmWuJjWR38PFok", webViewLink: "https://docs.google.com/document/d/1Tiy5EIDgB1-_XDSe1aX0pLpIYnL2YYmWuJjWR38PFok/view" },
       { title: "Project #3: Soundtrap Drums & Loops", id: "1JCTDjoXTgTqK7goxczUCbN-nk4afQAUlrhrOH5TShtw", webViewLink: "https://docs.google.com/document/d/1JCTDjoXTgTqK7goxczUCbN-nk4afQAUlrhrOH5TShtw/view" },
@@ -72,7 +73,20 @@ async function startServer() {
     const docId = req.query.id as string;
     if (!docId) return res.status(400).json({ error: 'Document ID is required' });
     try {
-      const pubUrl = `https://docs.google.com/document/d/${docId}/pub`;
+      const PUBLISH_URL_MAP: Record<string, string> = {
+        "mixing-help-hiphop-1": "https://docs.google.com/document/d/e/2PACX-1vRRcCwNyh2Etl3FnDP90h3PBPXqvKwM-2LbLebpw6B6j0CmIS4CJb5G46PGvYYsFC7GdxA3jjArVzSp/pub",
+        "1oQbqJMabNBT-1DfnPAugMmyH3LN3qXXfFqWqsdWnzF8": "https://docs.google.com/document/d/e/2PACX-1vSn1zukoDKI95AMWqtZT8FqZMtHL0obm3ay1yEztwAeekKZiEJQR8TYkKkP1piyUaax_hTYSTiV8YdC/pub",
+        "1LwVqdcdJ5caRrjhWnqoT3TTCVkK4VqUNZZgZjpUUy0s": "https://docs.google.com/document/d/e/2PACX-1vQGF7X2VO4t7dbwpR2Fr1lbfl1MAXIgUdI10Mn_cHNuHL9QeQk78EC8adGthyA13M752lnEOM53-IaR/pub",
+        "2PACX-1vRRcCwNyh2Etl3FnDP90h3PBPXqvKwM-2LbLebpw6B6j0CmIS4CJb5G46PGvYYsFC7GdxA3jjArVzSp": "https://docs.google.com/document/d/e/2PACX-1vRRcCwNyh2Etl3FnDP90h3PBPXqvKwM-2LbLebpw6B6j0CmIS4CJb5G46PGvYYsFC7GdxA3jjArVzSp/pub"
+      };
+
+      let pubUrl = PUBLISH_URL_MAP[docId];
+      if (!pubUrl) {
+        pubUrl = docId.startsWith('e/')
+          ? `https://docs.google.com/document/d/${docId}/pub`
+          : `https://docs.google.com/document/d/${docId}/pub`;
+      }
+
       const response = await fetch(pubUrl);
       if (!response.ok) {
         return res.json({ 
@@ -82,7 +96,7 @@ async function startServer() {
             'Complete recording and arrangement tasks',
             'Export and submit final audio project'
           ],
-          note: 'Note: Document is not published to the web. Publish to web in Google Docs (File > Share > Publish to web) to load live checklist items.' 
+          note: 'Note: Document is not published to the web or URL mapping needed. Publish to web in Google Docs (File > Share > Publish to web).' 
         });
       }
       const html = await response.text();

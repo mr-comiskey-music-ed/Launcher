@@ -246,6 +246,7 @@
 
   // Fallback Static Registries if API fails or local testing
   const FALLBACK_SE = [
+    { title: "Mixing Help #1: Hip Hop", id: "mixing-help-hiphop-1" },
     { title: "Project #1: Loops in Soundtrap", id: "1HOLjorJv6ONr7ACmGEcJq6CFbhi_Rr41dNDNvRFtngE" },
     { title: "Project #2: My Musical Life", id: "1Tiy5EIDgB1-_XDSe1aX0pLpIYnL2YYmWuJjWR38PFok" },
     { title: "Project #3: Soundtrap Drums & Loops", id: "1JCTDjoXTgTqK7goxczUCbN-nk4afQAUlrhrOH5TShtw" },
@@ -534,23 +535,24 @@
         .tab-btn.active { background: #EAB308; color: #133629; border-color: #FACC15; font-weight: 700; }
 
         /* Drum Patterns Styles */
-        .drum-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .drum-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; font-family: 'Cabin', sans-serif; }
         .drum-search, .drum-filter {
-          background: #18181a; border: 1px solid #3a3a3c; color: #f3f4f6; padding: 6px 10px; border-radius: 4px; font-size: 12px; outline: none;
+          background: #14382B; border: 1.5px solid #CA8A04; color: #f3f4f6; padding: 6px 10px; border-radius: 6px; font-size: 12px; outline: none; font-family: 'Cabin', sans-serif;
         }
         .drum-search { flex: 1; min-width: 140px; }
         .drum-grid { display: grid; grid-template-columns: 1fr; gap: 10px; max-height: 60vh; overflow-y: auto; }
         .drum-card {
-          background: #18181a;
-          border: 1px solid #3a3a3c;
+          background: #14382B;
+          border: 1px solid #CA8A04;
           border-radius: 6px;
           padding: 10px;
-          transition: opacity 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+          transition: border-color 0.15s ease;
+          font-family: 'Cabin', sans-serif;
         }
         .drum-card.is-dragging {
           opacity: 0.6 !important;
-          border-color: #38bdf8 !important;
-          box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+          border-color: #FACC15 !important;
+          box-shadow: 0 0 12px rgba(250, 204, 21, 0.4);
         }
         .drum-drag-handle {
           cursor: grab;
@@ -558,19 +560,19 @@
           display: inline-flex;
           align-items: center;
           gap: 3px;
-          color: #9ca3af;
-          background: #202023;
-          border: 1px solid #3a3a3c;
+          color: #d1d5db;
+          background: #1B4D3E;
+          border: 1px solid #CA8A04;
           padding: 2px 7px;
           border-radius: 4px;
           font-size: 11px;
           font-weight: 600;
-          letter-spacing: 0.3px;
+          font-family: 'Cabin', sans-serif;
         }
         .drum-drag-handle:hover {
-          color: #38bdf8;
-          border-color: #38bdf8;
-          background: #27272a;
+          color: #FACC15;
+          border-color: #FACC15;
+          background: #235C48;
         }
         .drum-drag-handle:active, .drum-card:active .drum-drag-handle {
           cursor: grabbing;
@@ -581,95 +583,95 @@
           display: inline-flex;
           align-items: center;
           gap: 3px;
-          color: #9ca3af;
-          background: #202023;
-          border: 1px solid #3a3a3c;
+          color: #d1d5db;
+          background: #1B4D3E;
+          border: 1px solid #CA8A04;
           padding: 2px 7px;
           border-radius: 4px;
           font-size: 11px;
           font-weight: 600;
-          letter-spacing: 0.3px;
+          font-family: 'Cabin', sans-serif;
           text-decoration: none;
         }
         .drum-drag-link:hover {
-          color: #38bdf8;
-          border-color: #38bdf8;
-          background: #27272a;
+          color: #FACC15;
+          border-color: #FACC15;
+          background: #235C48;
         }
         .drum-drag-link:active {
           cursor: grabbing;
         }
-        .drum-card-title { font-weight: bold; color: #38bdf8; font-size: 13px; margin-bottom: 6px; }
+        .drum-card-title { font-weight: bold; color: #FACC15; font-size: 13px; margin-bottom: 6px; font-family: 'Cabin', sans-serif; }
         .drum-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
-        .drum-tag { background: #242426; border: 1px solid #3a3a3c; color: #9ca3af; font-size: 10px; padding: 2px 6px; border-radius: 10px; }
-        .sequencer-table { display: flex; flex-direction: column; gap: 3px; background: #121212; padding: 6px; border-radius: 4px; border: 1px solid #2a2a2c; }
+        .drum-tag { background: #1B4D3E; border: 1px solid #CA8A04; color: #FEF08A; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-family: 'Cabin', sans-serif; }
+        .sequencer-table { display: flex; flex-direction: column; gap: 3px; background: #0F2E23; padding: 6px; border-radius: 6px; border: 1px solid #CA8A04; }
         .seq-row { display: flex; align-items: center; gap: 4px; }
-        .seq-label { width: 55px; font-size: 10px; color: #9ca3af; text-transform: uppercase; font-family: monospace; }
+        .seq-label { width: 55px; font-size: 10px; color: #FEF08A; text-transform: uppercase; font-family: 'Cabin', sans-serif; font-weight: 700; }
         .seq-steps { display: flex; gap: 2px; flex: 1; }
-        .seq-step { flex: 1; height: 12px; background: #242426; border-radius: 2px; min-width: 6px; box-sizing: border-box; }
+        .seq-step { flex: 1; height: 12px; background: #1B4D3E; border-radius: 2px; min-width: 6px; box-sizing: border-box; }
         .seq-step.active-hihatO { background: #c084fc !important; }
         .seq-step.active-hihatC { background: #facc15 !important; }
         .seq-step.active-snare { background: #f87171 !important; }
         .seq-step.active-kick { background: #38bdf8 !important; }
-        .seq-step.beat-divider { border-left: 2px solid #38bdf866; }
+        .seq-step.beat-divider { border-left: 2px solid #CA8A0466; }
         .drum-play-btn {
-          background: #2563eb; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600;
+          background: #EAB308; color: #133629; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 700; font-family: 'Cabin', sans-serif;
         }
-        .drum-play-btn:hover { background: #3b82f6; }
-        .drum-play-btn.playing { background: #dc2626 !important; }
+        .drum-play-btn:hover { background: #FACC15; }
+        .drum-play-btn.playing { background: #B91C1C !important; color: #fff !important; }
         .drum-fav-btn {
-          background: transparent; color: #9ca3af; border: 1px solid #3a3a3c; padding: 2px 6px; border-radius: 4px; font-size: 13px; cursor: pointer; line-height: 1; display: inline-flex; align-items: center; justify-content: center;
+          background: transparent; color: #d1d5db; border: 1px solid #CA8A04; padding: 2px 6px; border-radius: 4px; font-size: 13px; cursor: pointer; line-height: 1; display: inline-flex; align-items: center; justify-content: center;
         }
-        .drum-fav-btn:hover { background: #242426; border-color: #facc15; color: #facc15; }
-        .drum-fav-btn.is-fav { color: #facc15; border-color: #facc15; text-shadow: 0 0 6px rgba(250, 204, 21, 0.5); }
+        .drum-fav-btn:hover { background: #1B4D3E; border-color: #FACC15; color: #FACC15; }
+        .drum-fav-btn.is-fav { color: #FACC15; border-color: #FACC15; }
         .drum-midi-btn {
-          background: #27272a; color: #38bdf8; border: 1px solid #3f3f46; padding: 3px 7px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+          background: #1B4D3E; color: #FACC15; border: 1px solid #CA8A04; padding: 3px 7px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Cabin', sans-serif;
         }
-        .drum-midi-btn:hover { background: #38bdf8; color: #09090b; border-color: #38bdf8; }
-        .seq-step.playing-step { box-shadow: inset 0 0 0 2px #38bdf8, 0 0 8px #38bdf8 !important; filter: brightness(1.3); }
+        .drum-midi-btn:hover { background: #235C48; color: #FEF08A; border-color: #FACC15; }
+        .seq-step.playing-step { box-shadow: inset 0 0 0 2px #FACC15, 0 0 8px #FACC15 !important; filter: brightness(1.3); }
 
-        .tab-nav { display: flex; gap: 6px; margin-bottom: 12px; border-bottom: 1px solid #3a3a3c; padding-bottom: 8px; flex-wrap: wrap; }
-        .tab-btn { background: #18181a; color: #9ca3af; border: 1px solid #3a3a3c; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; }
-        .tab-btn.active { background: #2563eb; color: #fff; border-color: #3b82f6; }
+        .tab-nav { display: flex; gap: 6px; margin-bottom: 12px; border-bottom: 1px solid #CA8A04; padding-bottom: 8px; flex-wrap: wrap; }
+        .tab-btn { background: #14382B; color: #d1d5db; border: 1px solid #CA8A04; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: 'Cabin', sans-serif; }
+        .tab-btn.active { background: #EAB308; color: #133629; border-color: #FACC15; font-weight: 700; }
         .tab-pane { display: none; }
         .tab-pane.active { display: block; }
 
-        .shortcut-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #3a3a3c; }
-        .shortcut-key { font-family: monospace; background: #18181a; padding: 2px 6px; border-radius: 4px; color: #38bdf8; }
-        .bpm-display { font-size: 32px; font-weight: bold; color: #38bdf8; text-align: center; margin: 10px 0; font-family: monospace; }
-        .tap-btn { background: #2563eb; color: white; border: none; padding: 14px; width: 100%; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .shortcut-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #285E4A; font-family: 'Cabin', sans-serif; }
+        .shortcut-key { font-family: 'Cabin', sans-serif; font-weight: 700; background: #14382B; padding: 2px 6px; border-radius: 4px; color: #FEF08A; border: 1px solid #CA8A04; }
+        .bpm-display { font-size: 32px; font-weight: bold; color: #FACC15; text-align: center; margin: 10px 0; font-family: 'Cabin', sans-serif; }
+        .tap-btn { background: #EAB308; color: #133629; border: none; padding: 14px; width: 100%; border-radius: 6px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Cabin', sans-serif; }
 
         .video-container {
-          position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-top: 10px; margin-bottom: 16px; border-radius: 6px; border: 1px solid #3a3a3c; background: #000;
+          position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-top: 10px; margin-bottom: 16px; border-radius: 6px; border: 1px solid #CA8A04; background: #000;
         }
         .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-        .expandable-img-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 12px 0; }
-        .expandable-card { background: #18181a; border: 1px solid #3a3a3c; border-radius: 6px; padding: 8px; cursor: pointer; transition: border-color 0.2s; }
-        .expandable-card:hover { border-color: #38bdf8; }
+        .expandable-img-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 12px 0; font-family: 'Cabin', sans-serif; }
+        .expandable-card { background: #14382B; border: 1px solid #CA8A04; border-radius: 6px; padding: 8px; cursor: pointer; transition: border-color 0.2s; }
+        .expandable-card:hover { border-color: #FACC15; }
         .expandable-card img { width: 100%; height: auto; border-radius: 4px; display: block; }
-        .expandable-caption { font-size: 11px; color: #38bdf8; margin-top: 6px; text-align: center; font-weight: 600; }
+        .expandable-caption { font-size: 11px; color: #FACC15; margin-top: 6px; text-align: center; font-weight: 600; font-family: 'Cabin', sans-serif; }
         .lightbox-modal {
           display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
         }
-        .lightbox-content { max-width: 90%; max-height: 90%; border-radius: 6px; border: 2px solid #38bdf8; }
+        .lightbox-content { max-width: 90%; max-height: 90%; border-radius: 6px; border: 2px solid #EAB308; }
 
         /* Logic Pro 11 Dark Mode Glossary Tooltip */
         .logic-glossary-tooltip {
           position: fixed;
           z-index: 999999;
-          background: #18181a;
+          background: #14382B;
           color: #f3f4f6;
-          border: 1px solid #38bdf8;
+          border: 1px solid #CA8A04;
           border-radius: 6px;
           padding: 10px 14px;
-          box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8), 0 0 14px rgba(56, 189, 248, 0.25);
+          box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8), 0 0 14px rgba(202, 138, 4, 0.25);
           pointer-events: none;
           max-width: 300px;
           opacity: 0;
           display: none;
           transform: translateY(4px);
           transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-          font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+          font-family: 'Cabin', sans-serif;
           user-select: none;
         }
         .logic-glossary-tooltip.visible {
@@ -682,23 +684,24 @@
           justify-content: space-between;
           gap: 8px;
           margin-bottom: 6px;
-          border-bottom: 1px solid #2e2e33;
+          border-bottom: 1px solid #285E4A;
           padding-bottom: 4px;
         }
         .logic-glossary-tooltip .tooltip-badge {
-          background: #0284c7;
-          color: #f0f9ff;
+          background: #1B4D3E;
+          color: #FACC15;
           font-size: 9px;
           font-weight: 700;
           padding: 1px 6px;
           border-radius: 3px;
           letter-spacing: 0.5px;
           text-transform: uppercase;
+          border: 1px solid #CA8A04;
         }
         .logic-glossary-tooltip .tooltip-title {
           font-size: 13px;
           font-weight: 700;
-          color: #38bdf8;
+          color: #FACC15;
           letter-spacing: 0.3px;
         }
         .logic-glossary-tooltip .tooltip-body {
@@ -709,7 +712,7 @@
         .logic-glossary-tooltip .tooltip-footer {
           margin-top: 6px;
           font-size: 9px;
-          color: #94a3b8;
+          color: #FEE08A;
           font-style: italic;
           text-align: right;
         }
