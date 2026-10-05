@@ -49,7 +49,7 @@ async function startServer() {
         return (data.files || []).map((f: any) => ({
           title: f.name,
           id: f.id,
-          webViewLink: f.webViewLink || `https://docs.google.com/document/d/${f.id}/view`
+          webViewLink: `https://docs.google.com/document/d/${f.id}/view`
         })).sort((a: any, b: any) => a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' }));
       };
 
