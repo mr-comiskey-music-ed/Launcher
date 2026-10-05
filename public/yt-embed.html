@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Video Player</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000000;
+    }
+    #player-container, iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+  </style>
+  <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+  <div id="player-container"></div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const videoId = params.get('v') || '7H3cHfV8rXI';
+    let playerInstance = null;
+
+    function createPlayer() {
+      if (window.YT && window.YT.Player) {
+        try {
+          playerInstance = new window.YT.Player('player-container', {
+            host: 'https://www.youtube-nocookie.com',
+            videoId: videoId,
+            playerVars: {
+              autoplay: 0,
+              controls: 1,
+              modestbranding: 1,
+              rel: 0,
+              enablejsapi: 1,
+              origin: window.location.origin,
+              widget_referrer: window.location.href,
+              wmode: 'transparent',
+            },
+            events: {
+              onReady: function(event) {
+                try {
+                  const iframe = event.target.getIframe();
+                  if (iframe) {
+                    iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+                    iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+                  }
+                } catch(e) {}
+              }
+            }
+          });
+          return;
+        } catch(e) {
+          console.warn('YT.Player init failed, using iframe fallback', e);
+        }
+      }
+
+      // Direct iframe fallback
+      const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}&widget_referrer=${encodeURIComponent(window.location.href)}&modestbranding=1&rel=0&wmode=transparent`;
+      document.getElementById('player-container').innerHTML = `
+        <iframe src="${embedUrl}" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%;height:100%;border:0;"></iframe>
+      `;
+    }
+
+    if (window.YT && window.YT.Player) {
+      createPlayer();
+    } else {
+      window.onYouTubeIframeAPIReady = createPlayer;
+      setTimeout(() => {
+        if (!document.querySelector('iframe')) {
+          createPlayer();
+        }
+      }, 1200);
+    }
+
+    window.addEventListener('message', function(e) {
+      if (e.data === 'pause') {
+        if (playerInstance && typeof playerInstance.pauseVideo === 'function') {
+          try { playerInstance.pauseVideo(); } catch(err) {}
+        }
+      }
+    });
+  </script>
+</body>
+</html>
