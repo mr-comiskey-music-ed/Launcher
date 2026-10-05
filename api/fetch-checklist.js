@@ -15,6 +15,13 @@ export default async function handler(req, res) {
     const apiKey = process.env.GOOGLE_DRIVE_API_KEY || process.env.GEMINI_API_KEY;
     let targetDocId = fileId;
 
+    const SHORTCUT_TARGETS = {
+      "1mWPHycBDUv8cpk7NkUXC-ypx-J2Qa5AN": "1oQbqJMabNBT-1DfnPAugMmyH3LN3qXXfFqWqsdWnzF8"
+    };
+    if (SHORTCUT_TARGETS[fileId]) {
+      targetDocId = SHORTCUT_TARGETS[fileId];
+    }
+
     // 1. Resolve Drive shortcut if apiKey is available
     if (apiKey && !rawId.includes('docs.google.com/document/d/e/')) {
       try {

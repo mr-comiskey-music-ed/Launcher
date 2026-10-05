@@ -9,6 +9,7 @@
   <meta property="og:description" content="Logic Pro Floating Doc Launcher for Audio Engineering Students">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎛️</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -256,15 +257,30 @@
     { title: "Project #1: Partner Project & Logic Review", id: "118H-sHLE_Ezjn_rooh52rVnDZ6Kf_f7h0Wlioj24Wx4" }
   ];
 
+  // Explicit Shortcut-to-Document ID mapping to guarantee resolving Google Drive shortcuts
+  const SHORTCUT_TARGETS = {
+    "1mWPHycBDUv8cpk7NkUXC-ypx-J2Qa5AN": "1oQbqJMabNBT-1DfnPAugMmyH3LN3qXXfFqWqsdWnzF8"
+  };
+
   function populateSelect(selectElem, docs, defaultText) {
     selectElem.innerHTML = `<option value="">${defaultText}</option>`;
     docs.forEach(doc => {
       const opt = document.createElement('option');
-      let link = doc.webViewLink || `https://docs.google.com/document/d/${doc.id}/view`;
+      let docId = doc.id;
+      if (SHORTCUT_TARGETS[docId]) {
+        docId = SHORTCUT_TARGETS[docId];
+      }
+      let link = doc.webViewLink || `https://docs.google.com/document/d/${docId}/view`;
+      for (const [sId, tId] of Object.entries(SHORTCUT_TARGETS)) {
+        if (link.includes(sId)) {
+          link = link.replace(sId, tId);
+        }
+      }
       if (link.includes('drive.google.com/file/d/')) {
         const match = link.match(/\/d\/([a-zA-Z0-9-_]+)/);
         if (match && match[1]) {
-          link = `https://docs.google.com/document/d/${match[1]}/view`;
+          const resolved = SHORTCUT_TARGETS[match[1]] || match[1];
+          link = `https://docs.google.com/document/d/${resolved}/view`;
         }
       }
       opt.value = link;
@@ -377,16 +393,24 @@
     let directUrl = '';
     let docId = '';
 
+    for (const [sId, tId] of Object.entries(SHORTCUT_TARGETS)) {
+      if (selectedDocId.includes(sId)) {
+        selectedDocId = selectedDocId.replace(sId, tId);
+      }
+    }
+
     if (selectedDocId.startsWith('http://') || selectedDocId.startsWith('https://')) {
       directUrl = selectedDocId;
       const match = selectedDocId.match(/\/d\/(e\/[a-zA-Z0-9-_]+|[a-zA-Z0-9-_]+)/);
       if (match && match[1]) docId = match[1];
+      if (SHORTCUT_TARGETS[docId]) docId = SHORTCUT_TARGETS[docId];
 
-      if (selectedDocId.includes('drive.google.com/file/d/')) {
-        iframeSrc = selectedDocId.replace(/\/view.*$/, '/preview').replace(/\/edit.*$/, '/preview');
-        if (!iframeSrc.includes('/preview')) iframeSrc += '/preview';
+      if (selectedDocId.includes('docs.google.com/document/d/e/') || selectedDocId.includes('/pub')) {
+        iframeSrc = selectedDocId.includes('embedded=true') ? selectedDocId : (selectedDocId.includes('?') ? `${selectedDocId}&embedded=true` : `${selectedDocId}?embedded=true`);
       } else if (selectedDocId.includes('docs.google.com/document/d/')) {
-        iframeSrc = selectedDocId.replace(/\/view.*$/, '/preview?rm=minimal&authuser=0').replace(/\/edit.*$/, '/preview?rm=minimal&authuser=0');
+        iframeSrc = `https://docs.google.com/document/d/${docId}/preview?rm=minimal&authuser=0`;
+      } else if (selectedDocId.includes('drive.google.com/file/d/')) {
+        iframeSrc = `https://docs.google.com/document/d/${docId}/preview?rm=minimal&authuser=0`;
       } else {
         iframeSrc = selectedDocId;
       }
@@ -394,6 +418,7 @@
       docId = selectedDocId.replace(/[\/%\s]+$/, '');
       const match = docId.match(/\/d\/(e\/[a-zA-Z0-9-_]+|[a-zA-Z0-9-_]+)/);
       if (match && match[1]) docId = match[1];
+      if (SHORTCUT_TARGETS[docId]) docId = SHORTCUT_TARGETS[docId];
 
       iframeSrc = docId.startsWith('e/')
         ? `https://docs.google.com/document/d/${docId}/pub?embedded=true`
@@ -943,6 +968,11 @@
       });
 
       async function getChecklistData(forceRefresh = false) {
+        let lookupDocId = docId;
+        if (typeof SHORTCUT_TARGETS !== 'undefined' && SHORTCUT_TARGETS[lookupDocId]) {
+          lookupDocId = SHORTCUT_TARGETS[lookupDocId];
+        }
+
         if (!forceRefresh) {
           try {
             const cached = localStorage.getItem(cacheKey);
@@ -953,7 +983,7 @@
           } catch(e) {}
         }
 
-        const res = await fetch(`/api/fetch-checklist?id=${encodeURIComponent(docId)}`);
+        const res = await fetch(`/api/fetch-checklist?id=${encodeURIComponent(lookupDocId)}`);
         const text = await res.text();
         let data;
         try {
