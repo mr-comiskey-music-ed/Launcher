@@ -42,21 +42,40 @@ async function startServer() {
 
     try {
       const fetchFolder = async (folderId: string) => {
-        const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&key=${apiKey}&fields=files(id,name,mimeType,shortcutDetails,webViewLink)&orderBy=name`;
+        const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&key=${apiKey}&fields=files(id,name,mimeType,shortcutDetails,webViewLink)&supportsAllDrives=true&includeItemsFromAllDrives=true&orderBy=name`;
         const response = await fetch(url);
         if (!response.ok) throw new Error(`Google Drive API error: ${response.statusText}`);
         const data = await response.json();
-        return (data.files || []).map((f: any) => {
+        
+        const files = data.files || [];
+        const resolvedFiles = await Promise.all(files.map(async (f: any) => {
           let resolvedId = f.id;
-          if (f.mimeType === 'application/vnd.google-apps.shortcut' && f.shortcutDetails && f.shortcutDetails.targetId) {
-            resolvedId = f.shortcutDetails.targetId;
+          let title = f.name;
+          if (f.mimeType === 'application/vnd.google-apps.shortcut') {
+            if (f.shortcutDetails && f.shortcutDetails.targetId) {
+              resolvedId = f.shortcutDetails.targetId;
+            } else {
+              try {
+                const metaRes = await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}?fields=id,name,mimeType,shortcutDetails&key=${apiKey}&supportsAllDrives=true&includeItemsFromAllDrives=true`);
+                if (metaRes.ok) {
+                  const meta = await metaRes.json();
+                  if (meta.shortcutDetails && meta.shortcutDetails.targetId) {
+                    resolvedId = meta.shortcutDetails.targetId;
+                  }
+                }
+              } catch (e) {
+                console.error('Error fetching shortcut target for folder item:', e);
+              }
+            }
           }
           return {
-            title: f.name,
+            title,
             id: resolvedId,
             webViewLink: `https://docs.google.com/document/d/${resolvedId}/view`
           };
-        }).sort((a: any, b: any) => a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' }));
+        }));
+
+        return resolvedFiles.sort((a: any, b: any) => a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' }));
       };
 
       const [se, amp] = await Promise.all([
