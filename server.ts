@@ -42,15 +42,21 @@ async function startServer() {
 
     try {
       const fetchFolder = async (folderId: string) => {
-        const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&key=${apiKey}&fields=files(id,name,webViewLink)&orderBy=name`;
+        const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&key=${apiKey}&fields=files(id,name,mimeType,shortcutDetails,webViewLink)&orderBy=name`;
         const response = await fetch(url);
         if (!response.ok) throw new Error(`Google Drive API error: ${response.statusText}`);
         const data = await response.json();
-        return (data.files || []).map((f: any) => ({
-          title: f.name,
-          id: f.id,
-          webViewLink: `https://docs.google.com/document/d/${f.id}/view`
-        })).sort((a: any, b: any) => a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' }));
+        return (data.files || []).map((f: any) => {
+          let resolvedId = f.id;
+          if (f.mimeType === 'application/vnd.google-apps.shortcut' && f.shortcutDetails && f.shortcutDetails.targetId) {
+            resolvedId = f.shortcutDetails.targetId;
+          }
+          return {
+            title: f.name,
+            id: resolvedId,
+            webViewLink: `https://docs.google.com/document/d/${resolvedId}/view`
+          };
+        }).sort((a: any, b: any) => a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' }));
       };
 
       const [se, amp] = await Promise.all([
