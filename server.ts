@@ -71,7 +71,7 @@ async function startServer() {
   // API endpoint to fetch and parse checklist from published Google Doc
   app.get('/api/fetch-checklist', async (req, res) => {
     const docId = req.query.id as string;
-    if (!docId) return res.status(400).json({ error: 'Document ID is required' });
+    if (!docId) return res.status(400).json({ error: 'Document ID is required', items: [], note: 'Document ID is required' });
     try {
       const PUBLISH_URL_MAP: Record<string, string> = {
         "mixing-help-hiphop-1": "https://docs.google.com/document/d/e/2PACX-1vRRcCwNyh2Etl3FnDP90h3PBPXqvKwM-2LbLebpw6B6j0CmIS4CJb5G46PGvYYsFC7GdxA3jjArVzSp/pub",
@@ -82,12 +82,23 @@ async function startServer() {
 
       let pubUrl = PUBLISH_URL_MAP[docId];
       if (!pubUrl) {
-        pubUrl = docId.startsWith('e/')
-          ? `https://docs.google.com/document/d/${docId}/pub`
-          : `https://docs.google.com/document/d/${docId}/pub`;
+        if (docId.includes('docs.google.com/document/d/e/')) {
+          pubUrl = docId;
+        } else if (docId.startsWith('e/')) {
+          pubUrl = `https://docs.google.com/document/d/${docId}/pub`;
+        } else {
+          pubUrl = `https://docs.google.com/document/d/${docId}/pub`;
+        }
       }
 
-      const response = await fetch(pubUrl);
+      console.log(`Fetching checklist from URL: ${pubUrl} (docId: ${docId})`);
+      const response = await fetch(pubUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        }
+      });
+
       if (!response.ok) {
         return res.json({ 
           items: [
@@ -96,11 +107,24 @@ async function startServer() {
             'Complete recording and arrangement tasks',
             'Export and submit final audio project'
           ],
-          note: 'Note: Document is not published to the web or URL mapping needed. Publish to web in Google Docs (File > Share > Publish to web).' 
+          note: `Could not fetch checklist (HTTP ${response.status} ${response.statusText}). Please publish this Google Doc to the web via File > Share > Publish to web.` 
         });
       }
+
       const html = await response.text();
       
+      if (html.includes('The page could not be found') || html.includes('404 Not Found') || html.length < 100) {
+        return res.json({
+          items: [
+            'Review assignment instructions in Google Doc',
+            'Set up project tracks in DAW',
+            'Complete recording and arrangement tasks',
+            'Export and submit final audio project'
+          ],
+          note: 'The Google Doc returned a "Page not found" error. Ensure the document is published to the web (File > Share > Publish to web).'
+        });
+      }
+
       const items: string[] = [];
       const liMatches = html.match(/<li[^>]*>(.*?)<\/li>/gis);
       if (liMatches) {
@@ -125,9 +149,14 @@ async function startServer() {
       }
 
       if (items.length === 0) {
-        items.push('Review assignment requirements');
-        items.push('Complete project steps');
-        items.push('Export final audio file');
+        return res.json({
+          items: [
+            'Review assignment requirements in published document',
+            'Complete project steps in Logic Pro / Soundtrap',
+            'Export and submit final project file'
+          ],
+          note: 'Loaded published document successfully, but no explicit checklist items or bullet steps were found in the doc content.'
+        });
       }
 
       res.json({ items });
@@ -139,7 +168,7 @@ async function startServer() {
           'Complete project steps in DAW',
           'Export and submit final project'
         ],
-        note: 'Could not fetch checklist automatically.' 
+        note: `Error loading checklist: ${err.message}. Ensure the Google Doc is published to the web.` 
       });
     }
   });

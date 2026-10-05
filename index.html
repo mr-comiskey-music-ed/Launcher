@@ -177,16 +177,8 @@
     }
 
     .logic-term {
-      border-bottom: 1px dashed rgba(250, 204, 21, 0.65);
-      cursor: help;
-      transition: color 0.15s ease, border-bottom-color 0.15s ease, background 0.15s ease;
-      position: relative;
-    }
-    .logic-term:hover {
-      color: #FACC15;
-      border-bottom: 1px solid #FACC15;
-      background: rgba(250, 204, 21, 0.12);
-      border-radius: 2px;
+      color: inherit;
+      cursor: default;
     }
     .glossary-hint-box {
       margin-top: 14px;
@@ -719,47 +711,40 @@
 
         /* Logic Glossary Highlighted Term */
         .logic-term {
-          border-bottom: 1px dashed rgba(56, 189, 248, 0.65);
-          cursor: help;
-          transition: color 0.15s ease, border-bottom-color 0.15s ease, background 0.15s ease;
-          position: relative;
+          color: inherit;
         }
-        .logic-term:hover {
-          color: #38bdf8;
-          border-bottom: 1px solid #38bdf8;
-          background: rgba(56, 189, 248, 0.12);
-          border-radius: 2px;
-        }
-        .toolbar button.glossary-btn { background: #0e7490; border-color: #06b6d4; color: #cffafe; }
+        .toolbar button.glossary-btn { background: #14382B; border: 1.5px solid #CA8A04; color: #FEF08A; }
         .glossary-search-input {
           width: 100%;
           padding: 8px 12px;
-          background: #18181a;
-          border: 1px solid #3a3a3c;
-          border-radius: 4px;
+          background: #14382B;
+          border: 1.5px solid #CA8A04;
+          border-radius: 6px;
           color: #f3f4f6;
           font-size: 12px;
           box-sizing: border-box;
           outline: none;
           margin-bottom: 12px;
+          font-family: 'Cabin', sans-serif;
         }
-        .glossary-search-input:focus { border-color: #38bdf8; }
+        .glossary-search-input:focus { border-color: #FACC15; }
         .glossary-list-item {
-          background: #18181a;
-          border: 1px solid #3a3a3c;
+          background: #14382B;
+          border: 1px solid #CA8A04;
           border-radius: 6px;
           padding: 10px;
           margin-bottom: 8px;
           transition: border-color 0.15s ease;
         }
         .glossary-list-item:hover {
-          border-color: #38bdf8;
+          border-color: #FACC15;
         }
         .glossary-list-title {
           font-weight: bold;
-          color: #38bdf8;
+          color: #FACC15;
           font-size: 13px;
           margin-bottom: 4px;
+          font-family: 'Cabin', sans-serif;
         }
         .glossary-list-def {
           color: #e2e8f0;
@@ -1555,12 +1540,19 @@
 
       pipWindow.document.getElementById('openChecklistBtn').addEventListener('click', async () => {
         modalTitle.textContent = "📋 PROJECT CHECKLIST";
-        modalBody.innerHTML = `<div style="text-align: center; padding: 25px; color: #94a3b8;">Loading checklist items from Google Doc...</div>`;
+        modalBody.innerHTML = `<div style="text-align: center; padding: 25px; color: #FEE08A; font-family: 'Cabin', sans-serif;">Loading checklist items from Google Doc...</div>`;
         modal.style.display = 'flex';
 
         try {
           const res = await fetch(`/api/fetch-checklist?id=${encodeURIComponent(docId)}`);
-          const data = await res.json();
+          const text = await res.text();
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch (parseErr) {
+            throw new Error(`Server response was not valid JSON (${res.status}): ${text.substring(0, 120)}...`);
+          }
+
           const items = data.items || [];
           const note = data.note || '';
 
@@ -1572,20 +1564,20 @@
 
           let htmlContent = '';
           if (note) {
-            htmlContent += `<div style="background: #14382B; border: 1px solid #D97706; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; font-size: 11px; color: #FEE08A;">${note}</div>`;
+            htmlContent += `<div style="background: #14382B; border: 1.5px solid #CA8A04; padding: 10px 14px; border-radius: 6px; margin-bottom: 14px; font-size: 11px; color: #FEE08A; font-family: 'Cabin', sans-serif; line-height: 1.4;"><strong>Note:</strong> ${note}</div>`;
           }
 
           if (items.length === 0) {
-            htmlContent += `<div style="text-align: center; color: #9ca3af; padding: 20px;">No checklist items found in this document.</div>`;
+            htmlContent += `<div style="text-align: center; color: #d1d5db; padding: 20px; font-family: 'Cabin', sans-serif;">No checklist items found in this document. (Doc ID: ${docId})</div>`;
           } else {
-            htmlContent += `<div style="font-size: 11px; color: #94a3b8; margin-bottom: 10px;">Check off items as you complete them in Logic Pro or Soundtrap:</div>`;
+            htmlContent += `<div style="font-size: 11px; color: #FEE08A; margin-bottom: 10px; font-family: 'Cabin', sans-serif;">Check off items as you complete them in Logic Pro or Soundtrap:</div>`;
             htmlContent += `<div style="display: flex; flex-direction: column; gap: 8px;">`;
             items.forEach((item, idx) => {
               const isChecked = !!checkedMap[idx];
               htmlContent += `
-                <label style="display: flex; align-items: flex-start; gap: 10px; background: #18181a; padding: 10px; border-radius: 6px; border: 1px solid #3a3a3c; cursor: pointer; transition: border-color 0.15s ease;">
+                <label style="display: flex; align-items: flex-start; gap: 10px; background: #14382B; padding: 10px; border-radius: 6px; border: 1.5px solid #CA8A04; cursor: pointer; transition: border-color 0.15s ease; font-family: 'Cabin', sans-serif;">
                   <input type="checkbox" data-index="${idx}" ${isChecked ? 'checked' : ''} style="margin-top: 2px; accent-color: #EAB308; cursor: pointer; width: 16px; height: 16px;">
-                  <span style="color: ${isChecked ? '#9ca3af' : '#f3f4f6'}; text-decoration: ${isChecked ? 'line-through' : 'none'}; font-size: 12px; line-height: 1.4; flex: 1;">${item}</span>
+                  <span style="color: ${isChecked ? '#9ca3af' : '#f3f4f6'}; text-decoration: ${isChecked ? 'line-through' : 'none'}; font-size: 12px; line-height: 1.4; flex: 1; font-family: 'Cabin', sans-serif;">${item}</span>
                 </label>
               `;
             });
@@ -1610,7 +1602,18 @@
           });
 
         } catch (err) {
-          modalBody.innerHTML = `<div style="color: #ef4444; padding: 15px; text-align: center;">Error loading checklist: ${err.message}</div>`;
+          modalBody.innerHTML = `
+            <div style="background: #14382B; border: 1.5px solid #EF4444; padding: 14px; border-radius: 6px; color: #f3f4f6; font-family: 'Cabin', sans-serif;">
+              <div style="font-weight: 700; color: #FCA5A5; margin-bottom: 6px; font-size: 13px;">⚠️ Error Loading Checklist</div>
+              <div style="font-size: 12px; margin-bottom: 8px; color: #d1d5db; line-height: 1.4;">${err.message}</div>
+              <div style="font-size: 11px; color: #FEE08A; border-top: 1px solid #285E4A; padding-top: 8px; margin-top: 8px;">
+                <strong>Troubleshooting tips:</strong><br>
+                1. Ensure the Google Doc is published to the web (File > Share > Publish to web).<br>
+                2. Check that the document contains standard checkbox list items or bullet points.<br>
+                3. Active Document ID / URL: <code style="background: #0F2E23; padding: 2px 4px; border-radius: 4px; color: #FACC15;">${docId}</code>
+              </div>
+            </div>
+          `;
         }
       });
 
@@ -2071,7 +2074,102 @@
     "vocoders": "Vocoder",
     "waveforms": "Waveform",
     "zero crossings": "Zero Crossing",
-    "zooming": "Zoom Tool"
+    "zooming": "Zoom Tool",
+    "808": "A deep, long-decay sub-bass sound originally generated by the Roland TR-808 drum machine, now serving as the foundational bass/kick hybrid in modern hip-hop, trap, and pop.",
+    "909": "A punchy, analog-synthesized drum sound set from the Roland TR-909 machine, characterized by snappy snares and driving kick drums that define house and techno music.",
+    "A/B Testing": "Rapidly toggling between two audio sources (e.g., wet vs. dry signal, or a mix vs. a reference track) at matched volume levels to objectively evaluate processing decisions.",
+    "Additive Synthesis": "A method of audio synthesis that builds complex timbres by summing together individual sine waves at different frequencies, amplitudes, and phase relationships.",
+    "ADSR Envelope": "The four stages of a sound's life cycle when triggered: Attack (speed to peak), Decay (drop to sustain level), Sustain (held level), and Release (fade out speed after key release).",
+    "Aliasing": "Digital distortion caused when high frequencies exceed half the sample rate (the Nyquist limit) and fold back into lower, audible frequencies as harsh, unwanted metallic noise.",
+    "All-Pass Filter": "A filter that lets all frequencies through at equal amplitude but alters the phase relationship across frequencies; heavily used in diffusers, phasers, and spatial processors.",
+    "Amp Envelope": "An ADSR envelope hard-wired to control a synthesizer's Voltage Controlled Amplifier (VCA), determining how a sound's volume evolves over time.",
+    "Artifacts": "Unwanted digital noises, clicks, pops, or unnatural phase smearing caused by aggressive audio processing, heavy compression, time-stretching, or low-bitrate encoding.",
+    "ASIO / Core Audio": "Low-latency audio driver protocols. Core Audio is native to macOS; ASIO (Audio Stream Input/Output) is standard for professional audio interfaces on Windows.",
+    "Audio File Editor": "A sample-accurate editor in Logic Pro used for non-destructive or destructive editing directly on recorded audio waveform files.",
+    "Audio Track Editor": "A workspace showing the detailed region view of an audio track, used for Flex Pitch, Flex Time, and transient editing.",
+    "Atmos (Dolby Atmos)": "An object-based surround sound format that allows audio engineers to place and move individual sounds in a three-dimensional sphere around the listener.",
+    "Attenuation": "The act of reducing the volume level or amplitude of an audio signal.",
+    "Audio Restoration": "The practice of removing unwanted acoustic or digital imperfections (clicks, pops, vinyl crackle, room hum, clipping) using spectral editing software.",
+    "Band-Pass Filter": "A filter that allows a specific frequency band to pass through while attenuating frequencies above and below that range.",
+    "Band-Stop Filter (Notch)": "A filter that cuts a very narrow band of frequencies while passing all frequencies above and below it; useful for removing surgical resonances or AC hum.",
+    "Bandwidth (Q Factor)": "The range of frequencies affected by an equalizer band. A high Q value affects a narrow slice of frequencies; a low Q value affects a wide range.",
+    "Bitcrusher": "A lo-fi effect that reduces the bit depth and sample rate of digital audio to introduce harsh, crunchy quantized digital distortion and retro video game textures.",
+    "Buss Compression": "Applying a compressor across a sub-mix channel (e.g., drum bus, vocal bus, or master bus) to bind separate tracks together into a cohesive sonic unit ('glue').",
+    "Bussing": "Routing audio signals from one or more channel strips along a virtual signal pathway (a Bus) to an Auxiliary channel or main output.",
+    "Clip / Region": "A discrete block of recorded audio or MIDI data visible on a timeline within a DAW.",
+    "Clipper / Soft Clipping": "A wave-shaping effect that chops off waveform peaks exceeding 0 dBFS. Soft clipping gradually rounds off the peaks, generating pleasing analog-style tape harmonics.",
+    "Comb Filtering": "An acoustic or digital phase anomaly caused when a signal is mixed with a slightly delayed version of itself (1 to 15 ms), creating sharp, comb-like notches in the frequency response.",
+    "Control Voltage (CV)": "An analog method of transmitting pitch, gate, and parameter instructions between modular synth hardware using electrical voltage rather than digital signals.",
+    "Convolution Reverb": "A digital reverb processor that uses sampled Impulse Responses (IRs) captured from real physical spaces or hardware units to mathematically recreate their exact acoustic reflections.",
+    "Crossover": "An electronic filter unit that divides an audio signal into separate frequency bands (e.g., splitting sub frequencies for subwoofers and high frequencies for tweeters).",
+    "Detuning / Unison": "Stacking multiple active synth oscillators slightly out of pitch tune with each other to create a thick, wide, stereophonic chorus-like timbre.",
+    "Direct Input (DI) / DI Box": "A device used to connect high-impedance instrument signals (like electric guitar or bass) directly into a low-impedance microphone preamp without using an amplifier.",
+    "Direct Sound vs. Early Reflections": "Direct sound is the initial wave traveling straight from source to ear; early reflections are the first wave reflections bouncing off nearby room surfaces before full decay.",
+    "Ducker / Sidechaining": "A dynamic technique where the level of one audio signal automatically lowers ('ducks') the volume of another signal whenever it plays (commonly used to duck bass behind kick drums).",
+    "Dynamic EQ": "An equalizer whose gain cuts or boosts respond dynamically to incoming volume levels, functioning like a hybrid between a static parametric EQ and a multi-band compressor.",
+    "Environment": "An advanced MIDI routing window in Logic Pro that visually represents the software's underlying MIDI architecture and signal routing options.",
+    "Exciter / Harmonic Enhancer": "A plugin effect that generates high-frequency subtle harmonic distortion to add sparkle, air, and clarity to muffled audio tracks without boosting raw volume.",
+    "Filter Cutoff": "The frequency threshold at which a filter begins attenuating (cutting) audio frequencies above or below it.",
+    "Flam": "A drumming technique (or MIDI offset) where a secondary light stroke (grace note) is played micro-seconds before the primary snare or drum strike to create a thicker hit.",
+    "FM Synthesis (Frequency Modulation)": "A synthesis technique where the frequency of one audio oscillator (the Carrier) is rapidly modulated by another oscillator (the Modulator) to create rich, bell-like, or metallic timbres.",
+    "Formant": "Fundamental acoustic resonance frequencies of the vocal tract that give vowels and human voices their specific tonal character, independent of pitch.",
+    "Gain Reduction": "The total amount of decibels (dB) turned down by dynamic processing gear (compressors, limiters, gates) in response to input signal spikes.",
+    "Gated Reverb": "A production technique where a long, highly diffused reverb tail is abruptly cut off by a noise gate, creating a massive 1980s-style snare or drum burst effect.",
+    "Ghost Note": "A soft, subtle drum stroke played at low velocity (often on the snare or hi-hat) between main beats to add bounce, groove, and human pocket to a rhythm pattern.",
+    "Glitch / Stutter Effect": "Micro-editing audio or using specialized buffer plugins to slice a sound into rapid sub-frame repetitions (1/32, 1/64 notes) to create robotic, high-energy transition effects.",
+    "Granular Synthesis": "A synthesis method that splits audio samples into microscopic slices ('grains') under 50 ms, reordering, pitch-shifting, and looping them to form evolving soundscapes.",
+    "Haas Effect (Precedence Effect)": "A psychoacoustic phenomenon where if two identical sounds play within 1 to 35 ms of each other, the ear perceives them as a single fused sound coming from the direction of the earlier wave.",
+    "Hard Clipping": "Flatly truncating waveform peaks that cross a set ceiling threshold; generates aggressive, harsh, odd-harmonic distortion popular in modern loud drums and trap production.",
+    "Harmonic Distortion": "Processing that adds overtones and integer multiples of fundamental frequencies to an audio signal, adding warmth, presence, and perceived loudness.",
+    "Hi-Hat Roll / Pitch Slide": "Rapidly sequenced hi-hat patterns (often 1/16 to 1/64 notes) where velocity, pan, or pitch is dynamically shifted across the bar to create movement in trap beats.",
+    "Impulse Response (IR)": "An acoustic measurement file capturing how a physical room or hardware unit reacts to sound, used in convolution reverbs to recreate real physical spaces.",
+    "Infill / Drum Fill": "A short percussive break or altered drum pattern placed at the end of a musical phrase (typically every 4 or 8 bars) to signal a transition to a new song section.",
+    "Inter-Sample Peaks (ISP)": "True peak levels that exceed 0 dBFS when a digital signal is converted back into an analog waveform, even if the digital samples themselves did not clip.",
+    "Knee (Hard vs. Soft)": "Controls how gradually a compressor transitions from no gain reduction to full compression as a signal crosses the threshold volume limit.",
+    "Lookahead": "A compressor or limiter feature that introduces a micro-delay (1 to 5 ms) to incoming audio so the internal detector circuit can analyze and react to sharp transients before they hit the output stage.",
+    "Loudness (LUFS)": "Loudness Units relative to Full Scale; the international standard measurement for perceived loudness integrated over time, used by streaming platforms (e.g., Spotify, Apple Music).",
+    "Loudness Penalty": "The automatic reduction in volume level applied by streaming platforms (like Spotify or Apple Music) when a track exceeds their target integrated loudness standard (e.g., -14 LUFS).",
+    "MID/SIDE (M/S) Processing": "A technique that splits a stereo audio signal into its center channel (Mid) and side information (Sides) for independent EQ, compression, or spatial editing.",
+    "MIDI Draw": "A feature inside Logic Pro editors that lets you view and edit MIDI continuous controller (CC) data like pitch bend, volume, and expression as vector curves.",
+    "MIDI Velocity": "A value (0 to 127) recording how hard or fast a MIDI key or drum pad was hit, controlling volume or timbre dynamics.",
+    "Multi-Band Compression": "Dividing an audio signal into distinct frequency bands (e.g., Low, Mid, High) via crossovers so each band can be compressed independently with unique ratios and timings.",
+    "Nyquist-Shannon Theorem": "The rule stating that to accurately capture an analog frequency digitally, the digital sample rate must be at least double the highest frequency recorded.",
+    "Parallel Compression (New York Compression)": "Blending an untreated dry signal track with a duplicate track that has undergone heavy, aggressive compression to achieve punch and body without losing original dynamics.",
+    "Parallel Processing": "Splitting an audio signal into two tracks: keeping one original 'clean' track and heavily processing the duplicate track, then blending them together.",
+    "Parametric EQ": "An equalizer that gives full control over three main parameters per band: Frequency center, Gain level, and Bandwidth (Q factor).",
+    "Phantom Power (+48V)": "A 48-volt DC electrical current sent through an XLR cable from an audio interface or preamp to power condenser microphones and active DI boxes.",
+    "Phase Alignment": "Adjusting the time alignment of multiple microphone signals recording the same source (e.g., snare top and bottom mics) so their wave peaks line up, preventing low-end cancellation.",
+    "Phaser / Flanger": "Modulation effects that split audio and mix it with a micro-delayed copy while modulating phase filter notches (Phaser) or comb-filter delay times (Flanger) to create a sweeping jet-engine effect.",
+    "Pink Noise": "A sound wave pattern containing equal energy per octave across the frequency spectrum, matching human hearing perception closely.",
+    "Plate Reverb": "An artificial reverb produced by vibrating a metal plate via a transducer; produces a dense, bright, immediate reverb sound ideal for vocals and drums.",
+    "Pluck": "A synth patch characterized by a very fast attack and immediate decay envelope, mimicking string or percussive plucked sounds.",
+    "Polar Pattern": "A directional diagram showing a microphone's sensitivity to sounds arriving from different angles around its capsule (e.g., Cardioid, Omnidirectional, Figure-8).",
+    "Preamp (Preamplifier)": "An electronic circuit designed to boost weak micro-volt signals from microphones or instruments up to standard line-level audio for recording.",
+    "Pulse Width Modulation (PWM)": "Modulating the duty cycle ratio of a square wave oscillator back and forth, altering harmonic overtones to generate rich, chorus-like moving textures.",
+    "Quick Sampler": "A single-audio-file sampler in Logic Pro that automatically trims, chops, pitches, and maps loaded samples across a keyboard.",
+    "Rimshot": "A percussion hit produced when an acoustic drumstick hits both the head and the metal rim of a snare drum simultaneously, producing an explosive, high-pitched accent.",
+    "Ring Modulation": "An effect that multiplies two audio signals together, outputting non-harmonic sum and difference frequencies that sound metallic, robotic, or dissonant.",
+    "RMS (Root Mean Square)": "A mathematical measurement representing the average continuous volume power of an audio signal over time rather than short sudden peaks.",
+    "Sample Chopping": "The technique of slicing a continuous audio recording or drum loop into isolated segments mapped across pads or keyboard keys to re-sequence a new performance.",
+    "Sample Layering": "Stacking multiple drum samples (e.g., a low sub kick + a punchy mid kick + a transient top click) on a single beat to build a complete, radio-ready drum tone.",
+    "Sawtooth Wave": "A geometric waveform containing both even and odd integer harmonics; produces a bright, buzz-like tone ideal for synth leads, brass, and reese basses.",
+    "Serial Compression": "Routing audio sequentially through two or more subtle compressors in a chain rather than relying on a single compressor working hard.",
+    "Sidechain Compression": "Using the volume level of an external audio source (e.g., a kick drum) to trigger gain reduction on a compressor loaded on a completely different track (e.g., bass synth).",
+    "Signal-to-Noise Ratio (SNR)": "The measure of signal level strength relative to the background system noise floor generated by hardware electronics.",
+    "Smart Tempo": "Logic Pro's automatic tempo analysis engine that conforms project tempos to match free-form audio recordings without a metronome click.",
+    "Step Input Keyboard": "A window tool that allows MIDI notes to be entered one note at a time while playback is stopped.",
+    "Tape Saturation / Tape Emulation": "A plugin effect modeling the compression, frequency roll-off, and subtle harmonic saturation of magnetic tape machines, soothing harsh highs and rounding transients.",
+    "Transient Shaper / Designer": "A dynamic processor that independently boosts or softens the initial attack punch or trailing sustain tail of drum hits without relying on fixed volume thresholds.",
+    "Tube Saturation": "Harmonics generated by overloading vacuum tubes, adding warm, even-order harmonic overtones that make vocals and mid-range instruments sound lush and present.",
+    "VCA Compression": "A compressor style based on Voltage-Controlled Amplifier circuits (like the SSL Bus Comp); renowned for fast response, aggressive punch, and glue on drum busses.",
+    "Velocity Curve": "A response profile setting in DAWs or MIDI controllers that changes how sensitive pads/keys are to physical striking force when triggering sound levels.",
+    "Velocity Humanization": "Adding micro-randomization to MIDI note velocities so drum loops sound like a real human performer rather than a robotic computer sequence.",
+    "Virtual Analog (VA)": "Digital synthesis software or hardware DSP that uses mathematical algorithms to model the behavior of classic analog transistor and tube circuits.",
+    "Waveform Shapes (Square/Pulse)": "A geometric wave containing only odd harmonics, yielding a hollow, woody, reedy, or retro 8-bit audio texture.",
+    "Waveshaping Distortion": "A synthesis and saturation method that maps incoming waveform amplitudes through a non-linear transfer curve, warping waveform shapes to create harsh distortion.",
+    "Wavetable Synthesis": "A digital synthesis technique that uses two-dimensional morphing stacks of single-cycle sampled waveforms, interpolating between them dynamically over time.",
+    "White Noise": "A sound signal that contains equal energy at every single frequency across the human hearing spectrum simultaneously.",
+    "Zero-Crossing": "The precise point in an audio waveform timeline where the signal amplitude passes through zero volts, marking ideal edit locations to eliminate pops and clicks."
   };
 
   for (const [term, def] of Object.entries(LOGIC_GLOSSARY)) {
