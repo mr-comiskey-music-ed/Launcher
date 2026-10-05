@@ -424,12 +424,15 @@
           background: #235C48; color: #f3f4f6; border: 1px solid #CA8A04; padding: 5px 8px;
           border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 11px;
         }
-        .toolbar button:hover { background: #2E755B; border-color: #FACC15; color: #FACC15; }
+        .toolbar button:hover { opacity: 0.9; filter: brightness(1.1); }
         .toolbar button.shortcuts-btn { background: #D97706; border-color: #FACC15; color: #fff; }
-        .toolbar button.ai-btn { background: #14382B; border-color: #EAB308; color: #FEF08A; }
-        .toolbar button.patterns-btn { background: #047857; border-color: #10B981; color: #A7F3D0; }
-        .toolbar button.glossary-btn { background: #0e7490; border-color: #06b6d4; color: #cffafe; }
+        .toolbar button.ai-btn { background: #1e3a8a; border-color: #60a5fa; color: #eff6ff; }
+        .toolbar button.patterns-btn { background: #EAB308; border-color: #FEF08A; color: #133629; font-weight: 700; }
+        .toolbar button.glossary-btn { background: #0284c7; border-color: #38bdf8; color: #f0f9ff; }
         .toolbar button.checklist-btn { background: #065F46; border-color: #34D399; color: #ECFDF5; }
+        .toolbar button.mixtips-btn { background: #7c3aed; border-color: #a78bfa; color: #f5f3ff; }
+        .toolbar button.bpm-btn { background: #991b1b; border-color: #f87171; color: #fef2f2; }
+        .toolbar button.magnify-btn { background: #000000; border-color: #ffffff; color: #ffffff; }
         .toolbar button.active-btn { background: #CA8A04 !important; border-color: #FACC15 !important; color: #133629 !important; font-weight: 700; }
 
         .viewport-area { flex: 1; width: 100%; height: 100%; overflow: auto; position: relative; background: #ffffff; }
@@ -758,17 +761,17 @@
       toolbar.className = 'toolbar';
       toolbar.innerHTML = `
         <div class="control-group">
-          <button id="openShortcutsBtn" class="shortcuts-btn">Shortcuts</button>
-          <button id="openMixTipsBtn">🎛 Mix Tips</button>
-          <button id="openBpmBtn">⏱ BPM</button>
-          <button id="openAiChatBtn" class="ai-btn">🤖 Ask AI</button>
-          <button id="openPatternsBtn" class="patterns-btn">🥁 Patterns</button>
-          <button id="openGlossaryBtn" class="glossary-btn" title="Inspect Music Tech Dictionary">📖 Glossary</button>
           <button id="openChecklistBtn" class="checklist-btn" title="View interactive project checklist from Google Doc">✅ Checklist</button>
+          <button id="openShortcutsBtn" class="shortcuts-btn">Shortcuts</button>
+          <button id="openGlossaryBtn" class="glossary-btn" title="Inspect Music Tech Dictionary">📖 Glossary</button>
+          <button id="openMixTipsBtn" class="mixtips-btn">🎛 Mix Tips</button>
+          <button id="openBpmBtn" class="bpm-btn">⏱ BPM</button>
+          <button id="openPatternsBtn" class="patterns-btn">🥁 Patterns</button>
+          <button id="openAiChatBtn" class="ai-btn">🤖 Ask AI</button>
         </div>
         <div class="control-group">
-          <a href="${directUrl}" target="_blank" style="background: #0284c7; color: #fff; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">↗️ Open Doc</a>
-          <button id="loupeToggleBtn">🔍 Magnify</button>
+          <button id="loupeToggleBtn" class="magnify-btn">🔍 Magnify</button>
+          <a href="${directUrl}" target="_blank" style="background: #000000; color: #ffffff; border: 1px solid #ffffff; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">↗️ Open Doc</a>
         </div>
       `;
       pipWindow.document.body.appendChild(toolbar);

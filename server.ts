@@ -71,18 +71,11 @@ async function startServer() {
   // API endpoint to fetch and parse checklist from published Google Doc
   app.get('/api/fetch-checklist', async (req, res) => {
     const docId = req.query.id as string;
-    const DEFAULT_ITEMS = [
-      'Review assignment instructions in Google Doc',
-      'Set up project tracks and instrument channels in DAW',
-      'Complete recording and arrangement tasks',
-      'Apply mixing processing (EQ, Compression, Volume balance)',
-      'Export and submit final audio project'
-    ];
-
-    if (!docId) return res.json({ items: DEFAULT_ITEMS, note: 'Document ID is required.' });
+    if (!docId) return res.json({ items: [], note: 'Document ID is required.' });
     try {
       const PUBLISH_URL_MAP: Record<string, string> = {
         "mixing-help-hiphop-1": "https://docs.google.com/document/d/e/2PACX-1vRRcCwNyh2Etl3FnDP90h3PBPXqvKwM-2LbLebpw6B6j0CmIS4CJb5G46PGvYYsFC7GdxA3jjArVzSp/pub",
+        "1QsbuL5Qz-iavTE81iOQM-4oiQ3_pl2t7": "https://docs.google.com/document/d/e/2PACX-1vRRcCwNyh2Etl3FnDP90h3PBPXqvKwM-2LbLebpw6B6j0CmIS4CJb5G46PGvYYsFC7GdxA3jjArVzSp/pub",
         "1oQbqJMabNBT-1DfnPAugMmyH3LN3qXXfFqWqsdWnzF8": "https://docs.google.com/document/d/e/2PACX-1vSn1zukoDKI95AMWqtZT8FqZMtHL0obm3ay1yEztwAeekKZiEJQR8TYkKkP1piyUaax_hTYSTiV8YdC/pub",
         "1LwVqdcdJ5caRrjhWnqoT3TTCVkK4VqUNZZgZjpUUy0s": "https://docs.google.com/document/d/e/2PACX-1vQGF7X2VO4t7dbwpR2Fr1lbfl1MAXIgUdI10Mn_cHNuHL9QeQk78EC8adGthyA13M752lnEOM53-IaR/pub",
         "2PACX-1vRRcCwNyh2Etl3FnDP90h3PBPXqvKwM-2LbLebpw6B6j0CmIS4CJb5G46PGvYYsFC7GdxA3jjArVzSp": "https://docs.google.com/document/d/e/2PACX-1vRRcCwNyh2Etl3FnDP90h3PBPXqvKwM-2LbLebpw6B6j0CmIS4CJb5G46PGvYYsFC7GdxA3jjArVzSp/pub"
@@ -96,8 +89,8 @@ async function startServer() {
           pubUrl = `https://docs.google.com/document/d/${docId}/pub`;
         } else {
           return res.json({
-            items: DEFAULT_ITEMS,
-            note: 'Using standard project checklist template. To sync custom checklist items from this doc, publish it to the web (File > Share > Publish to web).'
+            items: [],
+            note: `Document ID "${docId}" is a private Google Drive file link, not a published web URL. To use automatic checklists, publish this doc via File > Share > Publish to web in Google Docs.`
           });
         }
       }
@@ -110,16 +103,16 @@ async function startServer() {
 
       if (!response.ok) {
         return res.json({
-          items: DEFAULT_ITEMS,
-          note: 'Document is not published to the web. Using standard project checklist template (Publish to web via File > Share > Publish to web in Google Docs).'
+          items: [],
+          note: `Could not fetch checklist (HTTP ${response.status}). Please ensure this Google Doc is published to the web (File > Share > Publish to web).`
         });
       }
 
       const html = await response.text();
       if (html.includes('The page could not be found') || html.includes('404 Not Found') || html.length < 100) {
         return res.json({
-          items: DEFAULT_ITEMS,
-          note: 'Published document returned 404. Using standard project checklist template.'
+          items: [],
+          note: 'The published document returned 404. Please check that the publish link is correct and active.'
         });
       }
 
@@ -148,8 +141,8 @@ async function startServer() {
 
       if (items.length === 0) {
         return res.json({
-          items: DEFAULT_ITEMS,
-          note: 'Loaded published document successfully, but no explicit checklist items were found. Using standard project template.'
+          items: [],
+          note: 'Published document loaded, but no checklist items or bullet steps were found in the document content.'
         });
       }
 
@@ -157,8 +150,8 @@ async function startServer() {
     } catch (err: any) {
       console.error('Fetch checklist error:', err);
       res.json({
-        items: DEFAULT_ITEMS,
-        note: 'Could not fetch checklist automatically. Using standard project checklist template.'
+        items: [],
+        note: `Error loading checklist: ${err.message}`
       });
     }
   });
