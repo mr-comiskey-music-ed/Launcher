@@ -68,106 +68,111 @@ async function startServer() {
     }
   });
 
-  // API endpoint to fetch and parse checklist from published Google Doc
+  // API endpoint to fetch and parse checklist from Google Drive Doc / Shortcut
   app.get('/api/fetch-checklist', async (req, res) => {
-    const docId = req.query.id as string;
-    if (!docId) return res.json({ items: [], note: 'Document ID is required.' });
+    let rawId = req.query.id as string;
+    if (!rawId) return res.json({ items: [], note: 'Document ID is required.' });
     try {
-      const PUBLISH_URL_MAP: Record<string, string> = {
-        "mixing-help-hiphop-1": "https://docs.google.com/document/d/e/2PACX-1vRRcCwNyh2Etl3FnDP90h3PBPXqvKwM-2LbLebpw6B6j0CmIS4CJb5G46PGvYYsFC7GdxA3jjArVzSp/pub",
-        "1QsbuL5Qz-iavTE81iOQM-4oiQ3_pl2t7": "https://docs.google.com/document/d/e/2PACX-1vRRcCwNyh2Etl3FnDP90h3PBPXqvKwM-2LbLebpw6B6j0CmIS4CJb5G46PGvYYsFC7GdxA3jjArVzSp/pub",
-        "1oQbqJMabNBT-1DfnPAugMmyH3LN3qXXfFqWqsdWnzF8": "https://docs.google.com/document/d/e/2PACX-1vSn1zukoDKI95AMWqtZT8FqZMtHL0obm3ay1yEztwAeekKZiEJQR8TYkKkP1piyUaax_hTYSTiV8YdC/pub",
-        "1LwVqdcdJ5caRrjhWnqoT3TTCVkK4VqUNZZgZjpUUy0s": "https://docs.google.com/document/d/e/2PACX-1vQGF7X2VO4t7dbwpR2Fr1lbfl1MAXIgUdI10Mn_cHNuHL9QeQk78EC8adGthyA13M752lnEOM53-IaR/pub",
-        "2PACX-1vRRcCwNyh2Etl3FnDP90h3PBPXqvKwM-2LbLebpw6B6j0CmIS4CJb5G46PGvYYsFC7GdxA3jjArVzSp": "https://docs.google.com/document/d/e/2PACX-1vRRcCwNyh2Etl3FnDP90h3PBPXqvKwM-2LbLebpw6B6j0CmIS4CJb5G46PGvYYsFC7GdxA3jjArVzSp/pub"
-      };
-
-      let pubUrl = PUBLISH_URL_MAP[docId];
-      if (!pubUrl) {
-        if (docId.includes('docs.google.com/document/d/e/')) {
-          pubUrl = docId;
-        } else if (docId.startsWith('e/')) {
-          pubUrl = `https://docs.google.com/document/d/${docId}/pub`;
-        } else {
-          return res.json({
-            items: [],
-            note: `Document ID "${docId}" is a private Google Drive file link, not a published web URL. To use automatic checklists, publish this doc via File > Share > Publish to web in Google Docs.`
-          });
-        }
+      let fileId = rawId;
+      if (rawId.includes('/d/')) {
+        const match = rawId.match(/\/d\/([a-zA-Z0-9-_]+)/);
+        if (match && match[1]) fileId = match[1];
+      } else if (rawId.includes('id=')) {
+        const match = rawId.match(/id=([a-zA-Z0-9-_]+)/);
+        if (match && match[1]) fileId = match[1];
       }
 
-      const response = await fetch(pubUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        }
-      });
+      const apiKey = process.env.GEMINI_API_KEY;
+      let targetDocId = fileId;
 
-      if (!response.ok) {
-        return res.json({
-          items: [],
-          note: `Could not fetch checklist (HTTP ${response.status}). Please ensure this Google Doc is published to the web (File > Share > Publish to web).`
-        });
-      }
-
-      const html = await response.text();
-      if (html.includes('The page could not be found') || html.includes('404 Not Found') || html.length < 100) {
-        return res.json({
-          items: [],
-          note: 'The published document returned 404. Please check that the publish link is correct and active.'
-        });
-      }
-
-      const items: string[] = [];
-
-      // Clean HTML and extract text lines or list elements
-      // First, check all <li> tags
-      const liMatches = html.match(/<li[^>]*>(.*?)<\/li>/gis);
-      if (liMatches) {
-        for (const li of liMatches) {
-          let cleanText = li.replace(/<[^>]+>/g, '').trim();
-          // Remove markdown checkbox syntax like [ ], [x], - [ ], etc.
-          cleanText = cleanText.replace(/^(-\s*)?\[\s*[xX]?\s*\]\s*/i, '').trim();
-          cleanText = cleanText.replace(/^[•\-\*]\s*/, '').trim();
-          if (cleanText && cleanText.length > 1 && cleanText.length < 300 && !cleanText.toLowerCase().includes('checklist')) {
-            items.push(cleanText);
-          }
-        }
-      }
-
-      // If no <li> found, check <p> tags or general text lines matching checklist/bullet/task format
-      if (items.length === 0) {
-        const pMatches = html.match(/<p[^>]*>(.*?)<\/p>/gis);
-        if (pMatches) {
-          for (const p of pMatches) {
-            let cleanText = p.replace(/<[^>]+>/g, '').trim();
-            // Check for markdown checkbox syntax or bullets
-            if (cleanText.includes('[ ]') || cleanText.includes('[x]') || cleanText.startsWith('•') || cleanText.startsWith('-') || cleanText.startsWith('*') || cleanText.toLowerCase().includes('step') || cleanText.toLowerCase().includes('task') || cleanText.match(/^\d+[\.\)]/)) {
-              cleanText = cleanText.replace(/^(-\s*)?\[\s*[xX]?\s*\]\s*/i, '').trim();
-              cleanText = cleanText.replace(/^[•\-\*]\s*/, '').trim();
-              if (cleanText && cleanText.length > 1 && !cleanText.toLowerCase().includes('### checklist') && !cleanText.toLowerCase().includes('checklist')) {
-                items.push(cleanText);
-              }
+      // 1. Resolve Drive shortcut if apiKey is available
+      if (apiKey && !rawId.includes('docs.google.com/document/d/e/')) {
+        try {
+          const metaRes = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=id,name,mimeType,shortcutDetails&key=${apiKey}`);
+          if (metaRes.ok) {
+            const meta = await metaRes.json();
+            if (meta.mimeType === 'application/vnd.google-apps.shortcut' && meta.shortcutDetails && meta.shortcutDetails.targetId) {
+              targetDocId = meta.shortcutDetails.targetId;
             }
           }
+        } catch (e) {
+          console.error('Error resolving Drive shortcut:', e);
         }
       }
 
-      // Fallback: strip all tags and check line by line for markdown checklist items (- [ ] ...)
-      if (items.length === 0) {
-        const bodyText = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-                             .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
-                             .replace(/<[^>]+>/g, '\n');
-        const lines = bodyText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-        let inChecklistSection = false;
-        for (const line of lines) {
-          if (line.toLowerCase().includes('checklist')) {
-            inChecklistSection = true;
-            continue;
+      // 2. Fetch document content via Drive export endpoint (text/plain)
+      let textContent = '';
+      if (apiKey) {
+        try {
+          const exportRes = await fetch(`https://www.googleapis.com/drive/v3/files/${targetDocId}/export?mimeType=text/plain&key=${apiKey}`);
+          if (exportRes.ok) {
+            textContent = await exportRes.text();
           }
-          if (inChecklistSection || line.startsWith('- [') || line.startsWith('[ ]') || line.startsWith('•') || line.startsWith('-')) {
+        } catch (e) {
+          console.error('Error exporting doc text:', e);
+        }
+      }
+
+      // 3. Fallback to published web URL or public fetch if export didn't return text
+      if (!textContent || textContent.length < 20 || textContent.includes('<!DOCTYPE html>') || textContent.includes('<html')) {
+        const PUBLISH_URL_MAP: Record<string, string> = {
+          "mixing-help-hiphop-1": "https://docs.google.com/document/d/e/2PACX-1vRRcCwNyh2Etl3FnDP90h3PBPXqvKwM-2LbLebpw6B6j0CmIS4CJb5G46PGvYYsFC7GdxA3jjArVzSp/pub",
+          "1QsbuL5Qz-iavTE81iOQM-4oiQ3_pl2t7": "https://docs.google.com/document/d/e/2PACX-1vRRcCwNyh2Etl3FnDP90h3PBPXqvKwM-2LbLebpw6B6j0CmIS4CJb5G46PGvYYsFC7GdxA3jjArVzSp/pub",
+          "1oQbqJMabNBT-1DfnPAugMmyH3LN3qXXfFqWqsdWnzF8": "https://docs.google.com/document/d/e/2PACX-1vSn1zukoDKI95AMWqtZT8FqZMtHL0obm3ay1yEztwAeekKZiEJQR8TYkKkP1piyUaax_hTYSTiV8YdC/pub",
+          "1LwVqdcdJ5caRrjhWnqoT3TTCVkK4VqUNZZgZjpUUy0s": "https://docs.google.com/document/d/e/2PACX-1vQGF7X2VO4t7dbwpR2Fr1lbfl1MAXIgUdI10Mn_cHNuHL9QeQk78EC8adGthyA13M752lnEOM53-IaR/pub"
+        };
+        let pubUrl = PUBLISH_URL_MAP[rawId] || PUBLISH_URL_MAP[fileId];
+        if (!pubUrl) {
+          if (rawId.includes('docs.google.com/document/d/e/')) {
+            pubUrl = rawId;
+          } else if (rawId.startsWith('e/')) {
+            pubUrl = `https://docs.google.com/document/d/${rawId}/pub`;
+          } else {
+            pubUrl = `https://docs.google.com/document/d/${targetDocId}/pub`;
+          }
+        }
+        const pubRes = await fetch(pubUrl, {
+          headers: { 'User-Agent': 'Mozilla/5.0' }
+        });
+        if (pubRes.ok) {
+          const html = await pubRes.text();
+          textContent = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                            .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+                            .replace(/<[^>]+>/g, '\n');
+        }
+      }
+
+      // 4. Parse checklist items from textContent (under ## Checklist or bullet points / markdown checkboxes)
+      const items: string[] = [];
+      const lines = textContent.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      let inChecklistSection = false;
+
+      for (const line of lines) {
+        if (line.toLowerCase().includes('checklist') || line.toLowerCase().includes('## checklist')) {
+          inChecklistSection = true;
+          continue;
+        }
+        if (inChecklistSection && line.startsWith('## ') && !line.toLowerCase().includes('checklist')) {
+          inChecklistSection = false;
+        }
+
+        if (inChecklistSection || line.startsWith('- [') || line.startsWith('[ ]') || line.startsWith('[x]') || line.startsWith('•') || line.startsWith('-') || line.startsWith('*')) {
+          let t = line.replace(/^(-\s*)?\[\s*[xX]?\s*\]\s*/i, '').trim();
+          t = t.replace(/^[•\-\*]\s*/, '').trim();
+          if (t && t.length > 1 && t.length < 300 && !t.toLowerCase().includes('file > share') && !t.toLowerCase().includes('checklist')) {
+            if (!items.includes(t)) items.push(t);
+          }
+        }
+      }
+
+      if (items.length === 0) {
+        for (const line of lines) {
+          if (line.startsWith('-') || line.startsWith('•') || line.startsWith('*') || line.match(/^\d+[\.\)]/)) {
             let t = line.replace(/^(-\s*)?\[\s*[xX]?\s*\]\s*/i, '').trim();
             t = t.replace(/^[•\-\*]\s*/, '').trim();
-            if (t && t.length > 2 && t.length < 300 && !t.toLowerCase().includes('file > share')) {
-              items.push(t);
+            t = t.replace(/^\d+[\.\)]\s*/, '').trim();
+            if (t && t.length > 2 && t.length < 300) {
+              if (!items.includes(t)) items.push(t);
             }
           }
         }
@@ -176,7 +181,7 @@ async function startServer() {
       if (items.length === 0) {
         return res.json({
           items: [],
-          note: 'Published document loaded, but no checklist items or bullet steps were found in the document content.'
+          note: 'Document loaded successfully, but no checklist items or bullet steps were found under a "## Checklist" section.'
         });
       }
 
