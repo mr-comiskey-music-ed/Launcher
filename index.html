@@ -14,6 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
   <style>
     /* Ed-Tech Myrtle Green & Gold Aesthetic - Cabin Typeface */
     body {
@@ -444,6 +445,15 @@
       markedScript.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
       pipWindow.document.head.appendChild(markedScript);
 
+      const refMeta = pipWindow.document.createElement('meta');
+      refMeta.name = 'referrer';
+      refMeta.content = 'strict-origin-when-cross-origin';
+      pipWindow.document.head.appendChild(refMeta);
+
+      const ytScript = pipWindow.document.createElement('script');
+      ytScript.src = 'https://www.youtube.com/iframe_api';
+      pipWindow.document.head.appendChild(ytScript);
+
       const style = pipWindow.document.createElement('style');
       style.textContent = `
         body, html {
@@ -642,105 +652,6 @@
           transition: border-color 0.15s ease;
           font-family: 'Cabin', sans-serif;
         }
-        .drum-card.is-dragging {
-          opacity: 0.6 !important;
-          border-color: #FACC15 !important;
-          box-shadow: 0 0 12px rgba(250, 204, 21, 0.4);
-        }
-        .drum-drag-handle {
-          cursor: grab;
-          user-select: none;
-          display: inline-flex;
-          align-items: center;
-          gap: 3px;
-          color: #d1d5db;
-          background: #1B4D3E;
-          border: 1px solid #CA8A04;
-          padding: 2px 7px;
-          border-radius: 4px;
-          font-size: 11px;
-          font-weight: 600;
-          font-family: 'Cabin', sans-serif;
-        }
-        .drum-drag-handle:hover {
-          color: #FACC15;
-          border-color: #FACC15;
-          background: #235C48;
-        }
-        .drum-drag-handle:active, .drum-card:active .drum-drag-handle {
-          cursor: grabbing;
-        }
-        .drum-drag-link {
-          cursor: grab;
-          user-select: none;
-          display: inline-flex;
-          align-items: center;
-          gap: 3px;
-          color: #d1d5db;
-          background: #1B4D3E;
-          border: 1px solid #CA8A04;
-          padding: 2px 7px;
-          border-radius: 4px;
-          font-size: 11px;
-          font-weight: 600;
-          font-family: 'Cabin', sans-serif;
-          text-decoration: none;
-        }
-        .drum-drag-link:hover {
-          color: #FACC15;
-          border-color: #FACC15;
-          background: #235C48;
-        }
-        .drum-drag-link:active {
-          cursor: grabbing;
-        }
-        .drum-drag-info-banner {
-          background: #0F2E23;
-          border: 1px solid #CA8A04;
-          border-left: 3px solid #EAB308;
-          border-radius: 6px;
-          padding: 8px 10px;
-          margin-bottom: 12px;
-          font-size: 11px;
-          color: #f3f4f6;
-          line-height: 1.45;
-          font-family: 'Cabin', sans-serif;
-        }
-        .drum-drag-info-banner code {
-          background: #14382B;
-          color: #FACC15;
-          padding: 1px 5px;
-          border-radius: 3px;
-          font-family: monospace;
-          font-size: 11px;
-          border: 1px solid #CA8A04;
-        }
-        .drum-drag-info-banner strong {
-          color: #FACC15;
-        }
-        .midi-toast {
-          position: fixed;
-          bottom: 16px;
-          left: 50%;
-          transform: translateX(-50%) translateY(20px);
-          background: #14382B;
-          color: #FACC15;
-          border: 1.5px solid #EAB308;
-          padding: 8px 14px;
-          border-radius: 6px;
-          font-size: 12px;
-          font-weight: 700;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.8);
-          z-index: 999999;
-          opacity: 0;
-          pointer-events: none;
-          transition: opacity 0.2s, transform 0.2s;
-          font-family: 'Cabin', sans-serif;
-        }
-        .midi-toast.show {
-          opacity: 1;
-          transform: translateX(-50%) translateY(0);
-        }
         .drum-card-title { font-weight: bold; color: #FACC15; font-size: 13px; margin-bottom: 6px; font-family: 'Cabin', sans-serif; }
         .drum-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
         .drum-tag { background: #1B4D3E; border: 1px solid #CA8A04; color: #FEF08A; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-family: 'Cabin', sans-serif; }
@@ -782,9 +693,18 @@
         .tap-btn { background: #EAB308; color: #133629; border: none; padding: 14px; width: 100%; border-radius: 6px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Cabin', sans-serif; }
 
         .video-container {
-          position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-top: 10px; margin-bottom: 16px; border-radius: 6px; border: 1px solid #CA8A04; background: #000;
+          position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-top: 10px; margin-bottom: 6px; border-radius: 6px; border: 1.5px solid #CA8A04; background: #000;
         }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .video-container iframe, .video-container > div { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .yt-fallback-bar {
+          display: flex; justify-content: flex-end; margin-bottom: 14px;
+        }
+        .yt-fallback-link {
+          font-size: 11px; color: #FEE08A; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; opacity: 0.85; transition: opacity 0.15s, color 0.15s; font-family: 'Cabin', sans-serif;
+        }
+        .yt-fallback-link:hover {
+          opacity: 1; color: #FACC15; text-decoration: underline;
+        }
         .expandable-img-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 12px 0; font-family: 'Cabin', sans-serif; }
         .expandable-card { background: #14382B; border: 1px solid #CA8A04; border-radius: 6px; padding: 8px; cursor: pointer; transition: border-color 0.2s; }
         .expandable-card:hover { border-color: #FACC15; }
@@ -1293,14 +1213,76 @@
         }
       };
 
+      let activeYtPlayers = {};
+
+      const stopAllYtPlayers = () => {
+        Object.values(activeYtPlayers).forEach(p => {
+          try {
+            if (p && typeof p.pauseVideo === 'function') p.pauseVideo();
+          } catch(e) {}
+        });
+      };
+
+      const mountYouTubePlayer = (containerId, videoId, title) => {
+        const container = pipWindow.document.getElementById(containerId);
+        if (!container) return;
+
+        const origin = window.location.origin || (pipWindow.location && pipWindow.location.origin) || '';
+        const href = window.location.href || origin;
+
+        const yt = pipWindow.YT || window.YT;
+        if (yt && yt.Player) {
+          try {
+            if (activeYtPlayers[containerId]) {
+              try { activeYtPlayers[containerId].destroy(); } catch(e) {}
+              delete activeYtPlayers[containerId];
+            }
+            activeYtPlayers[containerId] = new yt.Player(containerId, {
+              host: 'https://www.youtube-nocookie.com',
+              videoId: videoId,
+              playerVars: {
+                autoplay: 0,
+                controls: 1,
+                modestbranding: 1,
+                rel: 0,
+                enablejsapi: 1,
+                origin: origin,
+                widget_referrer: href,
+                wmode: 'transparent',
+              },
+              events: {
+                onReady: (event) => {
+                  try {
+                    const iframe = event.target?.getIframe?.();
+                    if (iframe) {
+                      iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+                      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+                    }
+                  } catch {}
+                }
+              }
+            });
+            return;
+          } catch(err) {
+            console.warn('YT.Player instantiation failed, falling back to direct iframe:', err);
+          }
+        }
+
+        // Direct iframe embed with complete origin & widget_referrer parameters
+        const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&origin=${encodeURIComponent(origin)}&widget_referrer=${encodeURIComponent(href)}&modestbranding=1&rel=0&wmode=transparent`;
+        container.innerHTML = `<iframe src="${embedUrl}" title="${title}" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"></iframe>`;
+      };
+
       pipWindow.document.getElementById('closeModalBtn').addEventListener('click', () => {
         stopCurrentPlayback();
+        stopAllYtPlayers();
         modal.style.display = 'none';
       });
 
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
           stopCurrentPlayback();
+          stopAllYtPlayers();
           modal.style.display = 'none';
         }
       });
@@ -1393,7 +1375,7 @@
         return buffer;
       }
 
-      function generatePatternMidiBytes(pat) {
+      function generatePatternMidiDataUri(pat) {
         const ticksPerBeat = 480;
         const stepsPerBeat = pat.stepsPerBeat || 4;
         const ticksPerStep = Math.round(ticksPerBeat / stepsPerBeat);
@@ -1461,11 +1443,7 @@
           trackLen & 0xFF
         ];
 
-        return new Uint8Array([...header, ...trackHeader, ...trackBytes]);
-      }
-
-      function generatePatternMidiDataUri(pat) {
-        const midiData = generatePatternMidiBytes(pat);
+        const midiData = new Uint8Array([...header, ...trackHeader, ...trackBytes]);
         let binaryStr = '';
         for (let i = 0; i < midiData.length; i++) {
           binaryStr += String.fromCharCode(midiData[i]);
@@ -1473,44 +1451,23 @@
         return `data:audio/midi;base64,${btoa(binaryStr)}`;
       }
 
-      function showMidiToast(message) {
-        let toast = pipWindow.document.getElementById('midiToast');
-        if (!toast) {
-          toast = pipWindow.document.createElement('div');
-          toast.id = 'midiToast';
-          toast.className = 'midi-toast';
-          pipWindow.document.body.appendChild(toast);
-        }
-        toast.textContent = message;
-        toast.classList.add('show');
-        clearTimeout(toast._timeout);
-        toast._timeout = setTimeout(() => {
-          toast.classList.remove('show');
-        }, 3800);
-      }
-
       function exportPatternMidi(pat) {
         const dataUri = generatePatternMidiDataUri(pat);
         const nameStr = pat.name || 'Drum Pattern';
-        const cleanName = `${nameStr.replace(/[^a-zA-Z0-9_-]/g, '_')}.mid`;
         const a = pipWindow.document.createElement('a');
         a.href = dataUri;
-        a.download = cleanName;
+        a.download = `${nameStr.replace(/[^a-zA-Z0-9_-]/g, '_')}.mid`;
         pipWindow.document.body.appendChild(a);
         a.click();
         setTimeout(() => {
           pipWindow.document.body.removeChild(a);
         }, 150);
-        showMidiToast(`⬇ Saved ${cleanName}! Drag directly into Logic Pro.`);
       }
 
       pipWindow.document.getElementById('openPatternsBtn').addEventListener('click', () => {
         modalTitle.textContent = "🥁 DRUM PATTERN DATABASE";
         
         modalBody.innerHTML = `
-          <div class="drum-drag-info-banner">
-            <span>💡 <strong>DAW Workflow:</strong> Drag <code>⋮⋮ Drag MIDI</code> directly into <strong>Soundtrap</strong> (in Chrome) or onto your <strong>Desktop/Finder</strong>. For <strong>Logic Pro</strong>, click <strong>⬇ MIDI</strong> and drag from your Downloads into Logic Pro!</span>
-          </div>
           <div class="drum-controls">
             <input type="text" id="drumSearch" class="drum-search" placeholder="Search pattern name or style (e.g. electro, house, rock)...">
             <select id="drumStyleFilter" class="drum-filter">
@@ -1617,13 +1574,10 @@
             gridHtml += `
               <div class="drum-card" id="drum-card-${cardId}" data-card-id="${cardId}">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
-                  <div style="display:flex; align-items:center; gap:8px;">
-                    <a class="drum-drag-link" data-card-id="${cardId}" href="${dataUri}" download="${midiFileName}" draggable="true" title="Drag MIDI directly into Soundtrap, Desktop, or Finder">⋮⋮ Drag MIDI</a>
-                    <div class="drum-card-title" style="margin-bottom:0;">${pat.name}</div>
-                  </div>
+                  <div class="drum-card-title" style="margin-bottom:0;">${pat.name}</div>
                   <div style="display:flex; gap:6px; align-items:center;">
                     <button class="drum-fav-btn ${isFav ? 'is-fav' : ''}" data-card-id="${cardId}" title="${isFav ? 'Remove Favorite' : 'Add to Favorites'}">${isFav ? '★' : '☆'}</button>
-                    <button class="drum-midi-btn" data-card-id="${cardId}" title="Export MIDI file for Logic Pro / Soundtrap">⬇ MIDI</button>
+                    <button class="drum-midi-btn" data-card-id="${cardId}" title="Download MIDI file for Logic Pro / Soundtrap">⬇ MIDI</button>
                     <button class="drum-play-btn" id="play-btn-${cardId}" data-card-id="${cardId}">▶ Play</button>
                   </div>
                 </div>
@@ -1649,49 +1603,6 @@
               e.stopPropagation();
               const cardId = btn.getAttribute('data-card-id');
               toggleFavorite(cardId);
-            });
-          });
-
-          gridContainer.querySelectorAll('.drum-drag-link').forEach(link => {
-            link.addEventListener('dragstart', (e) => {
-              const cardId = link.getAttribute('data-card-id');
-              const pat = filtered.find(p => (p.id || ('pat-' + filtered.indexOf(p))) === cardId);
-              if (!pat) return;
-
-              const midiBytes = generatePatternMidiBytes(pat);
-              const midiFileName = `${pat.name.replace(/\s+/g, '_')}.mid`;
-              const cardEl = pipWindow.document.getElementById('drum-card-' + cardId);
-              if (cardEl) cardEl.classList.add('is-dragging');
-
-              // 1. In-browser DAW drop support (Soundtrap, Web DAW)
-              try {
-                const blob = new Blob([midiBytes], { type: 'audio/midi' });
-                const file = new File([blob], midiFileName, { type: 'audio/midi' });
-                if (e.dataTransfer && e.dataTransfer.items && e.dataTransfer.items.add) {
-                  e.dataTransfer.items.add(file);
-                }
-              } catch (err) {
-                console.warn('dataTransfer.items add error:', err);
-              }
-
-              // 2. Chromium OS Drag-out download (drag directly to Desktop or Finder)
-              try {
-                const origin = window.location.origin || (pipWindow.location && pipWindow.location.origin) || '';
-                const downloadUrl = `${origin}/api/download-midi?id=${encodeURIComponent(cardId)}`;
-                e.dataTransfer.setData("DownloadURL", `audio/midi:${midiFileName}:${downloadUrl}`);
-              } catch (err) {}
-
-              // 3. Fallbacks for text drop targets
-              e.dataTransfer.setData("text/plain", midiFileName);
-              e.dataTransfer.effectAllowed = "copyMove";
-
-              showMidiToast(`Dragging ${pat.name}: drop into Soundtrap or onto Desktop/Finder!`);
-            });
-
-            link.addEventListener('dragend', (e) => {
-              const cardId = link.getAttribute('data-card-id');
-              const cardEl = pipWindow.document.getElementById('drum-card-' + cardId);
-              if (cardEl) cardEl.classList.remove('is-dragging');
             });
           });
 
@@ -1797,9 +1708,12 @@
               </div>
             </div>
 
-            <div style="margin-top:16px; font-weight:bold; color:#FACC15;">More Info:</div>
-            <div class="video-container">
-              <iframe src="https://www.youtube-nocookie.com/embed/7H3cHfV8rXI" title="EQ Masterclass Video" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <div style="margin-top:16px; font-weight:bold; color:#FACC15;">Video Masterclass:</div>
+            <div class="video-container" id="yt-box-eq">
+              <div id="yt-player-eq"></div>
+            </div>
+            <div class="yt-fallback-bar">
+              <a class="yt-fallback-link" href="https://www.youtube.com/watch?v=7H3cHfV8rXI" target="_blank" rel="noopener noreferrer">↗ Watch "3 Rules of EQ" on YouTube</a>
             </div>
           </div>
 
@@ -1813,24 +1727,39 @@
             </ul>
 
             <div style="margin-top:16px; font-weight:bold; color:#FACC15;">Simple Tutorial:</div>
-            <div class="video-container">
-              <iframe src="https://www.youtube-nocookie.com/embed/LGqDVhww-hs" title="Simple Compression Tutorial" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <div class="video-container" id="yt-box-comp1">
+              <div id="yt-player-comp1"></div>
+            </div>
+            <div class="yt-fallback-bar">
+              <a class="yt-fallback-link" href="https://www.youtube.com/watch?v=LGqDVhww-hs" target="_blank" rel="noopener noreferrer">↗ Watch Simple Compression Tutorial on YouTube</a>
             </div>
 
             <div style="margin-top:16px; font-weight:bold; color:#FACC15;">In Depth Tutorial:</div>
-            <div class="video-container">
-              <iframe src="https://www.youtube-nocookie.com/embed/booRjPgtIS4" title="In Depth Compression Tutorial" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <div class="video-container" id="yt-box-comp2">
+              <div id="yt-player-comp2"></div>
+            </div>
+            <div class="yt-fallback-bar">
+              <a class="yt-fallback-link" href="https://www.youtube.com/watch?v=booRjPgtIS4" target="_blank" rel="noopener noreferrer">↗ Watch In-Depth Compression Tutorial on YouTube</a>
             </div>
           </div>
         `;
 
         pipWindow.switchTab = (tabId) => {
+          stopAllYtPlayers();
           pipWindow.document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
           pipWindow.document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-          event.target.classList.add('active');
+          if (event && event.target && event.target.classList) {
+            event.target.classList.add('active');
+          }
           const pane = pipWindow.document.getElementById(tabId);
           if (pane) {
             pane.classList.add('active');
+          }
+          if (tabId === 'eqTab') {
+            mountYouTubePlayer('yt-player-eq', '7H3cHfV8rXI', '3 Rules of EQ Masterclass');
+          } else if (tabId === 'compTab') {
+            mountYouTubePlayer('yt-player-comp1', 'LGqDVhww-hs', 'Simple Compression Tutorial');
+            mountYouTubePlayer('yt-player-comp2', 'booRjPgtIS4', 'In Depth Compression Tutorial');
           }
         };
 
@@ -1842,6 +1771,7 @@
         };
 
         modal.style.display = 'flex';
+        mountYouTubePlayer('yt-player-eq', '7H3cHfV8rXI', '3 Rules of EQ Masterclass');
       });
 
       pipWindow.document.getElementById('openGlossaryBtn').addEventListener('click', () => {
