@@ -142,37 +142,56 @@ async function startServer() {
         }
       }
 
-      // 4. Parse checklist items strictly under a "Checklist" section
+      // 4. Parse checklist items under "Checklist" section
       const items: string[] = [];
       const lines = textContent.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
       let inChecklistSection = false;
+
+      console.log('--- FETCH CHECKLIST DEBUG ---');
+      console.log('Total lines parsed:', lines.length);
 
       for (const line of lines) {
         const lower = line.toLowerCase();
         if (lower.includes('checklist') && (line.startsWith('#') || lower === 'checklist' || lower.endsWith(':'))) {
           inChecklistSection = true;
+          console.log('Found checklist section header:', line);
           continue;
         }
         if (inChecklistSection && line.startsWith('#') && !lower.includes('checklist')) {
           inChecklistSection = false;
+          console.log('Exited checklist section at header:', line);
           continue;
         }
 
         if (inChecklistSection) {
-          // Remove ballot boxes (☐, ☑), markdown brackets with any space/non-breaking space, or bullet markers
-          let cleanText = line
-            .replace(/^[\s\-•\*]*[\u2610\u2611]\s*/, '')
-            .replace(/^[\s\-•\*]*\[\s*[\s\S]*?\s*\]\s*/, '')
-            .replace(/^[•\-\*]\s*/, '')
-            .trim();
+          console.log('Inspecting line in checklist section:', line);
+          // Match lines that have checkboxes: [ ], [x], [X], ☐, ☑
+          // Support non-breaking spaces and flexible spacing inside brackets
+          const checkboxRegex = /^[\s\-•\*]*(?:\[[\s\xA0]*\]|\[[xX]\]|[\u2610\u2611])\s*(.*)$/;
+          const match = line.match(checkboxRegex);
 
-          if (cleanText && cleanText.length > 1 && cleanText.length < 300 && !cleanText.toLowerCase().includes('file > share') && !cleanText.toLowerCase().includes('checklist')) {
-            if (!items.includes(cleanText)) {
-              items.push(cleanText);
+          if (match) {
+            let cleanText = (match[1] || '').trim();
+            // Fallback if match[1] is empty but line had bracket
+            if (!cleanText) {
+              cleanText = line
+                .replace(/^[\s\-•\*]*[\u2610\u2611]\s*/, '')
+                .replace(/^[\s\-•\*]*\[[\s\xA0]*[xX]?[\s\xA0]*\]\s*/, '')
+                .trim();
             }
+
+            console.log('Matched checkbox item! Clean text:', cleanText);
+            if (cleanText && cleanText.length > 0 && cleanText.length < 300 && !cleanText.toLowerCase().includes('file > share') && !cleanText.toLowerCase().includes('checklist')) {
+              if (!items.includes(cleanText)) {
+                items.push(cleanText);
+              }
+            }
+          } else {
+            console.log('Skipped line (no checkbox marker):', line);
           }
         }
       }
+      console.log('Extracted final items:', items);
 
       if (items.length === 0) {
         return res.json({

@@ -770,6 +770,9 @@
           <button id="openAiChatBtn" class="ai-btn">🤖 Ask AI</button>
         </div>
         <div class="control-group">
+          <button id="zoomOutBtn" class="tab-btn" title="Zoom Out" style="padding: 4px 8px; font-size: 11px;">🔍-</button>
+          <span id="zoomLevelDisplay" title="Click to reset zoom" style="font-size: 11px; font-weight: 700; color: #FACC15; min-width: 36px; text-align: center; cursor: pointer;">100%</span>
+          <button id="zoomInBtn" class="tab-btn" title="Zoom In" style="padding: 4px 8px; font-size: 11px;">🔍+</button>
           <button id="loupeToggleBtn" class="magnify-btn">🔍 Magnify</button>
           <a href="${directUrl}" target="_blank" style="background: #000000; color: #ffffff; border: 1px solid #ffffff; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">↗️ Open Doc</a>
         </div>
@@ -787,6 +790,21 @@
 
       docWrapper.appendChild(iframe);
       viewportArea.appendChild(docWrapper);
+
+      let currentZoom = 1.0;
+      const zoomDisplay = pipWindow.document.getElementById('zoomLevelDisplay');
+      const applyZoom = (newZoom) => {
+        currentZoom = Math.max(0.75, Math.min(2.25, newZoom));
+        iframe.style.transform = `scale(${currentZoom})`;
+        iframe.style.transformOrigin = 'top center';
+        iframe.style.width = `${(100 / currentZoom)}%`;
+        iframe.style.height = `${(100 / currentZoom)}%`;
+        zoomDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+      };
+
+      pipWindow.document.getElementById('zoomInBtn').addEventListener('click', () => applyZoom(currentZoom + 0.15));
+      pipWindow.document.getElementById('zoomOutBtn').addEventListener('click', () => applyZoom(currentZoom - 0.15));
+      zoomDisplay.addEventListener('click', () => applyZoom(1.0));
 
       const loupe = pipWindow.document.createElement('div');
       loupe.className = 'loupe';
