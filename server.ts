@@ -82,7 +82,7 @@ async function startServer() {
         if (match && match[1]) fileId = match[1];
       }
 
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = process.env.GOOGLE_DRIVE_API_KEY || process.env.GEMINI_API_KEY;
       let targetDocId = fileId;
 
       // 1. Resolve Drive shortcut if apiKey is available
