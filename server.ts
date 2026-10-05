@@ -142,37 +142,33 @@ async function startServer() {
         }
       }
 
-      // 4. Parse checklist items from textContent (under ## Checklist or bullet points / markdown checkboxes)
+      // 4. Parse checklist items strictly under a "Checklist" section
       const items: string[] = [];
       const lines = textContent.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
       let inChecklistSection = false;
 
       for (const line of lines) {
-        if (line.toLowerCase().includes('checklist') || line.toLowerCase().includes('## checklist')) {
+        const lower = line.toLowerCase();
+        if (lower.includes('checklist') && (line.startsWith('#') || lower === 'checklist' || lower.endsWith(':'))) {
           inChecklistSection = true;
           continue;
         }
-        if (inChecklistSection && line.startsWith('## ') && !line.toLowerCase().includes('checklist')) {
+        if (inChecklistSection && line.startsWith('#') && !lower.includes('checklist')) {
           inChecklistSection = false;
+          continue;
         }
 
-        if (inChecklistSection || line.startsWith('- [') || line.startsWith('[ ]') || line.startsWith('[x]') || line.startsWith('•') || line.startsWith('-') || line.startsWith('*')) {
-          let t = line.replace(/^(-\s*)?\[\s*[xX]?\s*\]\s*/i, '').trim();
-          t = t.replace(/^[•\-\*]\s*/, '').trim();
-          if (t && t.length > 1 && t.length < 300 && !t.toLowerCase().includes('file > share') && !t.toLowerCase().includes('checklist')) {
-            if (!items.includes(t)) items.push(t);
-          }
-        }
-      }
+        if (inChecklistSection) {
+          // Remove ballot boxes (☐, ☑), markdown brackets with any space/non-breaking space, or bullet markers
+          let cleanText = line
+            .replace(/^[\s\-•\*]*[\u2610\u2611]\s*/, '')
+            .replace(/^[\s\-•\*]*\[\s*[\s\S]*?\s*\]\s*/, '')
+            .replace(/^[•\-\*]\s*/, '')
+            .trim();
 
-      if (items.length === 0) {
-        for (const line of lines) {
-          if (line.startsWith('-') || line.startsWith('•') || line.startsWith('*') || line.match(/^\d+[\.\)]/)) {
-            let t = line.replace(/^(-\s*)?\[\s*[xX]?\s*\]\s*/i, '').trim();
-            t = t.replace(/^[•\-\*]\s*/, '').trim();
-            t = t.replace(/^\d+[\.\)]\s*/, '').trim();
-            if (t && t.length > 2 && t.length < 300) {
-              if (!items.includes(t)) items.push(t);
+          if (cleanText && cleanText.length > 1 && cleanText.length < 300 && !cleanText.toLowerCase().includes('file > share') && !cleanText.toLowerCase().includes('checklist')) {
+            if (!items.includes(cleanText)) {
+              items.push(cleanText);
             }
           }
         }
