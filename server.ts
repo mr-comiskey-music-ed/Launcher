@@ -13,7 +13,7 @@ async function startServer() {
 
   // API endpoint matching api/get-docs.js
   app.get('/api/get-docs', async (req, res) => {
-    const apiKey = process.env.GOOGLE_DRIVE_API_KEY;
+    const apiKey = process.env.GOOGLE_DRIVE_API_KEY || process.env.GEMINI_API_KEY;
     const SE_FOLDER_ID = '15pkshnr9luUQY9oZfpyxSZ4wI9oH4Bge';
     const AMP_FOLDER_ID = '1EvIPUXvf5PiSenapOKapb_N8QWUDuxMp';
 
