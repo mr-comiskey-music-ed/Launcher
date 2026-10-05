@@ -9,44 +9,48 @@
   <meta property="og:description" content="Logic Pro Floating Doc Launcher for Audio Engineering Students">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
-    /* Logic Pro Dark Aesthetic */
+    /* Ed-Tech Myrtle Green & Gold Aesthetic - Cabin Typeface */
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+      font-family: 'Cabin', sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
       margin: 0;
-      background-color: #121212;
-      color: #e3e3e3;
+      background-color: #133629;
+      color: #f3f4f6;
     }
     .card {
-      background: #242426;
-      border: 1px solid #3a3a3c;
-      padding: 28px;
-      border-radius: 10px;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+      background: #1B4D3E;
+      border: 1.5px solid #D97706;
+      padding: 32px;
+      border-radius: 14px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
       text-align: center;
       max-width: 440px;
       width: 90%;
     }
-    .logic-lcd {
-      background: #0d1117;
-      border: 1px solid #1f2937;
+    .edtech-lcd {
+      background: #0F2E23;
+      border: 1px solid #EAB308;
       border-radius: 6px;
       padding: 12px;
       margin-bottom: 20px;
-      color: #38bdf8;
+      color: #FACC15;
       font-family: monospace;
       font-size: 13px;
       text-transform: uppercase;
       letter-spacing: 1px;
+      font-weight: 700;
     }
-    h2 { margin: 0 0 6px 0; font-size: 20px; color: #f3f4f6; font-weight: 600; }
-    p { color: #9ca3af; font-size: 13px; line-height: 1.4; margin-bottom: 16px; }
+    h2 { margin: 0 0 6px 0; font-size: 20px; color: #ffffff; font-weight: 700; }
+    p { color: #d1d5db; font-size: 13px; line-height: 1.4; margin-bottom: 16px; }
     
     .select-group {
       text-align: left;
@@ -55,37 +59,31 @@
     label {
       font-size: 11px;
       font-weight: 700;
-      color: #9ca3af;
+      color: #FEE08A;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       display: block;
-      margin-bottom: 4px;
+      margin-bottom: 5px;
     }
     select, input[type="text"] {
       width: 100%;
-      padding: 10px;
-      background: #18181a;
-      border: 1px solid #3a3a3c;
-      color: #f3f4f6;
-      border-radius: 5px;
+      padding: 11px;
+      background: #14382B;
+      border: 1.5px solid #CA8A04;
+      color: #ffffff;
+      border-radius: 6px;
       box-sizing: border-box;
       font-size: 13px;
       outline: none;
+      font-family: 'Cabin', sans-serif;
     }
     select:focus, input[type="text"]:focus {
-      border-color: #38bdf8;
-    }
-
-    .help-text {
-      font-size: 11px;
-      color: #9ca3af;
-      margin-top: 6px;
-      margin-bottom: 12px;
-      font-style: italic;
+      border-color: #FACC15;
+      box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.25);
     }
 
     .divider {
-      border-top: 1px solid #3a3a3c;
+      border-top: 1px solid #285E4A;
       margin: 14px 0 18px 0;
       position: relative;
     }
@@ -94,44 +92,46 @@
       top: -9px;
       left: 50%;
       transform: translateX(-50%);
-      background: #242426;
+      background: #1B4D3E;
       padding: 0 8px;
       font-size: 10px;
-      color: #6b7280;
+      color: #FACC15;
+      font-weight: 700;
       text-transform: uppercase;
     }
 
     button.main-btn {
-      background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
-      color: white;
-      border: 1px solid #60a5fa;
+      background: #EAB308;
+      color: #133629;
+      border: 1px solid #FEF08A;
       padding: 12px 20px;
       font-size: 15px;
-      font-weight: 600;
-      border-radius: 6px;
+      font-weight: 700;
+      border-radius: 8px;
       cursor: pointer;
       width: 100%;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 14px rgba(234, 179, 8, 0.4);
+      font-family: 'Cabin', sans-serif;
     }
-    button.main-btn:hover { background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%); }
+    button.main-btn:hover { background: #FACC15; }
 
-    /* Logic Pro 11 Dark Mode Glossary Tooltip */
+    /* Glossary Tooltip */
     .logic-glossary-tooltip {
       position: fixed;
       z-index: 999999;
-      background: #18181a;
+      background: #1B4D3E;
       color: #f3f4f6;
-      border: 1px solid #38bdf8;
-      border-radius: 6px;
+      border: 1.5px solid #EAB308;
+      border-radius: 8px;
       padding: 10px 14px;
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8), 0 0 14px rgba(56, 189, 248, 0.25);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8), 0 0 14px rgba(250, 204, 21, 0.25);
       pointer-events: none;
       max-width: 300px;
       opacity: 0;
       display: none;
       transform: translateY(4px);
       transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
       user-select: none;
     }
     .logic-glossary-tooltip.visible {
@@ -144,12 +144,12 @@
       justify-content: space-between;
       gap: 8px;
       margin-bottom: 6px;
-      border-bottom: 1px solid #2e2e33;
+      border-bottom: 1px solid #285E4A;
       padding-bottom: 4px;
     }
     .logic-glossary-tooltip .tooltip-badge {
-      background: #0284c7;
-      color: #f0f9ff;
+      background: #EAB308;
+      color: #133629;
       font-size: 9px;
       font-weight: 700;
       padding: 1px 6px;
@@ -160,57 +160,56 @@
     .logic-glossary-tooltip .tooltip-title {
       font-size: 13px;
       font-weight: 700;
-      color: #38bdf8;
+      color: #FACC15;
       letter-spacing: 0.3px;
     }
     .logic-glossary-tooltip .tooltip-body {
-      color: #e2e8f0;
+      color: #f3f4f6;
       font-size: 12px;
       line-height: 1.45;
     }
     .logic-glossary-tooltip .tooltip-footer {
       margin-top: 6px;
       font-size: 9px;
-      color: #94a3b8;
+      color: #FEE08A;
       font-style: italic;
       text-align: right;
     }
 
-    /* Logic Glossary Highlighted Term */
     .logic-term {
-      border-bottom: 1px dashed rgba(56, 189, 248, 0.65);
+      border-bottom: 1px dashed rgba(250, 204, 21, 0.65);
       cursor: help;
       transition: color 0.15s ease, border-bottom-color 0.15s ease, background 0.15s ease;
       position: relative;
     }
     .logic-term:hover {
-      color: #38bdf8;
-      border-bottom: 1px solid #38bdf8;
-      background: rgba(56, 189, 248, 0.12);
+      color: #FACC15;
+      border-bottom: 1px solid #FACC15;
+      background: rgba(250, 204, 21, 0.12);
       border-radius: 2px;
     }
     .glossary-hint-box {
       margin-top: 14px;
       margin-bottom: 12px;
-      background: #18181a;
-      border: 1px solid #3a3a3c;
-      border-left: 3px solid #38bdf8;
+      background: #14382B;
+      border: 1.5px solid #CA8A04;
+      border-left: 3px solid #EAB308;
       border-radius: 6px;
       padding: 8px 10px;
       font-size: 11px;
-      color: #9ca3af;
+      color: #e5e7eb;
       text-align: left;
       line-height: 1.4;
     }
     .glossary-hint-box strong {
-      color: #38bdf8;
+      color: #FACC15;
     }
   </style>
 </head>
 <body>
 
 <div class="card">
-  <div class="logic-lcd">Mr. Comiskey's Floating App</div>
+  <div class="edtech-lcd">Mr. Comiskey's Project Launcher</div>
   <h2>Select Assignment Doc</h2>
 
 
@@ -228,8 +227,6 @@
     </select>
   </div>
 
-  <div class="help-text">Don't see it? Insert doc link below ↓</div>
-
   <div class="divider"><span>OR</span></div>
 
   <div class="select-group">
@@ -239,7 +236,7 @@
 
 
 
-  <button id="floatBtn" class="main-btn">Float Away!</button>
+  <button id="floatBtn" class="main-btn">LAUNCH!</button>
 </div>
 
 <script>
@@ -410,6 +407,11 @@
         height: 820,
       });
 
+      const fontLink = pipWindow.document.createElement('link');
+      fontLink.rel = 'stylesheet';
+      fontLink.href = 'https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap';
+      pipWindow.document.head.appendChild(fontLink);
+
       const markedScript = pipWindow.document.createElement('script');
       markedScript.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
       pipWindow.document.head.appendChild(markedScript);
@@ -418,22 +420,23 @@
       style.textContent = `
         body, html {
           margin: 0; padding: 0; height: 100%; display: flex; flex-direction: column; overflow: hidden;
-          background: #18181a; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; color: #e3e3e3;
+          background: #133629; font-family: 'Cabin', sans-serif; color: #f3f4f6;
         }
         .toolbar {
-          display: flex; align-items: center; justify-content: space-between; background: #242426;
-          padding: 6px 10px; gap: 4px; border-bottom: 1px solid #3a3a3c; user-select: none; z-index: 10; flex-wrap: wrap;
+          display: flex; align-items: center; justify-content: space-between; background: #1B4D3E;
+          padding: 8px 12px; gap: 6px; border-bottom: 2px solid #D97706; user-select: none; z-index: 10; flex-wrap: wrap;
         }
-        .control-group { display: flex; align-items: center; gap: 4px; font-size: 12px; }
+        .control-group { display: flex; align-items: center; gap: 6px; font-size: 12px; }
         .toolbar button {
-          background: #3a3a3c; color: #f3f4f6; border: 1px solid #4a4a4c; padding: 4px 7px;
-          border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 11px;
+          background: #235C48; color: #f3f4f6; border: 1px solid #CA8A04; padding: 5px 8px;
+          border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 11px;
         }
-        .toolbar button:hover { background: #4a4a4c; }
-        .toolbar button.shortcuts-btn { background: #2563eb; border-color: #3b82f6; }
-        .toolbar button.ai-btn { background: #1e3a8a; border-color: #3b82f6; color: #93c5fd; }
-        .toolbar button.patterns-btn { background: #047857; border-color: #059669; color: #a7f3d0; }
-        .toolbar button.active-btn { background: #16a34a !important; border-color: #22c55e !important; }
+        .toolbar button:hover { background: #2E755B; border-color: #FACC15; color: #FACC15; }
+        .toolbar button.shortcuts-btn { background: #D97706; border-color: #FACC15; color: #fff; }
+        .toolbar button.ai-btn { background: #14382B; border-color: #EAB308; color: #FEF08A; }
+        .toolbar button.patterns-btn { background: #047857; border-color: #10B981; color: #A7F3D0; }
+        .toolbar button.glossary-btn { background: #0e7490; border-color: #06b6d4; color: #cffafe; }
+        .toolbar button.active-btn { background: #CA8A04 !important; border-color: #FACC15 !important; color: #133629 !important; font-weight: 700; }
 
         .viewport-area { flex: 1; width: 100%; height: 100%; overflow: auto; position: relative; background: #ffffff; }
         .doc-wrapper { width: 100%; height: 100%; transform-origin: top left; position: relative; }
@@ -442,55 +445,55 @@
 
         .loupe {
           display: none; position: absolute; width: 200px; height: 200px; border-radius: 50%;
-          border: 3px solid #38bdf8; box-shadow: 0 6px 24px rgba(0,0,0,0.6); pointer-events: none;
+          border: 3px solid #EAB308; box-shadow: 0 6px 24px rgba(0,0,0,0.6); pointer-events: none;
           overflow: hidden; z-index: 50; background: #ffffff;
         }
         .loupe-iframe { position: absolute; border: none; transform-origin: top left; pointer-events: none; }
 
         /* AI Chat Drawer UI */
         .chat-drawer {
-          display: none; position: absolute; bottom: 0; left: 0; width: 100%; height: 280px;
-          background: #18181a; border-top: 1px solid #3a3a3c; flex-direction: column; z-index: 90;
+          display: none; position: absolute; bottom: 0; left: 0; width: 100%; height: 290px;
+          background: #1B4D3E; border-top: 2px solid #D97706; flex-direction: column; z-index: 90;
           box-shadow: 0 -6px 24px rgba(0,0,0,0.7);
         }
         .chat-header {
-          display: flex; justify-content: space-between; align-items: center; padding: 6px 12px;
-          background: #242426; border-bottom: 1px solid #3a3a3c; font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase;
+          display: flex; justify-content: space-between; align-items: center; padding: 8px 12px;
+          background: #133629; border-bottom: 1px solid #D97706; font-size: 11px; font-weight: 700; color: #FACC15; text-transform: uppercase;
         }
-        .chat-close { background: transparent !important; border: none !important; color: #9ca3af !important; font-size: 16px !important; cursor: pointer; }
+        .chat-close { background: transparent !important; border: none !important; color: #FEE08A !important; font-size: 16px !important; cursor: pointer; }
         .chat-messages {
-          flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; font-size: 12px; background: #121212;
+          flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; font-size: 12px; background: #0F2E23;
         }
-        .chat-msg { padding: 8px 10px; border-radius: 6px; max-width: 85%; line-height: 1.4; word-break: break-word; }
-        .chat-msg.user { background: #2563eb; color: #fff; align-self: flex-end; }
-        .chat-msg.assistant { background: #242426; color: #e3e3e3; border: 1px solid #3a3a3c; align-self: flex-start; }
-        .chat-msg.assistant strong, .chat-msg.assistant b { color: #38bdf8; font-weight: 700; }
+        .chat-msg { padding: 9px 12px; border-radius: 8px; max-width: 85%; line-height: 1.4; word-break: break-word; }
+        .chat-msg.user { background: #EAB308; color: #133629; font-weight: 700; align-self: flex-end; }
+        .chat-msg.assistant { background: #1E4E3D; color: #f3f4f6; border: 1px solid #CA8A04; align-self: flex-start; }
+        .chat-msg.assistant strong, .chat-msg.assistant b { color: #FACC15; font-weight: 700; }
         .chat-msg.assistant ul, .chat-msg.assistant ol { padding-left: 16px; margin: 4px 0; }
         .chat-msg.assistant li { margin-bottom: 3px; }
-        .chat-msg.assistant code { background: #18181a; color: #e2e8f0; padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 11px; border: 1px solid #3a3a3c; }
+        .chat-msg.assistant code { background: #14382B; color: #FEF08A; padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 11px; border: 1px solid #CA8A04; }
         .chat-msg.assistant p { margin: 4px 0; }
-        .chat-input-area { display: flex; padding: 8px; background: #242426; border-top: 1px solid #3a3a3c; gap: 6px; }
+        .chat-input-area { display: flex; padding: 8px 10px; background: #1B4D3E; border-top: 1px solid #D97706; gap: 6px; }
         .emergency-pill-strip {
           display: flex;
           gap: 6px;
           overflow-x: auto;
-          padding: 6px 8px;
-          background: #18181a;
-          border-top: 1px solid #3a3a3c;
+          padding: 6px 10px;
+          background: #14382B;
+          border-top: 1px solid #285E4A;
           white-space: nowrap;
           scrollbar-width: thin;
-          scrollbar-color: #3a3a3c transparent;
+          scrollbar-color: #CA8A04 transparent;
         }
         .emergency-pill-strip::-webkit-scrollbar { height: 4px; }
-        .emergency-pill-strip::-webkit-scrollbar-thumb { background: #3a3a3c; border-radius: 2px; }
+        .emergency-pill-strip::-webkit-scrollbar-thumb { background: #CA8A04; border-radius: 2px; }
         .emergency-pill {
-          background: #242426;
-          border: 1px solid #3a3a3c;
+          background: #1E4E3D;
+          border: 1px solid #CA8A04;
           color: #ffffff;
-          padding: 4px 10px;
+          padding: 5px 11px;
           border-radius: 12px;
           font-size: 11px;
-          font-weight: 500;
+          font-weight: 600;
           cursor: pointer;
           transition: border-color 0.15s, background 0.15s, color 0.15s;
           flex-shrink: 0;
@@ -499,18 +502,18 @@
           gap: 4px;
         }
         .emergency-pill:hover {
-          border-color: #38bdf8;
-          background: #2a2a2d;
-          color: #38bdf8;
+          border-color: #FACC15;
+          background: #27634E;
+          color: #FACC15;
         }
         .chat-input-area input {
-          flex: 1; padding: 6px 10px; background: #18181a; border: 1px solid #3a3a3c; color: #f3f4f6; border-radius: 4px; font-size: 12px; outline: none;
+          flex: 1; padding: 7px 10px; background: #14382B; border: 1.5px solid #CA8A04; color: #f3f4f6; border-radius: 6px; font-size: 12px; outline: none;
         }
-        .chat-input-area input:focus { border-color: #38bdf8; }
+        .chat-input-area input:focus { border-color: #FACC15; box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.25); }
         .chat-input-area button {
-          background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 12px;
+          background: #EAB308; color: #133629; border: none; padding: 7px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 12px;
         }
-        .chat-input-area button:hover { background: #3b82f6; }
+        .chat-input-area button:hover { background: #FACC15; }
 
         /* Modal Overlays */
         .modal-overlay {
@@ -518,13 +521,16 @@
           background: rgba(0, 0, 0, 0.85); z-index: 100; justify-content: center; align-items: center; padding: 14px; box-sizing: border-box;
         }
         .modal-content {
-          background: #242426; color: #f3f4f6; width: 100%; max-width: 580px; max-height: 90%;
-          border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #3a3a3c;
+          background: #1B4D3E; color: #f3f4f6; width: 100%; max-width: 580px; max-height: 90%;
+          border-radius: 10px; box-shadow: 0 16px 40px rgba(0,0,0,0.7); display: flex; flex-direction: column; overflow: hidden; border: 1.5px solid #D97706;
         }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #18181a; border-bottom: 1px solid #3a3a3c; }
-        .modal-header h3 { margin: 0; font-size: 14px; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; }
-        .modal-close { background: transparent !important; color: #9ca3af !important; font-size: 18px !important; border: none !important; cursor: pointer; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #133629; border-bottom: 1px solid #D97706; }
+        .modal-header h3 { margin: 0; font-size: 14px; color: #FACC15; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
+        .modal-close { background: transparent !important; color: #FEE08A !important; font-size: 18px !important; border: none !important; cursor: pointer; }
         .modal-body { padding: 16px; overflow-y: auto; font-size: 12px; }
+
+        .tab-btn { background: #14382B; color: #d1d5db; border: 1px solid #CA8A04; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .tab-btn.active { background: #EAB308; color: #133629; border-color: #FACC15; font-weight: 700; }
 
         /* Drum Patterns Styles */
         .drum-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
@@ -1028,6 +1034,13 @@
       pipWindow.document.getElementById('closeModalBtn').addEventListener('click', () => {
         stopCurrentPlayback();
         modal.style.display = 'none';
+      });
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          stopCurrentPlayback();
+          modal.style.display = 'none';
+        }
       });
 
       // Patterns Modal Trigger with embedded patterns & MIDI export
@@ -2187,45 +2200,6 @@
       tooltip.style.display = 'none';
       currentTrigger = null;
     }
-
-    // 1. MOUSEOVER HOVER LISTENER (>300ms hover delay)
-    doc.addEventListener('mouseover', (e) => {
-      const termEl = e.target.closest('[data-term], .logic-term');
-      if (!termEl) return;
-      if (!termEl.closest('.viewport-area, .doc-wrapper')) return;
-      if (activeHoverElement === termEl) return;
-
-      const rawTerm = termEl.getAttribute('data-term') || termEl.textContent;
-      const matched = resolveGlossaryTerm(rawTerm);
-      if (!matched) return;
-
-      clearTimeout(hoverTimer);
-      activeHoverElement = termEl;
-
-      let mouseX = e.clientX;
-      let mouseY = e.clientY;
-
-      const onMouseMove = (ev) => {
-        mouseX = ev.clientX;
-        mouseY = ev.clientY;
-      };
-      termEl.addEventListener('mousemove', onMouseMove);
-
-      hoverTimer = setTimeout(() => {
-        showTooltip(matched.term, matched.def, mouseX, mouseY, 'hover');
-      }, 300);
-
-      const onMouseLeave = () => {
-        clearTimeout(hoverTimer);
-        termEl.removeEventListener('mousemove', onMouseMove);
-        termEl.removeEventListener('mouseleave', onMouseLeave);
-        if (activeHoverElement === termEl) {
-          activeHoverElement = null;
-          hideTooltip('hover');
-        }
-      };
-      termEl.addEventListener('mouseleave', onMouseLeave);
-    });
 
     // 2. TEXT SELECTION LISTENER (selectionchange / mouseup)
     function handleSelectionCheck() {
