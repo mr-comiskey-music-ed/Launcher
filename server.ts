@@ -117,23 +117,57 @@ async function startServer() {
       }
 
       const items: string[] = [];
+
+      // Clean HTML and extract text lines or list elements
+      // First, check all <li> tags
       const liMatches = html.match(/<li[^>]*>(.*?)<\/li>/gis);
       if (liMatches) {
         for (const li of liMatches) {
-          const cleanText = li.replace(/<[^>]+>/g, '').trim();
-          if (cleanText && cleanText.length > 2 && cleanText.length < 250) {
+          let cleanText = li.replace(/<[^>]+>/g, '').trim();
+          // Remove markdown checkbox syntax like [ ], [x], - [ ], etc.
+          cleanText = cleanText.replace(/^(-\s*)?\[\s*[xX]?\s*\]\s*/i, '').trim();
+          cleanText = cleanText.replace(/^[•\-\*]\s*/, '').trim();
+          if (cleanText && cleanText.length > 1 && cleanText.length < 300 && !cleanText.toLowerCase().includes('checklist')) {
             items.push(cleanText);
           }
         }
       }
 
+      // If no <li> found, check <p> tags or general text lines matching checklist/bullet/task format
       if (items.length === 0) {
         const pMatches = html.match(/<p[^>]*>(.*?)<\/p>/gis);
         if (pMatches) {
           for (const p of pMatches) {
-            const cleanText = p.replace(/<[^>]+>/g, '').trim();
-            if (cleanText && (cleanText.toLowerCase().includes('step') || cleanText.toLowerCase().includes('task') || cleanText.startsWith('•') || cleanText.startsWith('-') || cleanText.match(/^\d+[\.\)]/))) {
-              items.push(cleanText.replace(/^[•\-\*]\s*/, ''));
+            let cleanText = p.replace(/<[^>]+>/g, '').trim();
+            // Check for markdown checkbox syntax or bullets
+            if (cleanText.includes('[ ]') || cleanText.includes('[x]') || cleanText.startsWith('•') || cleanText.startsWith('-') || cleanText.startsWith('*') || cleanText.toLowerCase().includes('step') || cleanText.toLowerCase().includes('task') || cleanText.match(/^\d+[\.\)]/)) {
+              cleanText = cleanText.replace(/^(-\s*)?\[\s*[xX]?\s*\]\s*/i, '').trim();
+              cleanText = cleanText.replace(/^[•\-\*]\s*/, '').trim();
+              if (cleanText && cleanText.length > 1 && !cleanText.toLowerCase().includes('### checklist') && !cleanText.toLowerCase().includes('checklist')) {
+                items.push(cleanText);
+              }
+            }
+          }
+        }
+      }
+
+      // Fallback: strip all tags and check line by line for markdown checklist items (- [ ] ...)
+      if (items.length === 0) {
+        const bodyText = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                             .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+                             .replace(/<[^>]+>/g, '\n');
+        const lines = bodyText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        let inChecklistSection = false;
+        for (const line of lines) {
+          if (line.toLowerCase().includes('checklist')) {
+            inChecklistSection = true;
+            continue;
+          }
+          if (inChecklistSection || line.startsWith('- [') || line.startsWith('[ ]') || line.startsWith('•') || line.startsWith('-')) {
+            let t = line.replace(/^(-\s*)?\[\s*[xX]?\s*\]\s*/i, '').trim();
+            t = t.replace(/^[•\-\*]\s*/, '').trim();
+            if (t && t.length > 2 && t.length < 300 && !t.toLowerCase().includes('file > share')) {
+              items.push(t);
             }
           }
         }
