@@ -276,8 +276,12 @@
   // Fetch Dynamic Folder Contents
   async function loadDriveDocs() {
     try {
-      const res = await fetch('/api/get-docs');
-      if (!res.ok) throw new Error('API fetch error');
+      const clientApiKey = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_GOOGLE_DRIVE_API_KEY || import.meta.env.VITE_GEMINI_API_KEY)) || '';
+      const res = await fetch(`/api/get-docs?key=${encodeURIComponent(clientApiKey)}`);
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || 'API fetch error');
+      }
       const data = await res.json();
       
       populateSelect(seSelect, data.se || FALLBACK_SE, '-- Choose Sound Engineering Project --');
@@ -375,24 +379,30 @@
     let docId = '';
 
     if (selectedDocId.startsWith('http://') || selectedDocId.startsWith('https://')) {
+      directUrl = selectedDocId;
       const match = selectedDocId.match(/\/d\/(e\/[a-zA-Z0-9-_]+|[a-zA-Z0-9-_]+)/);
-      if (match && match[1]) {
-        docId = match[1];
+      if (match && match[1]) docId = match[1];
+
+      if (selectedDocId.includes('drive.google.com/file/d/')) {
+        iframeSrc = selectedDocId.replace(/\/view.*$/, '/preview').replace(/\/edit.*$/, '/preview');
+        if (!iframeSrc.includes('/preview')) iframeSrc += '/preview';
+      } else if (selectedDocId.includes('docs.google.com/document/d/')) {
+        iframeSrc = selectedDocId.replace(/\/view.*$/, '/preview?rm=minimal&authuser=0').replace(/\/edit.*$/, '/preview?rm=minimal&authuser=0');
       } else {
-        docId = selectedDocId;
+        iframeSrc = selectedDocId;
       }
     } else {
       docId = selectedDocId.replace(/[\/%\s]+$/, '');
       const match = docId.match(/\/d\/(e\/[a-zA-Z0-9-_]+|[a-zA-Z0-9-_]+)/);
       if (match && match[1]) docId = match[1];
-    }
 
-    if (docId.startsWith('e/')) {
-      iframeSrc = `https://docs.google.com/document/d/${docId}/pub?embedded=true`;
-      directUrl = `https://docs.google.com/document/d/${docId}/pub`;
-    } else {
-      iframeSrc = `https://docs.google.com/document/d/${docId}/preview?rm=minimal&authuser=0`;
-      directUrl = `https://docs.google.com/document/d/${docId}/view`;
+      iframeSrc = docId.startsWith('e/')
+        ? `https://docs.google.com/document/d/${docId}/pub?embedded=true`
+        : `https://docs.google.com/document/d/${docId}/preview?rm=minimal&authuser=0`;
+      
+      directUrl = docId.startsWith('e/')
+        ? `https://docs.google.com/document/d/${docId}/pub`
+        : `https://docs.google.com/document/d/${docId}/view`;
     }
 
     try {
@@ -944,7 +954,8 @@
           } catch(e) {}
         }
 
-        const res = await fetch(`/api/fetch-checklist?id=${encodeURIComponent(docId)}`);
+        const clientApiKey = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_GOOGLE_DRIVE_API_KEY || import.meta.env.VITE_GEMINI_API_KEY)) || '';
+        const res = await fetch(`/api/fetch-checklist?id=${encodeURIComponent(docId)}&key=${encodeURIComponent(clientApiKey)}`);
         const text = await res.text();
         let data;
         try {
