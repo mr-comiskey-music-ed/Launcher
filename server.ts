@@ -67,6 +67,69 @@ async function startServer() {
     }
   });
 
+  // API endpoint to fetch and parse checklist from published Google Doc
+  app.get('/api/fetch-checklist', async (req, res) => {
+    const docId = req.query.id as string;
+    if (!docId) return res.status(400).json({ error: 'Document ID is required' });
+    try {
+      const pubUrl = `https://docs.google.com/document/d/${docId}/pub`;
+      const response = await fetch(pubUrl);
+      if (!response.ok) {
+        return res.json({ 
+          items: [
+            'Review assignment instructions in Google Doc',
+            'Set up project tracks in DAW',
+            'Complete recording and arrangement tasks',
+            'Export and submit final audio project'
+          ],
+          note: 'Note: Document is not published to the web. Publish to web in Google Docs (File > Share > Publish to web) to load live checklist items.' 
+        });
+      }
+      const html = await response.text();
+      
+      const items: string[] = [];
+      const liMatches = html.match(/<li[^>]*>(.*?)<\/li>/gis);
+      if (liMatches) {
+        for (const li of liMatches) {
+          const cleanText = li.replace(/<[^>]+>/g, '').trim();
+          if (cleanText && cleanText.length > 2 && cleanText.length < 250) {
+            items.push(cleanText);
+          }
+        }
+      }
+
+      if (items.length === 0) {
+        const pMatches = html.match(/<p[^>]*>(.*?)<\/p>/gis);
+        if (pMatches) {
+          for (const p of pMatches) {
+            const cleanText = p.replace(/<[^>]+>/g, '').trim();
+            if (cleanText && (cleanText.toLowerCase().includes('step') || cleanText.toLowerCase().includes('task') || cleanText.startsWith('•') || cleanText.startsWith('-') || cleanText.match(/^\d+[\.\)]/))) {
+              items.push(cleanText.replace(/^[•\-\*]\s*/, ''));
+            }
+          }
+        }
+      }
+
+      if (items.length === 0) {
+        items.push('Review assignment requirements');
+        items.push('Complete project steps');
+        items.push('Export final audio file');
+      }
+
+      res.json({ items });
+    } catch (err: any) {
+      console.error('Fetch checklist error:', err);
+      res.json({ 
+        items: [
+          'Review assignment instructions',
+          'Complete project steps in DAW',
+          'Export and submit final project'
+        ],
+        note: 'Could not fetch checklist automatically.' 
+      });
+    }
+  });
+
   // API endpoint matching api/chat.js
   app.post('/api/chat', async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;

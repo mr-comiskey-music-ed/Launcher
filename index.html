@@ -436,6 +436,7 @@
         .toolbar button.ai-btn { background: #14382B; border-color: #EAB308; color: #FEF08A; }
         .toolbar button.patterns-btn { background: #047857; border-color: #10B981; color: #A7F3D0; }
         .toolbar button.glossary-btn { background: #0e7490; border-color: #06b6d4; color: #cffafe; }
+        .toolbar button.checklist-btn { background: #065F46; border-color: #34D399; color: #ECFDF5; }
         .toolbar button.active-btn { background: #CA8A04 !important; border-color: #FACC15 !important; color: #133629 !important; font-weight: 700; }
 
         .viewport-area { flex: 1; width: 100%; height: 100%; overflow: auto; position: relative; background: #ffffff; }
@@ -775,6 +776,7 @@
           <button id="openAiChatBtn" class="ai-btn">🤖 Ask AI</button>
           <button id="openPatternsBtn" class="patterns-btn">🥁 Patterns</button>
           <button id="openGlossaryBtn" class="glossary-btn" title="Inspect Music Tech Dictionary">📖 Glossary</button>
+          <button id="openChecklistBtn" class="checklist-btn" title="View interactive project checklist from Google Doc">✅ Checklist</button>
         </div>
         <div class="control-group">
           <a href="${directUrl}" target="_blank" style="background: #0284c7; color: #fff; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">↗️ Open Doc</a>
@@ -1546,6 +1548,67 @@
         renderGlossaryList();
         modal.style.display = 'flex';
         searchInput.focus();
+      });
+
+      pipWindow.document.getElementById('openChecklistBtn').addEventListener('click', async () => {
+        modalTitle.textContent = "📋 PROJECT CHECKLIST";
+        modalBody.innerHTML = `<div style="text-align: center; padding: 25px; color: #94a3b8;">Loading checklist items from Google Doc...</div>`;
+        modal.style.display = 'flex';
+
+        try {
+          const res = await fetch(`/api/fetch-checklist?id=${encodeURIComponent(docId)}`);
+          const data = await res.json();
+          const items = data.items || [];
+          const note = data.note || '';
+
+          const storageKey = `floatdoc_checklist_${docId}`;
+          let checkedMap = {};
+          try {
+            checkedMap = JSON.parse(localStorage.getItem(storageKey) || '{}');
+          } catch (e) {}
+
+          let htmlContent = '';
+          if (note) {
+            htmlContent += `<div style="background: #14382B; border: 1px solid #D97706; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; font-size: 11px; color: #FEE08A;">${note}</div>`;
+          }
+
+          if (items.length === 0) {
+            htmlContent += `<div style="text-align: center; color: #9ca3af; padding: 20px;">No checklist items found in this document.</div>`;
+          } else {
+            htmlContent += `<div style="font-size: 11px; color: #94a3b8; margin-bottom: 10px;">Check off items as you complete them in Logic Pro or Soundtrap:</div>`;
+            htmlContent += `<div style="display: flex; flex-direction: column; gap: 8px;">`;
+            items.forEach((item, idx) => {
+              const isChecked = !!checkedMap[idx];
+              htmlContent += `
+                <label style="display: flex; align-items: flex-start; gap: 10px; background: #18181a; padding: 10px; border-radius: 6px; border: 1px solid #3a3a3c; cursor: pointer; transition: border-color 0.15s ease;">
+                  <input type="checkbox" data-index="${idx}" ${isChecked ? 'checked' : ''} style="margin-top: 2px; accent-color: #EAB308; cursor: pointer; width: 16px; height: 16px;">
+                  <span style="color: ${isChecked ? '#9ca3af' : '#f3f4f6'}; text-decoration: ${isChecked ? 'line-through' : 'none'}; font-size: 12px; line-height: 1.4; flex: 1;">${item}</span>
+                </label>
+              `;
+            });
+            htmlContent += `</div>`;
+          }
+
+          modalBody.innerHTML = htmlContent;
+
+          modalBody.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+            chk.addEventListener('change', (e) => {
+              const idx = e.target.getAttribute('data-index');
+              checkedMap[idx] = e.target.checked;
+              try {
+                localStorage.setItem(storageKey, JSON.stringify(checkedMap));
+              } catch (err) {}
+              const span = e.target.nextElementSibling;
+              if (span) {
+                span.style.color = e.target.checked ? '#9ca3af' : '#f3f4f6';
+                span.style.textDecoration = e.target.checked ? 'line-through' : 'none';
+              }
+            });
+          });
+
+        } catch (err) {
+          modalBody.innerHTML = `<div style="color: #ef4444; padding: 15px; text-align: center;">Error loading checklist: ${err.message}</div>`;
+        }
       });
 
       pipWindow.document.getElementById('openBpmBtn').addEventListener('click', () => {
