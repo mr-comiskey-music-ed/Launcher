@@ -452,9 +452,9 @@
         }
         .toolbar {
           display: flex; align-items: center; justify-content: space-between; background: #133629;
-          padding: 8px 12px; gap: 6px; border-bottom: 2px solid #D97706; user-select: none; z-index: 10; flex-wrap: wrap;
+          padding: 8px 12px; gap: 6px; border-bottom: 2px solid #D97706; user-select: none; z-index: 10; flex-wrap: wrap; height: auto; min-height: 48px; overflow: visible;
         }
-        .control-group { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+        .control-group { display: flex; align-items: center; gap: 6px; font-size: 12px; flex-wrap: wrap; }
         .toolbar button {
           background: #235C48; color: #f3f4f6; border: 1px solid #CA8A04; padding: 5px 8px;
           border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 11px; white-space: nowrap;
@@ -693,6 +693,53 @@
         }
         .drum-drag-link:active {
           cursor: grabbing;
+        }
+        .drum-drag-info-banner {
+          background: #0F2E23;
+          border: 1px solid #CA8A04;
+          border-left: 3px solid #EAB308;
+          border-radius: 6px;
+          padding: 8px 10px;
+          margin-bottom: 12px;
+          font-size: 11px;
+          color: #f3f4f6;
+          line-height: 1.45;
+          font-family: 'Cabin', sans-serif;
+        }
+        .drum-drag-info-banner code {
+          background: #14382B;
+          color: #FACC15;
+          padding: 1px 5px;
+          border-radius: 3px;
+          font-family: monospace;
+          font-size: 11px;
+          border: 1px solid #CA8A04;
+        }
+        .drum-drag-info-banner strong {
+          color: #FACC15;
+        }
+        .midi-toast {
+          position: fixed;
+          bottom: 16px;
+          left: 50%;
+          transform: translateX(-50%) translateY(20px);
+          background: #14382B;
+          color: #FACC15;
+          border: 1.5px solid #EAB308;
+          padding: 8px 14px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 700;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+          z-index: 999999;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.2s, transform 0.2s;
+          font-family: 'Cabin', sans-serif;
+        }
+        .midi-toast.show {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
         }
         .drum-card-title { font-weight: bold; color: #FACC15; font-size: 13px; margin-bottom: 6px; font-family: 'Cabin', sans-serif; }
         .drum-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
@@ -1346,7 +1393,7 @@
         return buffer;
       }
 
-      function generatePatternMidiDataUri(pat) {
+      function generatePatternMidiBytes(pat) {
         const ticksPerBeat = 480;
         const stepsPerBeat = pat.stepsPerBeat || 4;
         const ticksPerStep = Math.round(ticksPerBeat / stepsPerBeat);
@@ -1414,7 +1461,11 @@
           trackLen & 0xFF
         ];
 
-        const midiData = new Uint8Array([...header, ...trackHeader, ...trackBytes]);
+        return new Uint8Array([...header, ...trackHeader, ...trackBytes]);
+      }
+
+      function generatePatternMidiDataUri(pat) {
+        const midiData = generatePatternMidiBytes(pat);
         let binaryStr = '';
         for (let i = 0; i < midiData.length; i++) {
           binaryStr += String.fromCharCode(midiData[i]);
@@ -1422,23 +1473,44 @@
         return `data:audio/midi;base64,${btoa(binaryStr)}`;
       }
 
+      function showMidiToast(message) {
+        let toast = pipWindow.document.getElementById('midiToast');
+        if (!toast) {
+          toast = pipWindow.document.createElement('div');
+          toast.id = 'midiToast';
+          toast.className = 'midi-toast';
+          pipWindow.document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3800);
+      }
+
       function exportPatternMidi(pat) {
         const dataUri = generatePatternMidiDataUri(pat);
         const nameStr = pat.name || 'Drum Pattern';
+        const cleanName = `${nameStr.replace(/[^a-zA-Z0-9_-]/g, '_')}.mid`;
         const a = pipWindow.document.createElement('a');
         a.href = dataUri;
-        a.download = `${nameStr.replace(/[^a-zA-Z0-9_-]/g, '_')}.mid`;
+        a.download = cleanName;
         pipWindow.document.body.appendChild(a);
         a.click();
         setTimeout(() => {
           pipWindow.document.body.removeChild(a);
         }, 150);
+        showMidiToast(`⬇ Saved ${cleanName}! Drag directly into Logic Pro.`);
       }
 
       pipWindow.document.getElementById('openPatternsBtn').addEventListener('click', () => {
         modalTitle.textContent = "🥁 DRUM PATTERN DATABASE";
         
         modalBody.innerHTML = `
+          <div class="drum-drag-info-banner">
+            <span>💡 <strong>DAW Workflow:</strong> Drag <code>⋮⋮ Drag MIDI</code> directly into <strong>Soundtrap</strong> (in Chrome) or onto your <strong>Desktop/Finder</strong>. For <strong>Logic Pro</strong>, click <strong>⬇ MIDI</strong> and drag from your Downloads into Logic Pro!</span>
+          </div>
           <div class="drum-controls">
             <input type="text" id="drumSearch" class="drum-search" placeholder="Search pattern name or style (e.g. electro, house, rock)...">
             <select id="drumStyleFilter" class="drum-filter">
@@ -1546,7 +1618,7 @@
               <div class="drum-card" id="drum-card-${cardId}" data-card-id="${cardId}">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
                   <div style="display:flex; align-items:center; gap:8px;">
-                    <a class="drum-drag-link" href="${dataUri}" download="${midiFileName}" title="Drag MIDI directly into Logic Pro, DAW, or desktop">⋮⋮ Drag MIDI</a>
+                    <a class="drum-drag-link" data-card-id="${cardId}" href="${dataUri}" download="${midiFileName}" draggable="true" title="Drag MIDI directly into Soundtrap, Desktop, or Finder">⋮⋮ Drag MIDI</a>
                     <div class="drum-card-title" style="margin-bottom:0;">${pat.name}</div>
                   </div>
                   <div style="display:flex; gap:6px; align-items:center;">
@@ -1577,6 +1649,49 @@
               e.stopPropagation();
               const cardId = btn.getAttribute('data-card-id');
               toggleFavorite(cardId);
+            });
+          });
+
+          gridContainer.querySelectorAll('.drum-drag-link').forEach(link => {
+            link.addEventListener('dragstart', (e) => {
+              const cardId = link.getAttribute('data-card-id');
+              const pat = filtered.find(p => (p.id || ('pat-' + filtered.indexOf(p))) === cardId);
+              if (!pat) return;
+
+              const midiBytes = generatePatternMidiBytes(pat);
+              const midiFileName = `${pat.name.replace(/\s+/g, '_')}.mid`;
+              const cardEl = pipWindow.document.getElementById('drum-card-' + cardId);
+              if (cardEl) cardEl.classList.add('is-dragging');
+
+              // 1. In-browser DAW drop support (Soundtrap, Web DAW)
+              try {
+                const blob = new Blob([midiBytes], { type: 'audio/midi' });
+                const file = new File([blob], midiFileName, { type: 'audio/midi' });
+                if (e.dataTransfer && e.dataTransfer.items && e.dataTransfer.items.add) {
+                  e.dataTransfer.items.add(file);
+                }
+              } catch (err) {
+                console.warn('dataTransfer.items add error:', err);
+              }
+
+              // 2. Chromium OS Drag-out download (drag directly to Desktop or Finder)
+              try {
+                const origin = window.location.origin || (pipWindow.location && pipWindow.location.origin) || '';
+                const downloadUrl = `${origin}/api/download-midi?id=${encodeURIComponent(cardId)}`;
+                e.dataTransfer.setData("DownloadURL", `audio/midi:${midiFileName}:${downloadUrl}`);
+              } catch (err) {}
+
+              // 3. Fallbacks for text drop targets
+              e.dataTransfer.setData("text/plain", midiFileName);
+              e.dataTransfer.effectAllowed = "copyMove";
+
+              showMidiToast(`Dragging ${pat.name}: drop into Soundtrap or onto Desktop/Finder!`);
+            });
+
+            link.addEventListener('dragend', (e) => {
+              const cardId = link.getAttribute('data-card-id');
+              const cardEl = pipWindow.document.getElementById('drum-card-' + cardId);
+              if (cardEl) cardEl.classList.remove('is-dragging');
             });
           });
 
@@ -1670,7 +1785,7 @@
             <button class="tab-btn" onclick="switchTab('compTab')">Compression</button>
           </div>
           <div id="eqTab" class="tab-pane active">
-            <div style="margin-top:4px; font-weight:bold; color:#38bdf8;">Reference Visual Charts (Click to Expand):</div>
+            <div style="margin-top:4px; font-weight:bold; color:#FACC15;">Reference Visual Charts (Click to Expand):</div>
             <div class="expandable-img-grid">
               <div class="expandable-card" onclick="openLightbox('/sweetwater_eq_chart.jpg')">
                 <img src="/sweetwater_eq_chart.jpg" alt="Instrument Frequency Chart">
@@ -1682,7 +1797,7 @@
               </div>
             </div>
 
-            <div style="margin-top:16px; font-weight:bold; color:#38bdf8;">More Info:</div>
+            <div style="margin-top:16px; font-weight:bold; color:#FACC15;">More Info:</div>
             <div class="video-container">
               <iframe src="https://www.youtube-nocookie.com/embed/7H3cHfV8rXI" title="EQ Masterclass Video" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
@@ -1697,12 +1812,12 @@
               <li><b>Drum Bus Compression:</b> 2:1 or 4:1 ratio, 30ms attack, fast release for glue.</li>
             </ul>
 
-            <div style="margin-top:16px; font-weight:bold; color:#38bdf8;">Simple Tutorial:</div>
+            <div style="margin-top:16px; font-weight:bold; color:#FACC15;">Simple Tutorial:</div>
             <div class="video-container">
               <iframe src="https://www.youtube-nocookie.com/embed/LGqDVhww-hs" title="Simple Compression Tutorial" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
 
-            <div style="margin-top:16px; font-weight:bold; color:#38bdf8;">In Depth Tutorial:</div>
+            <div style="margin-top:16px; font-weight:bold; color:#FACC15;">In Depth Tutorial:</div>
             <div class="video-container">
               <iframe src="https://www.youtube-nocookie.com/embed/booRjPgtIS4" title="In Depth Compression Tutorial" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
