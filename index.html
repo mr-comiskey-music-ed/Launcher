@@ -276,8 +276,7 @@
   // Fetch Dynamic Folder Contents
   async function loadDriveDocs() {
     try {
-      const clientApiKey = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_GOOGLE_DRIVE_API_KEY || import.meta.env.VITE_GEMINI_API_KEY)) || '';
-      const res = await fetch(`/api/get-docs?key=${encodeURIComponent(clientApiKey)}`);
+      const res = await fetch('/api/get-docs');
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({}));
         throw new Error(errJson.error || 'API fetch error');
@@ -954,8 +953,7 @@
           } catch(e) {}
         }
 
-        const clientApiKey = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_GOOGLE_DRIVE_API_KEY || import.meta.env.VITE_GEMINI_API_KEY)) || '';
-        const res = await fetch(`/api/fetch-checklist?id=${encodeURIComponent(docId)}&key=${encodeURIComponent(clientApiKey)}`);
+        const res = await fetch(`/api/fetch-checklist?id=${encodeURIComponent(docId)}`);
         const text = await res.text();
         let data;
         try {
