@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
-  <script src="/chords-engine.js"></script>
+  <script src="/chords-engine.js?v=2.7"></script>
   <style>
     /* Ed-Tech Myrtle Green & Gold Aesthetic - Cabin Typeface */
     body {
@@ -456,7 +456,7 @@
       pipWindow.document.head.appendChild(ytScript);
 
       const chordsScript = pipWindow.document.createElement('script');
-      chordsScript.src = '/chords-engine.js';
+      chordsScript.src = '/chords-engine.js?v=2.7';
       pipWindow.document.head.appendChild(chordsScript);
 
       const style = pipWindow.document.createElement('style');
@@ -918,7 +918,345 @@
         .black-key-sharp { color: #fde047; }
         .black-key-flat { color: #93c5fd; }
         .key-sep { opacity: 0.5; font-size: 6px; }
-        .chord-search-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+
+        /* Chord Progression Creator & Timeline Styles */
+        .chord-creator-panel {
+          background: #0d261d; border: 1.5px solid #CA8A04; border-radius: 8px;
+          padding: 8px 10px; margin-bottom: 8px; box-sizing: border-box; width: 100%;
+        }
+        .builder-top-bar {
+          display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+          gap: 8px; padding-bottom: 8px; border-bottom: 1px solid #285E4A; margin-bottom: 8px;
+        }
+        .builder-controls-left { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+        .builder-select-group { display: inline-flex; align-items: center; gap: 4px; }
+        .builder-label { font-size: 11px; font-weight: 700; color: #FEF08A; font-family: 'Cabin', sans-serif; }
+        .builder-select {
+          background: #14382B; border: 1px solid #CA8A04; border-radius: 5px; color: #FACC15;
+          font-size: 11px; font-weight: 700; padding: 3px 6px; outline: none; cursor: pointer; font-family: 'Cabin', sans-serif;
+        }
+        .builder-select option { background: #0F2E23; color: #FACC15; }
+        .complexity-btn-group { display: inline-flex; border: 1px solid #CA8A04; border-radius: 5px; overflow: hidden; }
+        .complexity-btn {
+          background: #14382B; border: none; color: #d1d5db; padding: 3px 7px;
+          font-size: 10.5px; font-weight: 700; cursor: pointer; font-family: 'Cabin', sans-serif; transition: background 0.12s, color 0.12s;
+        }
+        .complexity-btn:not(:last-child) { border-right: 1px solid #285E4A; }
+        .complexity-btn.active { background: #EAB308; color: #133629; }
+        .builder-spice-btn {
+          background: #14382B; border: 1px solid #CA8A04; border-radius: 5px; color: #fb923c;
+          font-size: 10.5px; font-weight: 700; padding: 3px 7px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-family: 'Cabin', sans-serif; transition: all 0.12s;
+        }
+        .builder-spice-btn:hover, .builder-spice-btn.active { background: #ea580c; color: #fff; border-color: #fb923c; }
+        .diatonic-palette-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-bottom: 8px; }
+        .diatonic-card {
+          background: #14382B; border: 1.5px solid #CA8A04; border-radius: 6px; padding: 5px 3px 4px 3px;
+          text-align: center; cursor: pointer; position: relative; transition: transform 0.1s, border-color 0.1s, background 0.1s;
+          user-select: none; display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 58px;
+        }
+        .diatonic-card:hover { background: #194a38; border-color: #FACC15; transform: translateY(-1px); }
+        .diatonic-card.auditioning { background: #FACC15 !important; color: #133629 !important; border-color: #fff !important; transform: scale(0.97); }
+        .diatonic-card.auditioning * { color: #133629 !important; }
+
+        /* Chord Selection Box Degree Colors (Matching Window Buttons: R O Y G B V + Pink) */
+        .diatonic-card.deg-card-1 { background: #381010; border-color: #ef4444; }
+        .diatonic-card.deg-card-1 .diatonic-degree { color: #fca5a5; }
+        .diatonic-card.deg-card-1:hover { background: #501515; border-color: #f87171; }
+
+        .diatonic-card.deg-card-2 { background: #351a08; border-color: #ea580c; }
+        .diatonic-card.deg-card-2 .diatonic-degree { color: #fdba74; }
+        .diatonic-card.deg-card-2:hover { background: #4d240c; border-color: #fb923c; }
+
+        .diatonic-card.deg-card-3 { background: #352b08; border-color: #eab308; }
+        .diatonic-card.deg-card-3 .diatonic-degree { color: #fde047; }
+        .diatonic-card.deg-card-3:hover { background: #4d3e0c; border-color: #facc15; }
+
+        .diatonic-card.deg-card-4 { background: #08281d; border-color: #10b981; }
+        .diatonic-card.deg-card-4 .diatonic-degree { color: #6ee7b7; }
+        .diatonic-card.deg-card-4:hover { background: #0e3b2b; border-color: #34d399; }
+
+        .diatonic-card.deg-card-5 { background: #0b1f3d; border-color: #2563eb; }
+        .diatonic-card.deg-card-5 .diatonic-degree { color: #93c5fd; }
+        .diatonic-card.deg-card-5:hover { background: #122f5a; border-color: #60a5fa; }
+
+        .diatonic-card.deg-card-6 { background: #23123d; border-color: #7c3aed; }
+        .diatonic-card.deg-card-6 .diatonic-degree { color: #c4b5fd; }
+        .diatonic-card.deg-card-6:hover { background: #341a5b; border-color: #a78bfa; }
+
+        .diatonic-card.deg-card-7 { background: #350f29; border-color: #db2777; }
+        .diatonic-card.deg-card-7 .diatonic-degree { color: #f472b6; }
+        .diatonic-card.deg-card-7:hover { background: #4e173d; border-color: #f472b6; }
+
+        .diatonic-key-badge {
+          position: absolute; top: 2px; right: 3px; font-size: 8px; font-weight: 800; color: #9CA3AF;
+          background: rgba(0,0,0,0.35); border-radius: 3px; padding: 0 3px; line-height: 1.2;
+        }
+        .diatonic-degree { font-size: 13px; font-weight: 800; color: #FACC15; font-family: 'Cabin', sans-serif; line-height: 1.1; }
+        .diatonic-chord-name { font-size: 11.5px; font-weight: 800; color: #ffffff; font-family: 'Cabin', sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .diatonic-func-tag { font-size: 8px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.3px; font-weight: 600; line-height: 1; }
+        .spice-drawer { display: none; background: #0a1f17; border: 1px dashed #CA8A04; border-radius: 6px; padding: 6px; margin-bottom: 8px; }
+        .spice-drawer.open { display: block; }
+        .spice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 5px; }
+        .spice-card { background: #17382c; border: 1px solid #f97316; border-radius: 5px; padding: 4px; text-align: center; cursor: pointer; transition: all 0.1s; }
+        .spice-card:hover { background: #235442; border-color: #fb923c; }
+        .spice-card.auditioning { background: #f97316 !important; color: #fff !important; }
+        .spice-degree { font-size: 11px; font-weight: 800; color: #fb923c; }
+        .spice-chord { font-size: 11px; font-weight: 800; color: #fff; }
+        .spice-desc { font-size: 7.5px; color: #d1d5db; }
+        /* Timeline */
+        .timeline-container { background: #0a1f17; border: 1.5px solid #285E4A; border-radius: 6px; padding: 6px 8px; margin-bottom: 6px; position: relative; }
+        .timeline-header-bar { display: flex; align-items: center; justify-content: space-between; padding-bottom: 4px; margin-bottom: 6px; border-bottom: 1px solid #1a4234; }
+        .timeline-title { font-size: 11px; font-weight: 800; color: #FACC15; display: inline-flex; align-items: center; gap: 5px; text-transform: uppercase; }
+        .timeline-stat { font-size: 10px; color: #9CA3AF; font-family: 'Cabin', sans-serif; }
+        .phrase-toggle-group { display: inline-flex; border: 1.5px solid #CA8A04; border-radius: 4px; overflow: hidden; }
+        .phrase-toggle-btn { background: #14382B; border: none; color: #FEF08A; font-size: 10px; font-weight: 700; padding: 2px 9px; cursor: pointer; font-family: 'Cabin', sans-serif; transition: all 0.12s; }
+        .phrase-toggle-btn:not(:last-child) { border-right: 1px solid #285E4A; }
+        .phrase-toggle-btn:hover { background: #235C48; color: #FACC15; }
+        .phrase-toggle-btn.active { background: #EAB308 !important; color: #133629 !important; font-weight: 800 !important; }
+
+        /* DAW Ruler - Top yellow row for bar headers, bottom row for beat numbers across 100% width */
+        .daw-timeline-wrapper { position: relative; border: 1.5px solid #285E4A; border-radius: 6px; overflow: hidden; background: #081912; margin-bottom: 6px; box-sizing: border-box; width: 100%; }
+        .daw-ruler { display: flex; flex-direction: column; background: #0f2e23; user-select: none; border-bottom: 1.5px solid #285E4A; width: 100%; box-sizing: border-box; }
+        .daw-ruler-measures-row { display: flex; flex-direction: row; width: 100%; height: 22px; border-bottom: 1px solid rgba(0,0,0,0.4); box-sizing: border-box; }
+        .daw-ruler-measure-header {
+          flex: 1 1 0%; min-width: 0; background: #EAB308; color: #133629; font-weight: 800; font-size: 11px; line-height: 22px;
+          display: flex; align-items: center; justify-content: center; font-family: 'Cabin', sans-serif;
+          border-right: 2px solid #854d0e; text-transform: uppercase; white-space: nowrap; overflow: hidden; box-sizing: border-box;
+        }
+        .daw-ruler-measure-header:last-child { border-right: none; }
+        .daw-ruler-beats-row { display: flex; flex-direction: row; width: 100%; height: 18px; background: #091f17; box-sizing: border-box; }
+        .daw-ruler-beat {
+          flex: 1 1 0%; min-width: 0; display: flex; align-items: center; justify-content: center;
+          font-size: 10px; line-height: 18px; color: #FEF08A; font-weight: 700; border-right: 1px dashed rgba(255,255,255,0.18); height: 100%;
+          white-space: nowrap; overflow: hidden; box-sizing: border-box; background: #0f2e23;
+        }
+        .daw-ruler-beat:last-child { border-right: none; }
+        .daw-ruler-beat.measure-end { border-right: 2px solid #CA8A04; }
+
+        /* DAW Chord Track - Zero padding so chord clips align 100% with the ruler bars and beats */
+        .daw-track {
+          display: flex; height: 70px; width: 100%; position: relative; padding: 0; margin: 0; box-sizing: border-box; align-items: stretch;
+          background-color: #06150f;
+          user-select: none;
+        }
+        .daw-track.drag-over { background-color: #113426; outline: 2px dashed #FACC15; }
+
+        /* Red Moving Playhead */
+        .daw-playhead-line { position: absolute; top: 0; bottom: 0; width: 2px; background: #ef4444; z-index: 30; pointer-events: none; box-shadow: 0 0 6px #ef4444; display: none; }
+
+        /* DAW Chord Clip Block */
+        .daw-chord-clip {
+          position: relative; height: 100%; border-radius: 4px; box-sizing: border-box; display: flex; flex-direction: column;
+          justify-content: space-between; padding: 2px 4px; margin: 0; border: 1.5px solid rgba(0,0,0,0.5); border-right: 1.5px solid rgba(0,0,0,0.8); cursor: grab;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.4); transition: border-color 0.12s, box-shadow 0.12s, opacity 0.12s; min-width: 20px; overflow: hidden;
+        }
+        .daw-chord-clip:active { cursor: grabbing; }
+        .daw-chord-clip.clip-dragging { opacity: 0.45; border-style: dashed !important; }
+        .daw-chord-clip.clip-drag-over-left {
+          border-left: 4px solid #FACC15 !important;
+          box-shadow: -6px 0 16px rgba(250, 204, 21, 0.95) !important;
+          position: relative !important;
+        }
+        .daw-chord-clip.clip-drag-over-left::after {
+          content: '' !important;
+          position: absolute !important;
+          left: -2px !important;
+          top: 0 !important;
+          bottom: 0 !important;
+          width: 5px !important;
+          background: #FACC15 !important;
+          box-shadow: 0 0 12px #FACC15, 0 0 24px #EAB308 !important;
+          z-index: 100 !important;
+          pointer-events: none !important;
+          border-radius: 2px !important;
+        }
+        .daw-chord-clip.clip-drag-over-right {
+          border-right: 4px solid #FACC15 !important;
+          box-shadow: 6px 0 16px rgba(250, 204, 21, 0.95) !important;
+          position: relative !important;
+        }
+        .daw-chord-clip.clip-drag-over-right::after {
+          content: '' !important;
+          position: absolute !important;
+          right: -2px !important;
+          top: 0 !important;
+          bottom: 0 !important;
+          width: 5px !important;
+          background: #FACC15 !important;
+          box-shadow: 0 0 12px #FACC15, 0 0 24px #EAB308 !important;
+          z-index: 100 !important;
+          pointer-events: none !important;
+          border-radius: 2px !important;
+        }
+
+        /* Glowing Insertion Indicator Line Popping Up Between Chords */
+        .daw-insertion-line {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 4px;
+          background: #FACC15 !important;
+          box-shadow: 0 0 10px #FACC15, 0 0 22px rgba(250, 204, 21, 0.95) !important;
+          z-index: 1000 !important;
+          pointer-events: none !important;
+          display: none;
+          transform: translateX(-50%);
+          border-radius: 2px;
+        }
+        .daw-insertion-line::before {
+          content: '▼' !important;
+          position: absolute !important;
+          top: -2px !important;
+          left: 50% !important;
+          transform: translateX(-50%) !important;
+          color: #FACC15 !important;
+          font-size: 13px !important;
+          line-height: 1 !important;
+          text-shadow: 0 0 6px #000, 0 0 10px #FACC15 !important;
+        }
+        .daw-insertion-line::after {
+          content: '▲' !important;
+          position: absolute !important;
+          bottom: -2px !important;
+          left: 50% !important;
+          transform: translateX(-50%) !important;
+          color: #FACC15 !important;
+          font-size: 13px !important;
+          line-height: 1 !important;
+          text-shadow: 0 0 6px #000, 0 0 10px #FACC15 !important;
+        }
+
+        /* Dotted Box Popping Over Chord About to Be Swapped Out */
+        .daw-chord-clip.clip-swap-hover {
+          outline: 3px dashed #FACC15 !important;
+          outline-offset: -3px !important;
+          box-shadow: inset 0 0 16px rgba(250, 204, 21, 0.5), 0 0 14px rgba(250, 204, 21, 0.85) !important;
+          transform: scale(1.03) !important;
+          z-index: 50 !important;
+          animation: swap-box-pulse 0.6s infinite alternate ease-in-out !important;
+        }
+        @keyframes swap-box-pulse {
+          from { outline-color: #FACC15; }
+          to { outline-color: #ffffff; }
+        }
+        .daw-chord-clip.clip-swap-hover::before {
+          content: '🔄 SWAP';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: rgba(15, 46, 35, 0.95);
+          border: 1.5px dashed #FACC15;
+          color: #FACC15;
+          font-size: 11px;
+          font-weight: 900;
+          padding: 3px 7px;
+          border-radius: 4px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.85);
+          pointer-events: none;
+          z-index: 60;
+          white-space: nowrap;
+          letter-spacing: 0.5px;
+          font-family: 'Cabin', sans-serif;
+        }
+
+        .daw-chord-clip.active-playhead {
+          border-color: #FACC15 !important; box-shadow: 0 0 14px rgba(250, 204, 21, 0.85) !important; filter: brightness(1.15);
+        }
+
+        /* Scale Degree Palette (Matching Window Buttons: R O Y G B V + Pink) */
+        .clip-deg-1 { background: #b91c1c !important; border-color: #f87171 !important; color: #fef2f2 !important; }
+        .clip-deg-2 { background: #ea580c !important; border-color: #fb923c !important; color: #ffffff !important; }
+        .clip-deg-3 { background: #eab308 !important; border-color: #fef08a !important; color: #133629 !important; }
+        .clip-deg-3 .daw-chord-name { color: #133629 !important; font-weight: 900 !important; text-shadow: none !important; }
+        .clip-deg-3 .daw-degree-label { color: #133629 !important; font-weight: 800 !important; }
+        .clip-deg-3 .daw-inv-badge { background: #133629 !important; color: #fef08a !important; border-color: #ca8a04 !important; }
+        .clip-deg-4 { background: #059669 !important; border-color: #34d399 !important; color: #ecfdf5 !important; }
+        .clip-deg-5 { background: #2563eb !important; border-color: #60a5fa !important; color: #ffffff !important; }
+        .clip-deg-6 { background: #7c3aed !important; border-color: #a78bfa !important; color: #ffffff !important; }
+        .clip-deg-7 { background: #db2777 !important; border-color: #f472b6 !important; color: #ffffff !important; }
+
+        /* Legacy color classes fallback */
+        .clip-color-blue { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
+        .clip-color-teal { background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); }
+        .clip-color-green { background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); }
+        .clip-color-purple { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); }
+        .clip-color-amber { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
+
+        /* Top-Left Delete Button (Separate from resize handle) */
+        .daw-clip-del-btn {
+          position: absolute; top: 2px; left: 2px;
+          background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.45); color: #ffffff;
+          font-size: 10px; font-weight: 900; cursor: pointer; width: 16px; height: 16px; display: inline-flex;
+          align-items: center; justify-content: center; line-height: 1; border-radius: 3px;
+          z-index: 60; transition: all 0.1s; pointer-events: auto;
+        }
+        .daw-clip-del-btn:hover { background: #dc2626; color: #fff; border-color: #ef4444; }
+
+        .daw-clip-header {
+          display: flex; justify-content: space-between; align-items: center; width: 100%; z-index: 20; position: relative;
+          height: 16px; padding-left: 18px; padding-right: 2px; box-sizing: border-box;
+        }
+        .daw-degree-label { font-size: 9.5px; font-weight: 700; color: rgba(255,255,255,0.95); font-family: 'Cabin', sans-serif; line-height: 1; }
+        .daw-inv-badge {
+          background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.3); color: #FEF08A;
+          font-size: 8px; font-weight: 700; padding: 0 3px; border-radius: 3px; cursor: pointer; line-height: 1.2; z-index: 25;
+        }
+        .daw-inv-badge:hover { background: #EAB308; color: #133629; }
+
+        .daw-clip-body { display: flex; align-items: center; justify-content: center; flex: 1; width: 100%; padding-right: 10px; box-sizing: border-box; }
+        .daw-chord-name {
+          font-size: 14px; font-weight: 800; color: #ffffff; font-family: 'Cabin', sans-serif; line-height: 1.1;
+          letter-spacing: 0.3px; text-shadow: 0 1px 3px rgba(0,0,0,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        /* Resizing Drag Handle (||) - positioned on bottom right edge to never block delete button */
+        .daw-resize-handle {
+          position: absolute; right: 0; bottom: 0; top: 22px; width: 10px;
+          cursor: col-resize; display: flex; align-items: center; justify-content: center;
+          color: rgba(255,255,255,0.7); font-size: 8px; font-weight: 900;
+          background: rgba(0,0,0,0.3); border-bottom-right-radius: 4px;
+          user-select: none; transition: background 0.1s; z-index: 20;
+        }
+        .daw-resize-handle:hover { background: rgba(250, 204, 21, 0.6); color: #133629; }
+        /* Transport Bar */
+        .timeline-transport-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; padding-top: 6px; border-top: 1px dashed #285E4A; }
+        .transport-left { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+        .transport-right { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+        .play-prog-btn {
+          background: #EAB308; color: #133629; border: none; border-radius: 5px; padding: 5px 12px;
+          font-size: 11.5px; font-weight: 800; cursor: pointer; font-family: 'Cabin', sans-serif; display: inline-flex; align-items: center; gap: 4px; transition: background 0.12s;
+        }
+        .play-prog-btn:hover { background: #FACC15; }
+        .play-prog-btn.active { background: #ef4444; color: #ffffff; }
+        .transport-toggle-btn {
+          background: #14382B; border: 1px solid #CA8A04; border-radius: 5px; color: #d1d5db;
+          padding: 4px 8px; font-size: 10.5px; font-weight: 700; cursor: pointer; font-family: 'Cabin', sans-serif;
+          transition: background 0.12s, color 0.12s, border-color 0.12s; text-align: center; white-space: nowrap; box-sizing: border-box;
+        }
+        .transport-toggle-btn.loop-btn { min-width: 96px; width: 96px; display: inline-flex; align-items: center; justify-content: center; }
+        .transport-toggle-btn.active { background: #166534; color: #86efac; border-color: #22c55e; }
+        .bpm-slider-group { display: inline-flex; align-items: center; gap: 4px; background: #14382B; border: 1px solid #CA8A04; border-radius: 5px; padding: 2px 7px; }
+        .bpm-slider { width: 75px; accent-color: #EAB308; cursor: pointer; }
+        .bpm-val-text { font-size: 10.5px; font-weight: 800; color: #FEF08A; min-width: 44px; font-family: 'Cabin', sans-serif; }
+        .style-btn-group { display: inline-flex; border: 1px solid #CA8A04; border-radius: 5px; overflow: hidden; }
+        .style-btn { background: #14382B; border: none; color: #d1d5db; padding: 3px 6px; font-size: 10px; font-weight: 700; cursor: pointer; font-family: 'Cabin', sans-serif; }
+        .style-btn:not(:last-child) { border-right: 1px solid #285E4A; }
+        .style-btn.active { background: #CA8A04; color: #ffffff; }
+        .midi-export-btn {
+          background: #2563eb; color: #ffffff; border: none; border-radius: 5px; padding: 5px 10px;
+          font-size: 11px; font-weight: 800; cursor: pointer; font-family: 'Cabin', sans-serif; display: inline-flex; align-items: center; gap: 4px; transition: background 0.12s;
+        }
+        .midi-export-btn:hover { background: #3b82f6; }
+        .clear-btn { background: #14382B; border: 1px solid #991b1b; color: #fca5a5; border-radius: 5px; padding: 4px 8px; font-size: 10.5px; font-weight: 700; cursor: pointer; font-family: 'Cabin', sans-serif; }
+        .clear-btn:hover { background: #991b1b; color: #fff; }
+        .text-toggle-btn { background: #14382B; border: 1px solid #CA8A04; color: #FEF08A; border-radius: 5px; padding: 4px 8px; font-size: 10.5px; font-weight: 700; cursor: pointer; font-family: 'Cabin', sans-serif; }
+        .text-drawer { display: none; margin-top: 6px; padding: 6px; background: #0a1f17; border: 1px dashed #CA8A04; border-radius: 6px; gap: 6px; align-items: center; }
+        .text-drawer.open { display: flex; }
+        .text-drawer input { flex: 1; background: #14382B; border: 1px solid #CA8A04; border-radius: 4px; color: #FACC15; font-size: 11.5px; font-weight: 700; padding: 4px 8px; outline: none; font-family: 'Cabin', sans-serif; }
+        .text-drawer button { background: #EAB308; color: #133629; border: none; border-radius: 4px; padding: 4px 8px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Cabin', sans-serif; }
+
+        .chord-search-row { display: none; gap: 8px; align-items: center; margin-bottom: 6px; }
         .chord-search-input { flex: 1; background: #14382B; border: 1.5px solid #CA8A04; border-radius: 6px; color: #FACC15; font-size: 13px; font-weight: 700; padding: 7px 10px; outline: none; font-family: 'Cabin', sans-serif; }
         .chord-search-input:focus { border-color: #FACC15; box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.2); }
         .chord-presets-bar { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; align-items: center; font-size: 11px; }
@@ -1363,9 +1701,9 @@
       let stopChordsEngine = () => {};
 
       pipWindow.document.getElementById('closeModalBtn').addEventListener('click', () => {
-        stopCurrentPlayback();
-        stopAllYtPlayers();
-        stopChordsEngine();
+        try { stopCurrentPlayback(); } catch(e) {}
+        try { stopAllYtPlayers(); } catch(e) {}
+        try { stopChordsEngine(); } catch(e) {}
         modal.style.display = 'none';
         modal.classList.remove('wide-overlay');
         const modalContent = pipWindow.document.querySelector('.modal-content');
@@ -1374,9 +1712,9 @@
 
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
-          stopCurrentPlayback();
-          stopAllYtPlayers();
-          stopChordsEngine();
+          try { stopCurrentPlayback(); } catch(e) {}
+          try { stopAllYtPlayers(); } catch(e) {}
+          try { stopChordsEngine(); } catch(e) {}
           modal.style.display = 'none';
           modal.classList.remove('wide-overlay');
           const modalContent = pipWindow.document.querySelector('.modal-content');
@@ -1795,12 +2133,16 @@
           <div id="eqTab" class="tab-pane active">
             <div style="margin-top:4px; font-weight:bold; color:#FACC15;">Reference Visual Charts (Click to Expand):</div>
             <div class="expandable-img-grid">
-              <div class="expandable-card" onclick="openLightbox('/sweetwater_eq_chart.jpg')">
-                <img src="/sweetwater_eq_chart.jpg" alt="Instrument Frequency Chart">
-                <div class="expandable-caption">🔍 Instrument Frequency Ranges Chart (Click to expand)</div>
+              <div class="expandable-card" data-img="src/assets/images/Easy EQ Tips.jpeg">
+                <img src="src/assets/images/Easy EQ Tips.jpeg" alt="Easy EQ Tips">
+                <div class="expandable-caption">🔍 Easy EQ Tips (Click to expand)</div>
               </div>
-              <div class="expandable-card" onclick="openLightbox('/descriptive_audio_terms.jpg')">
-                <img src="/descriptive_audio_terms.jpg" alt="5 Ranges Descriptive Audio Terms">
+              <div class="expandable-card" data-img="src/assets/images/Sweetwater EQ Chart.png">
+                <img src="src/assets/images/Sweetwater EQ Chart.png" alt="Sweetwater EQ Chart">
+                <div class="expandable-caption">🔍 Sweetwater EQ Chart (Click to expand)</div>
+              </div>
+              <div class="expandable-card" data-img="src/assets/images/5 Ranges Descriptive Audio Terms.jpeg">
+                <img src="src/assets/images/5 Ranges Descriptive Audio Terms.jpeg" alt="5 Ranges Descriptive Audio Terms">
                 <div class="expandable-caption">🔍 5 Ranges Descriptive Audio Terms (Click to expand)</div>
               </div>
             </div>
@@ -1815,12 +2157,20 @@
           </div>
 
           <div id="compTab" class="tab-pane">
+            <div style="margin-top:4px; font-weight:bold; color:#FACC15;">Compression Workflow Chart (Click to Expand):</div>
+            <div class="expandable-img-grid" style="margin-bottom:12px;">
+              <div class="expandable-card" data-img="src/assets/images/Compressor Step by Step 3_4.jpeg">
+                <img src="src/assets/images/Compressor Step by Step 3_4.jpeg" alt="Compressor Step by Step">
+                <div class="expandable-caption">🔍 Compressor Step by Step (Click to expand)</div>
+              </div>
+            </div>
+
             <p><b>Compression & Bussing Rules:</b></p>
             <ul style="padding-left:18px; line-height:1.6; margin-bottom:14px;">
               <li><b>Slow Attack (>30ms):</b> Lets transients through (punchy drums & percussion).</li>
-              <li><b>Fast Attack (<10ms):</b> Catches peaks & smooths out performances (tames vocals/bass).</li>
+              <li><b>Fast Attack (<10ms):</b> Catches peaks & smooths out performances (tames vocals/guitars/bass), but can remove some energy from the performance as well.</li>
               <li><b>Auto/Sync Release:</b> Keeps compressor pumping smoothly with song tempo.</li>
-              <li><b>Drum Bus Compression:</b> 2:1 or 4:1 ratio, 30ms attack, fast release for glue.</li>
+              <li><b>Bus Compression:</b> lower ratio (2:1 or so), medium attack, auto release helps glue things together.</li>
             </ul>
 
             <div style="margin-top:16px; font-weight:bold; color:#FACC15;">Simple Tutorial:</div>
@@ -1837,6 +2187,14 @@
             </div>
             <div class="yt-fallback-bar">
               <a class="yt-fallback-link" href="https://www.youtube.com/watch?v=booRjPgtIS4" target="_blank" rel="noopener noreferrer">↗ Watch In-Depth Compression Tutorial on YouTube</a>
+            </div>
+
+            <div style="margin-top:16px; font-weight:bold; color:#FACC15;">How to Hear Compression:</div>
+            <div class="video-container" id="yt-box-comp3">
+              <div id="yt-player-comp3"></div>
+            </div>
+            <div class="yt-fallback-bar">
+              <a class="yt-fallback-link" href="https://www.youtube.com/watch?v=K0XGXz6SHco" target="_blank" rel="noopener noreferrer">↗ Watch How to Hear Compression Tutorial on YouTube</a>
             </div>
           </div>
         `;
@@ -1857,6 +2215,7 @@
           } else if (tabId === 'compTab') {
             mountYouTubePlayer('yt-player-comp1', 'LGqDVhww-hs', 'Simple Compression Tutorial');
             mountYouTubePlayer('yt-player-comp2', 'booRjPgtIS4', 'In Depth Compression Tutorial');
+            mountYouTubePlayer('yt-player-comp3', 'K0XGXz6SHco', 'How to Hear Compression Tutorial');
           }
         };
 
@@ -1867,20 +2226,40 @@
           lb.style.display = 'flex';
         };
 
+        modalBody.addEventListener('click', (e) => {
+          const card = e.target.closest('.expandable-card');
+          if (card) {
+            const imgSrc = card.getAttribute('data-img');
+            if (imgSrc) {
+              const lb = pipWindow.document.getElementById('lightboxModal');
+              const lbImg = pipWindow.document.getElementById('lightboxImg');
+              lbImg.src = imgSrc;
+              lb.style.display = 'flex';
+            }
+          }
+        });
+
         modal.style.display = 'flex';
         mountYouTubePlayer('yt-player-eq', '7H3cHfV8rXI', '3 Rules of EQ Masterclass');
       });
 
       pipWindow.document.getElementById('openChordsBtn').addEventListener('click', () => {
-        stopCurrentPlayback();
-        stopAllYtPlayers();
-        stopChordsEngine();
+        try { stopCurrentPlayback(); } catch(e) {}
+        try { stopAllYtPlayers(); } catch(e) {}
+        try { stopChordsEngine(); } catch(e) {}
+        modal.style.display = 'flex';
 
         const openFn = window.openChordsAndNotesModal || (pipWindow && pipWindow.openChordsAndNotesModal);
         if (typeof openFn === 'function') {
-          openFn(pipWindow, modal, modalTitle, modalBody, (stopFn) => {
-            stopChordsEngine = stopFn;
-          });
+          try {
+            openFn(pipWindow, modal, modalTitle, modalBody, (stopFn) => {
+              stopChordsEngine = stopFn;
+            });
+          } catch(err) {
+            console.error('Error invoking openChordsAndNotesModal:', err);
+          }
+        } else {
+          console.warn('openChordsAndNotesModal is not defined yet');
         }
       });
 
@@ -2018,7 +2397,8 @@
       pipWindow.document.getElementById('openBpmBtn').addEventListener('click', () => {
         modalTitle.textContent = "⏱ TAP TEMPO & DELAY MATH";
         modalBody.innerHTML = `
-          <div class="bpm-display" id="bpmVal">120 BPM</div>
+          <div class="bpm-display" id="bpmVal" title="Double-click to set tempo manually" style="cursor: pointer; user-select: none;">120 BPM</div>
+          <div style="text-align:center; font-size:11px; color:#9CA3AF; margin-top:-6px; margin-bottom:12px;">💡 Double-click BPM to enter tempo manually</div>
           <button class="tap-btn" id="tapPad">TAP TEMPO HERE</button>
           <div style="margin-top:16px;">
             <b>Delay Sync Values:</b>
@@ -2031,7 +2411,8 @@
         const delayTable = pipWindow.document.getElementById('delayTable');
 
         const updateDelays = (bpm) => {
-          const quarterMs = Math.round((60000 / bpm));
+          const safeBpm = Math.max(10, Math.min(400, bpm || 120));
+          const quarterMs = Math.round((60000 / safeBpm));
           const eighthMs = Math.round(quarterMs / 2);
           const sixteenthMs = Math.round(quarterMs / 4);
           const dottedEighthMs = Math.round(eighthMs * 1.5);
@@ -2043,6 +2424,66 @@
             <div class="shortcut-row"><span>1/16 Note Delay:</span><span class="shortcut-key">${sixteenthMs} ms</span></div>
           `;
         };
+
+        const makeBpmEditable = () => {
+          const currentText = bpmVal.textContent || '120';
+          const currentBpm = parseInt(currentText, 10) || 120;
+          const input = pipWindow.document.createElement('input');
+          input.type = 'number';
+          input.min = '20';
+          input.max = '350';
+          input.value = currentBpm;
+          input.style.fontSize = '26px';
+          input.style.width = '130px';
+          input.style.textAlign = 'center';
+          input.style.background = '#0F2E23';
+          input.style.color = '#FEF08A';
+          input.style.border = '2px solid #EAB308';
+          input.style.borderRadius = '6px';
+          input.style.padding = '4px';
+          input.style.fontWeight = 'bold';
+          input.style.fontFamily = "'Cabin', sans-serif";
+
+          bpmVal.innerHTML = '';
+          bpmVal.appendChild(input);
+          input.focus();
+          input.select();
+
+          let finished = false;
+          const finish = () => {
+            if (finished) return;
+            finished = true;
+            const parsed = parseInt(input.value, 10);
+            const finalBpm = (!isNaN(parsed) && parsed >= 20 && parsed <= 350) ? parsed : currentBpm;
+            bpmVal.textContent = `${finalBpm} BPM`;
+            updateDelays(finalBpm);
+            taps = [];
+          };
+
+          input.addEventListener('blur', finish);
+          input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              finish();
+            } else if (e.key === 'Escape') {
+              finished = true;
+              bpmVal.textContent = `${currentBpm} BPM`;
+              updateDelays(currentBpm);
+            }
+          });
+        };
+
+        bpmVal.addEventListener('dblclick', (e) => {
+          e.preventDefault();
+          makeBpmEditable();
+        });
+
+        const tapPadEl = pipWindow.document.getElementById('tapPad');
+        if (tapPadEl) {
+          tapPadEl.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            makeBpmEditable();
+          });
+        }
 
         updateDelays(120);
 

@@ -293,8 +293,8 @@ You are an encouraging, highly practical High School Music Technology AI assista
     res.sendFile(path.join(process.cwd(), 'public', 'yt-embed.html'));
   });
 
-  // Serve static assets from public directory
-  app.use(express.static(path.join(process.cwd(), 'public')));
+  // Serve static assets from public directory without serving public/index.html over root
+  app.use(express.static(path.join(process.cwd(), 'public'), { index: false }));
 
   // Create Vite server in middleware mode
   const vite = await createViteServer({
