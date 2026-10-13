@@ -16,6 +16,7 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
   <script src="/chords-engine.js?v=2.7"></script>
+  <script src="/fx-library.js?v=1.0"></script>
   <style>
     /* Ed-Tech Myrtle Green & Gold Aesthetic - Cabin Typeface */
     body {
@@ -459,6 +460,10 @@
       chordsScript.src = '/chords-engine.js?v=2.7';
       pipWindow.document.head.appendChild(chordsScript);
 
+      const fxScript = pipWindow.document.createElement('script');
+      fxScript.src = '/fx-library.js?v=1.0';
+      pipWindow.document.head.appendChild(fxScript);
+
       const style = pipWindow.document.createElement('style');
       style.textContent = `
         body, html {
@@ -698,8 +703,9 @@
         .seq-step.playing-step { box-shadow: inset 0 0 0 2px #FACC15, 0 0 8px #FACC15 !important; filter: brightness(1.3); }
 
         .tab-nav { display: flex; gap: 6px; margin-bottom: 12px; border-bottom: 1px solid #CA8A04; padding-bottom: 8px; flex-wrap: wrap; }
-        .tab-btn { background: #14382B; color: #d1d5db; border: 1px solid #CA8A04; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: 'Cabin', sans-serif; }
-        .tab-btn.active { background: #EAB308; color: #133629; border-color: #FACC15; font-weight: 700; }
+        .tab-btn { background: #14382B; color: #d1d5db; border: 1.5px solid #285E4A; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: 'Cabin', sans-serif; transition: all 0.15s ease; }
+        .tab-btn:hover { background: #1B4D3E; border-color: #CA8A04; color: #FEF08A; }
+        .tab-btn.active { background: #FACC15 !important; color: #133629 !important; border-color: #EAB308 !important; font-weight: 700 !important; box-shadow: 0 2px 8px rgba(250,204,21,0.3); }
         .tab-pane { display: none; }
         .tab-pane.active { display: block; }
 
@@ -730,6 +736,27 @@
           display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
         }
         .lightbox-content { max-width: 90%; max-height: 90%; border-radius: 6px; border: 2px solid #EAB308; }
+
+        /* FX & Processing Library Styles */
+        .fx-svg-icon {
+          width: 100%;
+          height: 100%;
+          color: #FACC15;
+          display: block;
+        }
+        .fx-card-btn:hover {
+          border-color: #FACC15 !important;
+          background: #184232 !important;
+        }
+        .fx-card-btn.selected {
+          border-color: #FACC15 !important;
+          background: #1A4535 !important;
+          box-shadow: 0 0 10px rgba(250, 204, 21, 0.3) !important;
+        }
+        .fx-cat-btn:hover {
+          border-color: #FACC15 !important;
+          color: #FEF08A !important;
+        }
 
         /* Logic Pro 11 Dark Mode Glossary Tooltip */
         .logic-glossary-tooltip {
@@ -844,6 +871,67 @@
           max-height: calc(100vh - 8px) !important;
           margin: 0 !important;
           border-radius: 8px !important;
+        }
+        .modal-content.mixtips-modal {
+          max-width: 780px !important;
+          width: 95% !important;
+          height: 600px !important;
+          max-height: calc(100vh - 30px) !important;
+          min-height: 560px !important;
+        }
+        .modal-content.mixtips-modal .modal-body {
+          display: flex !important;
+          flex-direction: column !important;
+          height: calc(100% - 46px) !important;
+          overflow: hidden !important;
+          padding: 12px 16px !important;
+        }
+        .modal-content.mixtips-modal .tab-nav {
+          display: flex !important;
+          gap: 6px !important;
+          margin-bottom: 12px !important;
+          border-bottom: 2px solid #CA8A04 !important;
+          padding-bottom: 8px !important;
+          flex-shrink: 0 !important;
+        }
+        .modal-content.mixtips-modal .tab-btn {
+          background: #14382B !important;
+          color: #d1d5db !important;
+          border: 1.5px solid #285E4A !important;
+          padding: 6px 16px !important;
+          border-radius: 6px !important;
+          cursor: pointer !important;
+          font-weight: 600 !important;
+          font-size: 12px !important;
+          font-family: 'Cabin', sans-serif !important;
+          transition: all 0.15s ease !important;
+          user-select: none !important;
+        }
+        .modal-content.mixtips-modal .tab-btn:hover {
+          background: #1B4D3E !important;
+          border-color: #CA8A04 !important;
+          color: #FEF08A !important;
+        }
+        .modal-content.mixtips-modal .tab-btn.active {
+          background: #FACC15 !important;
+          color: #133629 !important;
+          border: 1.5px solid #EAB308 !important;
+          font-weight: 800 !important;
+          box-shadow: 0 2px 8px rgba(250,204,21,0.4) !important;
+        }
+        .modal-content.mixtips-modal .tab-pane {
+          flex: 1 !important;
+          min-height: 0 !important;
+          overflow-y: auto !important;
+        }
+        .modal-content.mixtips-modal #fxLibraryTab {
+          height: 100% !important;
+          overflow: hidden !important;
+          display: none;
+          flex-direction: column !important;
+        }
+        .modal-content.mixtips-modal #fxLibraryTab.active {
+          display: flex !important;
         }
         .chords-container { display: flex; flex-direction: column; gap: 8px; width: 100%; box-sizing: border-box; }
         .inst-box {
@@ -1704,10 +1792,15 @@
         try { stopCurrentPlayback(); } catch(e) {}
         try { stopAllYtPlayers(); } catch(e) {}
         try { stopChordsEngine(); } catch(e) {}
+        try { if (pipWindow.stopFxAudio) pipWindow.stopFxAudio(); } catch(e) {}
+        try { if (window.stopFxAudio) window.stopFxAudio(); } catch(e) {}
         modal.style.display = 'none';
         modal.classList.remove('wide-overlay');
         const modalContent = pipWindow.document.querySelector('.modal-content');
-        if (modalContent) modalContent.classList.remove('wide-modal');
+        if (modalContent) {
+          modalContent.classList.remove('wide-modal');
+          modalContent.classList.remove('mixtips-modal');
+        }
       });
 
       modal.addEventListener('click', (e) => {
@@ -1715,10 +1808,15 @@
           try { stopCurrentPlayback(); } catch(e) {}
           try { stopAllYtPlayers(); } catch(e) {}
           try { stopChordsEngine(); } catch(e) {}
+          try { if (pipWindow.stopFxAudio) pipWindow.stopFxAudio(); } catch(e) {}
+          try { if (window.stopFxAudio) window.stopFxAudio(); } catch(e) {}
           modal.style.display = 'none';
           modal.classList.remove('wide-overlay');
           const modalContent = pipWindow.document.querySelector('.modal-content');
-          if (modalContent) modalContent.classList.remove('wide-modal');
+          if (modalContent) {
+            modalContent.classList.remove('wide-modal');
+            modalContent.classList.remove('mixtips-modal');
+          }
         }
       });
 
@@ -2124,30 +2222,30 @@
       });
 
       pipWindow.document.getElementById('openMixTipsBtn').addEventListener('click', () => {
-        modalTitle.textContent = "🎛 MIX TIPS & FREQUENCY CHEATSHEET";
+        modalTitle.textContent = "🎛 MIX TIPS & FX LIBRARY";
+        const modalContent = pipWindow.document.querySelector('.modal-content');
+        if (modalContent) modalContent.classList.add('mixtips-modal');
         modalBody.innerHTML = `
           <div class="tab-nav">
-            <button class="tab-btn active" onclick="switchTab('eqTab')">EQ</button>
-            <button class="tab-btn" onclick="switchTab('compTab')">Compression</button>
+            <button type="button" class="tab-btn active" data-tab="eqTab">EQ</button>
+            <button type="button" class="tab-btn" data-tab="compTab">Compression</button>
+            <button type="button" class="tab-btn" data-tab="fxLibraryTab">FX Library</button>
           </div>
           <div id="eqTab" class="tab-pane active">
-            <div style="margin-top:4px; font-weight:bold; color:#FACC15;">Reference Visual Charts (Click to Expand):</div>
+            <div style="margin-top:4px; font-weight:bold; color:#FACC15;">Reference Visual Charts:</div>
             <div class="expandable-img-grid">
-              <div class="expandable-card" data-img="src/assets/images/Easy EQ Tips.jpeg">
-                <img src="src/assets/images/Easy EQ Tips.jpeg" alt="Easy EQ Tips">
-                <div class="expandable-caption">🔍 Easy EQ Tips (Click to expand)</div>
+              <div style="background:#14382B; border:1px solid #CA8A04; border-radius:6px; padding:8px;">
+                <img src="src/assets/images/Easy EQ Tips.jpeg" alt="Easy EQ Tips" style="width:100%; height:auto; border-radius:4px; display:block;">
               </div>
               <div class="expandable-card" data-img="src/assets/images/Sweetwater EQ Chart.png">
                 <img src="src/assets/images/Sweetwater EQ Chart.png" alt="Sweetwater EQ Chart">
-                <div class="expandable-caption">🔍 Sweetwater EQ Chart (Click to expand)</div>
+                <div class="expandable-caption">🔍 Open in tab</div>
               </div>
-              <div class="expandable-card" data-img="src/assets/images/5 Ranges Descriptive Audio Terms.jpeg">
-                <img src="src/assets/images/5 Ranges Descriptive Audio Terms.jpeg" alt="5 Ranges Descriptive Audio Terms">
-                <div class="expandable-caption">🔍 5 Ranges Descriptive Audio Terms (Click to expand)</div>
+              <div style="background:#14382B; border:1px solid #CA8A04; border-radius:6px; padding:8px;">
+                <img src="src/assets/images/5 Ranges Descriptive Audio Terms.jpeg" alt="5 Ranges Descriptive Audio Terms" style="width:100%; height:auto; border-radius:4px; display:block;">
               </div>
             </div>
 
-            <div style="margin-top:16px; font-weight:bold; color:#FACC15;">Video Masterclass:</div>
             <div class="video-container" id="yt-box-eq">
               <div id="yt-player-eq"></div>
             </div>
@@ -2157,11 +2255,9 @@
           </div>
 
           <div id="compTab" class="tab-pane">
-            <div style="margin-top:4px; font-weight:bold; color:#FACC15;">Compression Workflow Chart (Click to Expand):</div>
             <div class="expandable-img-grid" style="margin-bottom:12px;">
-              <div class="expandable-card" data-img="src/assets/images/Compressor Step by Step 3_4.jpeg">
-                <img src="src/assets/images/Compressor Step by Step 3_4.jpeg" alt="Compressor Step by Step">
-                <div class="expandable-caption">🔍 Compressor Step by Step (Click to expand)</div>
+              <div style="background:#14382B; border:1px solid #CA8A04; border-radius:6px; padding:8px;">
+                <img src="src/assets/images/Compressor Step by Step 3_4.jpeg" alt="Compressor Step by Step" style="width:100%; height:auto; border-radius:4px; display:block;">
               </div>
             </div>
 
@@ -2197,27 +2293,77 @@
               <a class="yt-fallback-link" href="https://www.youtube.com/watch?v=K0XGXz6SHco" target="_blank" rel="noopener noreferrer">↗ Watch How to Hear Compression Tutorial on YouTube</a>
             </div>
           </div>
+
+          <div id="fxLibraryTab" class="tab-pane" style="height:100%; display:none; flex-direction:column; overflow:hidden;">
+            <div id="fxLibraryContainer" style="height:100%; display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden;"></div>
+          </div>
         `;
 
         pipWindow.switchTab = (tabId) => {
           stopAllYtPlayers();
-          pipWindow.document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-          pipWindow.document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-          if (event && event.target && event.target.classList) {
-            event.target.classList.add('active');
-          }
-          const pane = pipWindow.document.getElementById(tabId);
-          if (pane) {
-            pane.classList.add('active');
-          }
+          try { if (pipWindow.stopFxAudio) pipWindow.stopFxAudio(); } catch(e) {}
+          try { if (window.stopFxAudio) window.stopFxAudio(); } catch(e) {}
+
+          const allBtns = modalBody.querySelectorAll('.tab-nav .tab-btn');
+          allBtns.forEach(b => {
+            const isTarget = (b.getAttribute('data-tab') === tabId);
+            if (isTarget) {
+              b.classList.add('active');
+              b.style.setProperty('background', '#FACC15', 'important');
+              b.style.setProperty('color', '#133629', 'important');
+              b.style.setProperty('border-color', '#EAB308', 'important');
+              b.style.setProperty('font-weight', '800', 'important');
+              b.style.setProperty('box-shadow', '0 2px 8px rgba(250,204,21,0.4)', 'important');
+            } else {
+              b.classList.remove('active');
+              b.style.setProperty('background', '#14382B', 'important');
+              b.style.setProperty('color', '#d1d5db', 'important');
+              b.style.setProperty('border-color', '#285E4A', 'important');
+              b.style.setProperty('font-weight', '600', 'important');
+              b.style.removeProperty('box-shadow');
+            }
+          });
+
+          const allPanes = modalBody.querySelectorAll('.tab-pane');
+          allPanes.forEach(p => {
+            if (p.id === tabId) {
+              p.classList.add('active');
+              p.style.display = (tabId === 'fxLibraryTab') ? 'flex' : 'block';
+            } else {
+              p.classList.remove('active');
+              p.style.display = 'none';
+            }
+          });
+
           if (tabId === 'eqTab') {
             mountYouTubePlayer('yt-player-eq', '7H3cHfV8rXI', '3 Rules of EQ Masterclass');
           } else if (tabId === 'compTab') {
             mountYouTubePlayer('yt-player-comp1', 'LGqDVhww-hs', 'Simple Compression Tutorial');
             mountYouTubePlayer('yt-player-comp2', 'booRjPgtIS4', 'In Depth Compression Tutorial');
             mountYouTubePlayer('yt-player-comp3', 'K0XGXz6SHco', 'How to Hear Compression Tutorial');
+          } else if (tabId === 'fxLibraryTab') {
+            const container = pipWindow.document.getElementById('fxLibraryContainer');
+            const renderFn = pipWindow.renderFxLibrary || window.renderFxLibrary;
+            if (typeof renderFn === 'function' && container) {
+              renderFn(container, pipWindow);
+            } else if (container) {
+              setTimeout(() => {
+                const retryFn = pipWindow.renderFxLibrary || window.renderFxLibrary;
+                if (typeof retryFn === 'function') retryFn(container, pipWindow);
+              }, 80);
+            }
           }
         };
+
+        window.switchTab = pipWindow.switchTab;
+
+        modalBody.querySelectorAll('.tab-nav .tab-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const tabId = btn.getAttribute('data-tab');
+            if (tabId) pipWindow.switchTab(tabId);
+          });
+        });
 
         pipWindow.openLightbox = (imgSrc) => {
           const lb = pipWindow.document.getElementById('lightboxModal');
@@ -2231,16 +2377,13 @@
           if (card) {
             const imgSrc = card.getAttribute('data-img');
             if (imgSrc) {
-              const lb = pipWindow.document.getElementById('lightboxModal');
-              const lbImg = pipWindow.document.getElementById('lightboxImg');
-              lbImg.src = imgSrc;
-              lb.style.display = 'flex';
+              window.open(imgSrc, '_blank');
             }
           }
         });
 
         modal.style.display = 'flex';
-        mountYouTubePlayer('yt-player-eq', '7H3cHfV8rXI', '3 Rules of EQ Masterclass');
+        pipWindow.switchTab('eqTab');
       });
 
       pipWindow.document.getElementById('openChordsBtn').addEventListener('click', () => {
