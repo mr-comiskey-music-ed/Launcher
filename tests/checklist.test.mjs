@@ -120,3 +120,78 @@ test('fetchChecklist reports a friendly note when nothing is found', async () =>
   assert.deepEqual(out.items, []);
   assert.match(out.note, /Checklist/);
 });
+
+// ---- blank-line cutoff and the "Your ____ must:" lead-in ----
+
+const EXAMPLE_ITEMS = [
+  'Be at least 16 bars long',
+  'Develop in some way - don’t just have everything come in all at once and end all at once.',
+  'Have at least 6 tracks:',
+  'Programmed drums',
+  'Finger drummed drums',
+  'Bass - bass guitar/808/bass synth/double bass',
+  'Chord Instrument 1  - keys, piano, synth, guitar, strings, etc.',
+  'Chord Instrument 2  - keys, piano, synth, guitar, strings, etc.',
+  'Melody - vocals, saxophone solo, synth lead, guitar solo, solo violin, synth plucks - something you could sing along with.'
+];
+const GRADE_PARAGRAPH = 'Fulfilling these requirements will get you a 90%. Go past these requirements and comment with how you did so to receive the remaining 10%. Ideas for this: longer length, advanced development, additional instruments.';
+
+test('a blank line after the items ends the checklist (plain-text export, no checkbox glyphs)', () => {
+  const text = ['Intro text', '', 'Checklist:', ...EXAMPLE_ITEMS.slice(0, 3), ...EXAMPLE_ITEMS.slice(3).map(i => '\t\t' + i), '', GRADE_PARAGRAPH, ''].join('\n');
+  assert.deepEqual(parseChecklist(text), EXAMPLE_ITEMS);
+});
+
+test('a blank line after the items ends the checklist (checkbox glyphs)', () => {
+  const text = ['Checklist:', ...EXAMPLE_ITEMS.map(i => '☐ ' + i), '', GRADE_PARAGRAPH].join('\n');
+  assert.deepEqual(parseChecklist(text), EXAMPLE_ITEMS);
+});
+
+test('blank lines BEFORE the first item are ignored', () => {
+  assert.deepEqual(parseChecklist(['Checklist:', '', '', 'One', 'Two', '', 'Not an item'].join('\n')), ['One', 'Two']);
+});
+
+test('whitespace-only and non-breaking-space lines count as blank', () => {
+  assert.deepEqual(parseChecklist(['Checklist:', 'One', '     ', 'Not an item'].join('\n')), ['One']);
+});
+
+test('"Your ____ must:" opens the checklist, and the lead-in line is not an item', () => {
+  for (const lead of ['Your Project must:', 'Your drum loop track must:', 'Your Song must', 'Your beat MUST:', '# Your Beat must:', 'your project must :']) {
+    const text = ['Welcome!', '', lead, 'Have a kick', 'Have a snare', '', 'Grading: ' + GRADE_PARAGRAPH].join('\n');
+    assert.deepEqual(parseChecklist(text), ['Have a kick', 'Have a snare'], `lead-in: ${lead}`);
+  }
+});
+
+test('other "must" sentences do not open a checklist', () => {
+  for (const line of ['You must:', 'Your work is due Friday.', 'Students must: bring headphones', 'Your project must be turned in on time. Really.']) {
+    assert.deepEqual(parseChecklist([line, 'Some line', 'Another line'].join('\n')), [], line);
+  }
+});
+
+test('"Your ____ must:" and "Checklist" can both appear; both lists are merged', () => {
+  const text = ['Your Project must:', 'Item A', 'Item B', '', 'Notes', '', 'Checklist:', 'Item C', '', 'tail'].join('\n');
+  assert.deepEqual(parseChecklist(text), ['Item A', 'Item B', 'Item C']);
+});
+
+test('published HTML: an empty paragraph ends the checklist; nested lists do not', () => {
+  const li = t => `<li class="c1"><span class="c2">${t}</span></li>`;
+  const html = '<html><body><p class="c0"><span>Intro</span></p>' +
+    '<p class="c3"><span class="c4"><b>Checklist:</b></span></p>' +
+    '<ul class="c5">' + li('Be at least 16 bars long') + li('Develop in some way') +
+    '<li class="c1"><span>Have at least <b>6 tracks</b>:</span></li>' +
+    '<ul class="c6">' + li('Programmed drums') + li('Bass - bass guitar/808') + '</ul>' + '</ul>' +
+    '<p class="c7"><span class="c8"></span></p>' +
+    `<p class="c9"><span><b>Fulfilling these requirements will get you a 90%.</b> Go past these requirements.</span></p></body></html>`;
+  assert.deepEqual(parseChecklist(htmlToText(html)), [
+    'Be at least 16 bars long', 'Develop in some way', 'Have at least 6 tracks:', 'Programmed drums', 'Bass - bass guitar/808'
+  ]);
+});
+
+test('published HTML: "<br><br>" (double line break) also ends the checklist', () => {
+  const html = '<p><span>Your Project must:</span></p><ul><li><span>One</span></li><li><span>Two</span></li></ul><p><span><br><br>Fulfilling these requirements will get you a 90%.</span></p>';
+  assert.deepEqual(parseChecklist(htmlToText(html)), ['One', 'Two']);
+});
+
+test('published HTML: a list directly followed by a paragraph (no gap) is NOT cut early', () => {
+  const html = '<p>Checklist:</p><ul><li>One</li></ul><ul><li>Two</li></ul><ul><li>Three</li></ul>';
+  assert.deepEqual(parseChecklist(htmlToText(html)), ['One', 'Two', 'Three']);
+});
