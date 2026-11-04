@@ -71,7 +71,7 @@ export function htmlToText(html) {
     .replace(/<script\b[\s\S]*?<\/script>/gi, '')
     .replace(/<style\b[\s\S]*?<\/style>/gi, '')
     .replace(/<h([1-6])\b[^>]*>/gi, '\n# ')
-    .replace(/<\/(p|li|div|tr|h[1-6]|ul|ol|table)>/gi, '\n')
+    .replace(/<\/(p|li|div|tr|h[1-6])>/gi, '\n')
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<[^>]+>/g, '');
   return decodeEntities(text);
@@ -80,20 +80,28 @@ export function htmlToText(html) {
 const MARKER_RE = /^[\s\-•*]*(?:\[[\s ]*[xX]?[\s ]*\]|[☐☑☒])\s*(.*)$/;
 const FOOTER_RE = /^(published using google docs|learn more|report abuse|updated automatically every \d+ minutes)$/i;
 
+// Lines that open the checklist, besides a "Checklist" heading:
+//   "Your Project must:", "Your drum track must include:", "Your Beat must" ...
+const MUST_RE = /^your\b.{0,80}?\bmust(?:\s+(?:also\s+|at least\s+)?(?:include|have|contain|do))?\s*:?\s*$/i;
+
 /**
- * Finds the "Checklist" section and returns its items.
+ * Finds the checklist section and returns its items.
+ * - The section starts at a "Checklist" line, or a "Your ______ must:" line.
+ * - It ends at the next heading, or at the first BLANK line (empty paragraph / double line break)
+ *   after at least one item. Blank lines before the first item are ignored.
  * - If the section has real checkbox markers (☐ ☑ [ ] [x]) only those lines are used.
- * - Otherwise every line in the section counts (bullets are stripped), until the next heading.
+ * - Otherwise every line in the section counts (bullets are stripped).
  */
 export function parseChecklist(textContent) {
+  // blank lines are kept on purpose: they mark where the checklist ends
   const lines = String(textContent || '')
     .split(/\r?\n/)
-    .map(l => l.replace(/ /g, ' ').trim())
-    .filter(Boolean);
+    .map(l => l.replace(/\u00a0/g, ' ').trim());
 
   const marked = [];
   const loose = [];
   let inSection = false;
+  let sectionLines = 0;
 
   const add = (list, text) => {
     const clean = text.trim();
@@ -104,11 +112,21 @@ export function parseChecklist(textContent) {
   };
 
   for (const line of lines) {
+    if (!line) {
+      if (inSection && sectionLines > 0) inSection = false;
+      continue;
+    }
+
     const lower = line.toLowerCase();
     const isHeading = line.startsWith('#');
+    const plain = line.replace(/^#+\s*/, '');
 
-    if (lower.includes('checklist') && (isHeading || lower === 'checklist' || lower.endsWith(':'))) {
+    const opensSection =
+      (lower.includes('checklist') && (isHeading || lower === 'checklist' || lower.endsWith(':'))) ||
+      MUST_RE.test(plain);
+    if (opensSection) {
       inSection = true;
+      sectionLines = 0;
       continue;
     }
     if (inSection && isHeading) {
@@ -117,9 +135,10 @@ export function parseChecklist(textContent) {
     }
     if (!inSection || FOOTER_RE.test(line)) continue;
 
+    sectionLines++;
     const m = line.match(MARKER_RE);
     if (m) add(marked, m[1] || '');
-    else add(loose, line.replace(/^[\s\-•*]+/, ''));
+    else add(loose, line.replace(/^[\s\-\u2022*]+/, ''));
   }
 
   return (marked.length ? marked : loose).slice(0, MAX_ITEMS);
