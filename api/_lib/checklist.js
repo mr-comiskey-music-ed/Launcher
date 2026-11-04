@@ -81,8 +81,8 @@ const MARKER_RE = /^[\s\-•*]*(?:\[[\s ]*[xX]?[\s ]*\]|[☐☑☒])\s*(.*)$/;
 const FOOTER_RE = /^(published using google docs|learn more|report abuse|updated automatically every \d+ minutes)$/i;
 
 // Lines that open the checklist, besides a "Checklist" heading:
-//   "Your Project must:", "Your drum track must:", "Your Beat must" ...
-const MUST_RE = /^your\b.{0,80}?\bmust\s*:?\s*$/i;
+//   "Your Project must:", "Your drum track must include:", "Your Beat must" ...
+const MUST_RE = /^your\b.{0,80}?\bmust(?:\s+(?:also\s+|at least\s+)?(?:include|have|contain|do))?\s*:?\s*$/i;
 
 /**
  * Finds the checklist section and returns its items.

@@ -155,14 +155,14 @@ test('whitespace-only and non-breaking-space lines count as blank', () => {
 });
 
 test('"Your ____ must:" opens the checklist, and the lead-in line is not an item', () => {
-  for (const lead of ['Your Project must:', 'Your drum loop track must:', 'Your Song must', 'Your beat MUST:', '# Your Beat must:', 'your project must :']) {
+  for (const lead of ['Your Project must:', 'Your drum loop track must:', 'Your Song must', 'Your beat MUST:', '# Your Beat must:', 'your project must :', 'Your Project must include:', 'Your Song must include', 'Your Beat must also include:', 'Your Track must have:', 'Your drum loop must at least include:']) {
     const text = ['Welcome!', '', lead, 'Have a kick', 'Have a snare', '', 'Grading: ' + GRADE_PARAGRAPH].join('\n');
     assert.deepEqual(parseChecklist(text), ['Have a kick', 'Have a snare'], `lead-in: ${lead}`);
   }
 });
 
 test('other "must" sentences do not open a checklist', () => {
-  for (const line of ['You must:', 'Your work is due Friday.', 'Students must: bring headphones', 'Your project must be turned in on time. Really.']) {
+  for (const line of ['You must:', 'Your work is due Friday.', 'Students must: bring headphones', 'Your project must be turned in on time. Really.', 'Your project must include a kick drum and a snare.', 'You must include:']) {
     assert.deepEqual(parseChecklist([line, 'Some line', 'Another line'].join('\n')), [], line);
   }
 });
