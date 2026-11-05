@@ -607,6 +607,14 @@
         .toolbar button.bpm-btn { background: #2563eb !important; border-color: #60a5fa !important; color: #ffffff !important; font-weight: 700; }
         .toolbar button.glossary-btn { background: #7c3aed !important; border-color: #a78bfa !important; color: #ffffff !important; font-weight: 600; }
         .toolbar button.ai-btn { background: #db2777 !important; border-color: #f472b6 !important; color: #ffffff !important; font-weight: 600; }
+        /* Tools toggle: a rainbow of the tool-button colors; hides the tool buttons to save room */
+        .toolbar button.tools-toggle-btn {
+          background: linear-gradient(90deg, #991b1b, #D97706, #EAB308, #065F46, #2563eb, #7c3aed, #db2777);
+          border: 1.5px solid #ffffff; color: #ffffff; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.7); flex-shrink: 0;
+        }
+        .toolbar button.tools-toggle-btn.tools-off { background: #000000; text-shadow: none; border-color: #FACC15; color: #FACC15; }
+        .toolbar.tools-hidden .toolbar-nav { display: none; }
+        .toolbar.tools-hidden { align-items: center; }
         .toolbar button.magnify-btn { background: #000000; border-color: #ffffff; color: #ffffff; }
         .toolbar button.active-btn { background: #CA8A04 !important; border-color: #FACC15 !important; color: #133629 !important; font-weight: 700; }
 
@@ -1474,6 +1482,7 @@
       const toolbar = pipWindow.document.createElement('div');
       toolbar.className = 'toolbar';
       toolbar.innerHTML = `
+        <button id="toolsToggleBtn" class="tools-toggle-btn" title="Show or hide the tool buttons (the mini checklist stays)"><span class="btn-emoji">🧰</span> Tools</button>
         <div class="toolbar-nav">
           <button id="openChecklistBtn" class="checklist-btn" title="View interactive project checklist from Google Doc"><span class="btn-emoji">✅</span> Checklist</button>
           <button id="openShortcutsBtn" class="shortcuts-btn"><span class="btn-emoji">⌨️</span> Shortcuts</button>
@@ -1485,7 +1494,7 @@
           <button id="openAiChatBtn" class="ai-btn"><span class="btn-emoji">🤖</span> Ask AI</button>
         </div>
         <div class="toolbar-actions">
-          <button id="loupeToggleBtn" class="magnify-btn"><span class="btn-emoji">🔍</span> 2x Zoom</button>
+          <button id="loupeToggleBtn" class="magnify-btn"><span class="btn-emoji">🔍</span> <span id="zoomLabel">Zoom</span></button>
           <a href="${directUrl}" target="_blank" class="open-doc-link">↗️ Open Doc</a>
         </div>
       `;
@@ -2870,28 +2879,39 @@
         modal.style.display = 'flex';
       });
 
-      // 2x Zoom = a real zoom of the doc you are looking at (the scroll position is kept).
+      // Zoom = a real zoom of the doc you are looking at (the scroll position is kept).
       // The wrapper is made smaller by the zoom factor, then scaled back up to fill the window.
-      const MAGNIFY_FACTOR = 2;
-      let magnifyActive = false;
+      // Each click steps through 1x -> 1.5x -> 2x -> back to 1x.
+      const ZOOM_LEVELS = [1, 1.5, 2];
+      let zoomIndex = 0;
       const magnifyBtn = pipWindow.document.getElementById('loupeToggleBtn');
+      const zoomLabel = pipWindow.document.getElementById('zoomLabel');
 
-      function setMagnify(on) {
-        magnifyActive = !!on;
-        magnifyBtn.classList.toggle('active-btn', magnifyActive);
-        viewportArea.classList.toggle('magnified', magnifyActive);
-        if (magnifyActive) {
-          docWrapper.style.width = `${100 / MAGNIFY_FACTOR}%`;
-          docWrapper.style.height = `${100 / MAGNIFY_FACTOR}%`;
-          docWrapper.style.transform = `scale(${MAGNIFY_FACTOR})`;
-        } else {
-          docWrapper.style.width = '';
-          docWrapper.style.height = '';
-          docWrapper.style.transform = '';
-        }
+      function setZoom(index) {
+        zoomIndex = index;
+        const factor = ZOOM_LEVELS[zoomIndex];
+        const on = factor !== 1;
+        magnifyBtn.classList.toggle('active-btn', on);
+        viewportArea.classList.toggle('magnified', on);
+        zoomLabel.textContent = on ? `${factor}x Zoom` : 'Zoom';
+        docWrapper.style.width = on ? `${100 / factor}%` : '';
+        docWrapper.style.height = on ? `${100 / factor}%` : '';
+        docWrapper.style.transform = on ? `scale(${factor})` : '';
       }
 
-      magnifyBtn.addEventListener('click', () => setMagnify(!magnifyActive));
+      magnifyBtn.addEventListener('click', () => setZoom((zoomIndex + 1) % ZOOM_LEVELS.length));
+
+      // Tools button: hide / show the row of tool buttons to leave more room for the doc.
+      // The mini checklist is its own widget, so it stays visible either way.
+      const toolsBtn = pipWindow.document.getElementById('toolsToggleBtn');
+      function setToolsHidden(hidden) {
+        toolbar.classList.toggle('tools-hidden', hidden);
+        toolsBtn.classList.toggle('tools-off', hidden);
+        try { localStorage.setItem('floatdoc_tools_hidden', hidden ? '1' : '0'); } catch (e) {}
+      }
+      toolsBtn.addEventListener('click', () => setToolsHidden(!toolbar.classList.contains('tools-hidden')));
+      try { if (localStorage.getItem('floatdoc_tools_hidden') === '1') setToolsHidden(true); } catch (e) {}
+
       // Initialize Logic Glossary & Inspector in the PiP Window
       initGlossary(pipWindow.document, pipWindow);
 
