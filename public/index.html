@@ -607,12 +607,12 @@
         .toolbar button.bpm-btn { background: #2563eb !important; border-color: #60a5fa !important; color: #ffffff !important; font-weight: 700; }
         .toolbar button.glossary-btn { background: #7c3aed !important; border-color: #a78bfa !important; color: #ffffff !important; font-weight: 600; }
         .toolbar button.ai-btn { background: #db2777 !important; border-color: #f472b6 !important; color: #ffffff !important; font-weight: 600; }
-        /* Tools toggle: a rainbow of the tool-button colors; hides the tool buttons to save room */
-        .toolbar button.tools-toggle-btn {
+        /* Focus button: black & white like Zoom / Open Doc. In Focus mode it turns into the rainbow Tools button, which brings the tools back. */
+        .toolbar button.tools-toggle-btn { background: #000000; border: 1px solid #ffffff; color: #ffffff; flex-shrink: 0; }
+        .toolbar button.tools-toggle-btn.tools-off {
           background: linear-gradient(90deg, #991b1b, #D97706, #EAB308, #065F46, #2563eb, #7c3aed, #db2777);
-          border: 1.5px solid #ffffff; color: #ffffff; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.7); flex-shrink: 0;
+          border: 1.5px solid #ffffff; color: #ffffff; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.7);
         }
-        .toolbar button.tools-toggle-btn.tools-off { background: #000000; text-shadow: none; border-color: #FACC15; color: #FACC15; }
         .toolbar.tools-hidden .toolbar-nav { display: none; }
         .toolbar.tools-hidden { align-items: center; }
         .toolbar button.magnify-btn { background: #000000; border-color: #ffffff; color: #ffffff; }
@@ -1482,7 +1482,6 @@
       const toolbar = pipWindow.document.createElement('div');
       toolbar.className = 'toolbar';
       toolbar.innerHTML = `
-        <button id="toolsToggleBtn" class="tools-toggle-btn" title="Show or hide the tool buttons (the mini checklist stays)"><span class="btn-emoji">🧰</span> Tools</button>
         <div class="toolbar-nav">
           <button id="openChecklistBtn" class="checklist-btn" title="View interactive project checklist from Google Doc"><span class="btn-emoji">✅</span> Checklist</button>
           <button id="openShortcutsBtn" class="shortcuts-btn"><span class="btn-emoji">⌨️</span> Shortcuts</button>
@@ -1494,6 +1493,7 @@
           <button id="openAiChatBtn" class="ai-btn"><span class="btn-emoji">🤖</span> Ask AI</button>
         </div>
         <div class="toolbar-actions">
+          <button id="toolsToggleBtn" class="tools-toggle-btn" title="Focus: hide the tool buttons to make more room for the doc (the mini checklist stays)"><span class="btn-emoji" id="toolsToggleEmoji">🎯</span> <span id="toolsToggleLabel">Focus</span></button>
           <button id="loupeToggleBtn" class="magnify-btn"><span class="btn-emoji">🔍</span> <span id="zoomLabel">Zoom</span></button>
           <a href="${directUrl}" target="_blank" class="open-doc-link">↗️ Open Doc</a>
         </div>
@@ -2901,12 +2901,15 @@
 
       magnifyBtn.addEventListener('click', () => setZoom((zoomIndex + 1) % ZOOM_LEVELS.length));
 
-      // Tools button: hide / show the row of tool buttons to leave more room for the doc.
+      // Focus / Tools button: Focus hides the row of tool buttons to leave more room for the doc;
+      // in Focus mode the same button becomes the rainbow Tools button that brings them back.
       // The mini checklist is its own widget, so it stays visible either way.
       const toolsBtn = pipWindow.document.getElementById('toolsToggleBtn');
       function setToolsHidden(hidden) {
         toolbar.classList.toggle('tools-hidden', hidden);
         toolsBtn.classList.toggle('tools-off', hidden);
+        pipWindow.document.getElementById('toolsToggleEmoji').textContent = hidden ? '🧰' : '🎯';
+        pipWindow.document.getElementById('toolsToggleLabel').textContent = hidden ? 'Tools' : 'Focus';
         try { localStorage.setItem('floatdoc_tools_hidden', hidden ? '1' : '0'); } catch (e) {}
       }
       toolsBtn.addEventListener('click', () => setToolsHidden(!toolbar.classList.contains('tools-hidden')));
