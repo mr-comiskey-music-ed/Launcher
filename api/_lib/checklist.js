@@ -144,6 +144,19 @@ export function parseChecklist(textContent) {
   return (marked.length ? marked : loose).slice(0, MAX_ITEMS);
 }
 
+/**
+ * Which DAW is this assignment for? Looks at the WHOLE doc text and counts mentions.
+ * Returns 'soundtrap', 'logic', or null when it is not clear (the AI then assumes Logic Pro).
+ */
+export function detectDaw(textContent) {
+  const text = String(textContent || '');
+  const soundtrap = (text.match(/soundtrap/gi) || []).length;
+  const logic = (text.match(/\blogic\b/gi) || []).length;
+  if (soundtrap >= 2 && soundtrap > logic) return 'soundtrap';
+  if (logic >= 1 && logic > soundtrap) return 'logic';
+  return null;
+}
+
 async function timedFetch(fetchImpl, url, options = {}) {
   return fetchImpl(url, { ...options, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
 }
@@ -191,11 +204,14 @@ export async function fetchChecklist(rawId, { apiKey, fetchImpl = fetch } = {}) 
   }
 
   const items = parseChecklist(textContent);
+  const daw = detectDaw(textContent);
+  const extra = daw ? { daw } : {};
   if (items.length === 0) {
     return {
       items: [],
+      ...extra,
       note: 'Document loaded, but no checklist items were found under a "Checklist" heading.'
     };
   }
-  return { items };
+  return { items, ...extra };
 }

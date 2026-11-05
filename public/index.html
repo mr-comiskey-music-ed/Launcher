@@ -367,6 +367,26 @@
   });
 
   // Shortcuts Data
+  // Soundtrap runs in the browser, so these are the basic Chromebook/browser commands.
+  // Kept short on purpose: add more only after checking them in Soundtrap itself.
+  const SOUNDTRAP_SHORTCUTS_DATA = [
+    { category: "Transport", items: [
+      { key: "SPACE", desc: "Play or Stop" }
+    ]},
+    { category: "Editing", items: [
+      { key: "CTRL + Z", desc: "Undo" },
+      { key: "CTRL + SHIFT + Z", desc: "Redo" },
+      { key: "CTRL + C", desc: "Copy selected region" },
+      { key: "CTRL + X", desc: "Cut selected region" },
+      { key: "CTRL + V", desc: "Paste" },
+      { key: "DELETE / BACKSPACE", desc: "Delete selected region" }
+    ]},
+    { category: "Browser Tips", items: [
+      { key: "CTRL + R", desc: "Reload page (let Soundtrap finish saving first)" },
+      { key: "CTRL + +  /  CTRL + -", desc: "Zoom the whole page in / out" }
+    ]}
+  ];
+
   const SHORTCUTS_DATA = [
     { category: "Navigation & Transport", items: [
       { key: "SPACE", desc: "Play or Stop" },
@@ -1537,6 +1557,18 @@
       const CHECKLIST_TTL_MS = 30 * 60 * 1000;
       let checklistNoteOverride = ''; // lets a refresh message (e.g. "showing your saved checklist") survive the re-open
       let currentChecklist = { items: [], checkedMap: sharedCheckedMap };
+      let currentDaw = null; // 'logic' | 'soundtrap' | null, detected from the assignment doc
+
+      function applyDaw(data) {
+        currentDaw = data && (data.daw === 'soundtrap' || data.daw === 'logic') ? data.daw : null;
+        const input = pipWindow.document.getElementById('chatInput');
+        if (input) {
+          input.placeholder = currentDaw === 'soundtrap'
+            ? 'Ask about Soundtrap, EQ, loops...'
+            : 'Ask about Logic Pro, EQ, shortcuts...';
+        }
+        return data;
+      }
 
       function readChecklistCache() {
         try {
@@ -1558,7 +1590,7 @@
         // A saved copy is used for 30 minutes. Errors and empty answers are never saved.
         const cached = readChecklistCache();
         const isFresh = cached && cached.items.length > 0 && cached.savedAt && (Date.now() - cached.savedAt) < CHECKLIST_TTL_MS;
-        if (!forceRefresh && isFresh) return cached;
+        if (!forceRefresh && isFresh) return applyDaw(cached);
 
         try {
           const res = await fetch(`/api/fetch-checklist?id=${encodeURIComponent(lookupDocId)}`);
@@ -1578,11 +1610,11 @@
           } else if (forceRefresh) {
             try { localStorage.removeItem(cacheKey); } catch (e) {}
           }
-          return data;
+          return applyDaw(data);
         } catch (err) {
           // Offline or the doc is unreachable right now: fall back to the last good copy if there is one.
           if (cached && cached.items.length > 0) {
-            return { ...cached, note: 'Showing your saved checklist. The doc could not be reached just now.' };
+            return applyDaw({ ...cached, note: 'Showing your saved checklist. The doc could not be reached just now.' });
           }
           throw err;
         }
@@ -1751,6 +1783,7 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               prompt: apiPayload,
+              daw: currentDaw,
               // lets the AI know which assignment steps the student has (and has not) finished
               checklist: currentChecklist.items.map(text => ({ text, done: !!currentChecklist.checkedMap[text] }))
             })
@@ -1788,7 +1821,9 @@
         pill.addEventListener('click', () => {
           const pillText = pill.getAttribute('data-pill');
           chatInput.value = pillText;
-          const fullPrompt = `Emergency Logic Pro Troubleshooter request: The student clicked '${pillText}'. Give a clear, encouraging 3-step bulleted checklist using macOS keyboard shortcuts in bold to resolve this issue immediately.`;
+          const fullPrompt = currentDaw === 'soundtrap'
+            ? `Emergency Soundtrap Troubleshooter request: The student clicked '${pillText}'. Give a clear, encouraging 3-step bulleted checklist to fix this in Soundtrap (a browser-based DAW on a Chromebook). Only use steps you are sure of.`
+            : `Emergency Logic Pro Troubleshooter request: The student clicked '${pillText}'. Give a clear, encouraging 3-step bulleted checklist using macOS keyboard shortcuts in bold to resolve this issue immediately.`;
           sendChatQuery(fullPrompt, pillText);
         });
       });
@@ -2358,15 +2393,24 @@
       });
 
       pipWindow.document.getElementById('openShortcutsBtn').addEventListener('click', () => {
-        modalTitle.textContent = "🎹 LOGIC KEYBOARD SHORTCUTS";
-        let html = '';
-        SHORTCUTS_DATA.forEach(cat => {
-          html += `<div style="color:#FACC15; font-weight:bold; margin:10px 0 4px 0; border-bottom:1px solid #285E4A; padding-bottom:2px;">${cat.category}</div>`;
-          cat.items.forEach(item => {
-            html += `<div class="shortcut-row"><span>${item.desc}</span><span class="shortcut-key">${item.key}</span></div>`;
+        let which = currentDaw === 'soundtrap' ? 'soundtrap' : 'logic';
+        const render = () => {
+          const isST = which === 'soundtrap';
+          modalTitle.textContent = isST ? "🎹 SOUNDTRAP KEYBOARD SHORTCUTS" : "🎹 LOGIC KEYBOARD SHORTCUTS";
+          const btn = (id, label, active) => `<button type="button" id="${id}" style="flex:1; padding:4px 6px; font-size:11px; font-weight:700; cursor:pointer; border-radius:4px; border:1px solid #CA8A04; background:${active ? '#CA8A04' : '#1B4D3E'}; color:${active ? '#1B4D3E' : '#FACC15'};">${label}</button>`;
+          let html = `<div style="display:flex; gap:6px; margin-bottom:4px;">${btn('shortcutsLogicBtn', 'Logic Pro', !isST)}${btn('shortcutsSoundtrapBtn', 'Soundtrap', isST)}</div>`;
+          (isST ? SOUNDTRAP_SHORTCUTS_DATA : SHORTCUTS_DATA).forEach(cat => {
+            html += `<div style="color:#FACC15; font-weight:bold; margin:10px 0 4px 0; border-bottom:1px solid #285E4A; padding-bottom:2px;">${cat.category}</div>`;
+            cat.items.forEach(item => {
+              html += `<div class="shortcut-row"><span>${item.desc}</span><span class="shortcut-key">${item.key}</span></div>`;
+            });
           });
-        });
-        modalBody.innerHTML = html;
+          if (isST) html += `<div style="font-size:10px; color:#9ca3af; margin-top:10px;">Need more? Check the Soundtrap Help Center.</div>`;
+          modalBody.innerHTML = html;
+          pipWindow.document.getElementById('shortcutsLogicBtn').addEventListener('click', () => { which = 'logic'; render(); });
+          pipWindow.document.getElementById('shortcutsSoundtrapBtn').addEventListener('click', () => { which = 'soundtrap'; render(); });
+        };
+        render();
         modal.style.display = 'flex';
       });
 
