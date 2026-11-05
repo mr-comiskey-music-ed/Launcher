@@ -1485,7 +1485,7 @@
           <button id="openAiChatBtn" class="ai-btn"><span class="btn-emoji">🤖</span> Ask AI</button>
         </div>
         <div class="toolbar-actions">
-          <button id="loupeToggleBtn" class="magnify-btn"><span class="btn-emoji">🔍</span> Magnify</button>
+          <button id="loupeToggleBtn" class="magnify-btn"><span class="btn-emoji">🔍</span> 2x Zoom</button>
           <a href="${directUrl}" target="_blank" class="open-doc-link">↗️ Open Doc</a>
         </div>
       `;
@@ -2867,7 +2867,7 @@
         modal.style.display = 'flex';
       });
 
-      // Magnify = a real zoom of the doc you are looking at (the scroll position is kept).
+      // 2x Zoom = a real zoom of the doc you are looking at (the scroll position is kept).
       // The wrapper is made smaller by the zoom factor, then scaled back up to fill the window.
       const MAGNIFY_FACTOR = 2;
       let magnifyActive = false;
@@ -2889,13 +2889,6 @@
       }
 
       magnifyBtn.addEventListener('click', () => setMagnify(!magnifyActive));
-      // Double-click anywhere outside the doc itself also toggles it
-      // (the doc is a Google page, so the browser never tells us about clicks inside it).
-      pipWindow.document.body.addEventListener('dblclick', (e) => {
-        if (e.target.closest('input, textarea, button, select, .modal-content, .chat-drawer, a')) return;
-        setMagnify(!magnifyActive);
-      });
-
       // Initialize Logic Glossary & Inspector in the PiP Window
       initGlossary(pipWindow.document, pipWindow);
 
