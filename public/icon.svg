@@ -6,7 +6,12 @@
   </g>
   <g fill="#FFFFFF" stroke="#133629" stroke-width="12">
     <rect x="104" y="150" width="80" height="56" rx="16"/>
-    <rect x="216" y="278" width="80" height="56" rx="16"/>
     <rect x="328" y="194" width="80" height="56" rx="16"/>
+  </g>
+  <g transform="translate(256 196)">
+    <path d="M0 -92 C 34 -62 40 -14 32 40 L -32 40 C -40 -14 -34 -62 0 -92 Z" fill="#FFFFFF" stroke="#133629" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M-30 -4 L-78 62 L-28 44 Z M30 -4 L78 62 L28 44 Z" fill="#DB2777" stroke="#133629" stroke-width="12" stroke-linejoin="round"/>
+    <circle cx="0" cy="-36" r="15" fill="#2563EB" stroke="#133629" stroke-width="9"/>
+    <path d="M-20 52 Q0 128 20 52 Z" fill="#FACC15" stroke="#D97706" stroke-width="10" stroke-linejoin="round"/>
   </g>
 </svg>
