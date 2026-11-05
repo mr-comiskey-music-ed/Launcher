@@ -8,9 +8,8 @@
     <rect x="104" y="296" width="80" height="56" rx="16"/>
     <rect x="216" y="216" width="80" height="56" rx="16"/>
   </g>
-  <!-- right fader: the same rounded knob as the others, drawn as a rocket (nose cone on top, fins, flame) -->
-  <path d="M328 156 L284 222 L328 206 Z M408 156 L452 222 L408 206 Z" fill="#FACC15" stroke="#133629" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M368 52 C386 70 408 104 408 150 L408 190 Q408 206 392 206 L344 206 Q328 206 328 190 L328 150 C328 104 350 70 368 52 Z" fill="#FFFFFF" stroke="#133629" stroke-width="12" stroke-linejoin="round"/>
-  <circle cx="368" cy="148" r="14" fill="#D97706" stroke="#133629" stroke-width="8"/>
+  <!-- right fader: the full rounded fader knob, with a nose cone on top (one outline, no seams) -->
+  <path d="M368 52 C390 78 400 110 400 148 Q408 150 408 166 L408 190 Q408 206 392 206 L344 206 Q328 206 328 190 L328 166 Q328 150 336 148 C336 110 346 78 368 52 Z" fill="#FFFFFF" stroke="#133629" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="368" cy="178" r="13" fill="#D97706" stroke="#133629" stroke-width="8"/>
   <path d="M346 216 Q368 300 390 216 Z" fill="#FACC15" stroke="#D97706" stroke-width="10" stroke-linejoin="round"/>
 </svg>
