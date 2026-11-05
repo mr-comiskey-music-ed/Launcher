@@ -8,12 +8,12 @@
     <rect x="80" y="296" width="80" height="56" rx="16"/>
     <rect x="216" y="216" width="80" height="56" rx="16"/>
   </g>
-  <!-- right fader: flame and fins attach to the rounded knob; the nose cone floats above it with the same dark gap the knobs have along the fader bed -->
+  <!-- right fader: flame and fins attach to the rounded knob; the nose cone sits above it separated by a dark line as wide as the gap around the other knobs -->
   <g stroke="#133629" stroke-width="12" stroke-linejoin="round">
     <path d="M356 160 L320 232 L356 214 Z M428 160 L464 232 L428 214 Z" fill="#FACC15"/>
     <path d="M364 196 L420 196 Q392 330 364 196 Z" fill="#FACC15"/>
     <rect x="352" y="150" width="80" height="56" rx="16" fill="#FFFFFF"/>
-    <path d="M392 50 C414 72 432 104 432 126 Q432 138 420 138 L364 138 Q352 138 352 126 C352 104 370 72 392 50 Z" fill="#FFFFFF"/>
+    <path d="M392 56 C414 80 432 112 432 138 Q432 150 420 150 L364 150 Q352 150 352 138 C352 112 370 80 392 56 Z" fill="#FFFFFF"/>
   </g>
   <circle cx="392" cy="178" r="13" fill="#D97706" stroke="#133629" stroke-width="8"/>
   <path d="M378 218 Q392 288 406 218 Z" fill="#D97706"/>
