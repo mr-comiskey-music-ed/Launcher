@@ -8,8 +8,13 @@
   <meta property="og:title" content="Mr.C Launcher 🎹">
   <meta property="og:description" content="Logic Pro Floating Doc Launcher for Audio Engineering Students">
   <meta property="og:type" content="website">
+  <meta property="og:image" content="/favicon-192.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎛️</text></svg>">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+  <link rel="icon" type="image/svg+xml" href="/icon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -40,6 +45,9 @@
       max-width: 440px;
       width: 90%;
     }
+    .brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .brand-row .brand-icon { width: 72px; height: 72px; flex-shrink: 0; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.45); }
+    .brand-row .edtech-lcd { flex: 1; margin-bottom: 0; align-self: stretch; display: flex; align-items: center; justify-content: center; }
     .edtech-lcd {
       background: #0F2E23;
       border: 1px solid #EAB308;
@@ -205,7 +213,10 @@
 <body>
 
 <div class="card">
-  <div class="edtech-lcd">Mr. Comiskey's Project Launcher</div>
+  <div class="brand-row">
+    <img class="brand-icon" src="/favicon-192.png" alt="" width="72" height="72">
+    <div class="edtech-lcd">Mr. Comiskey's Project Launcher</div>
+  </div>
   <h2>Select Assignment Doc</h2>
 
 
@@ -2501,7 +2512,7 @@
           <div id="compTab" class="tab-pane">
             <div class="expandable-img-grid" style="margin-bottom:12px;">
               <div style="background:#14382B; border:1px solid #CA8A04; border-radius:6px; padding:8px;">
-                <img src="src/assets/images/Compressor Step by Step 3_4.jpeg" alt="Compressor Step by Step" style="width:100%; height:auto; border-radius:4px; display:block;">
+                <img src="assets/images/Compressor Step by Step.jpeg" alt="Compressor Step by Step" style="width:100%; height:auto; border-radius:4px; display:block;">
               </div>
             </div>
 
