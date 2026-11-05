@@ -8,10 +8,9 @@
     <rect x="104" y="296" width="80" height="56" rx="16"/>
     <rect x="216" y="216" width="80" height="56" rx="16"/>
   </g>
-  <g transform="translate(368 200)">
-    <path d="M-30 0 L-64 58 L-28 44 Z M30 0 L64 58 L28 44 Z" fill="#FACC15" stroke="#133629" stroke-width="12" stroke-linejoin="round"/>
-    <path d="M0 -92 C 34 -62 40 -14 32 40 L -32 40 C -40 -14 -34 -62 0 -92 Z" fill="#FFFFFF" stroke="#133629" stroke-width="12" stroke-linejoin="round"/>
-    <circle cx="0" cy="-36" r="15" fill="#D97706" stroke="#133629" stroke-width="9"/>
-    <path d="M-20 52 Q0 128 20 52 Z" fill="#FACC15" stroke="#D97706" stroke-width="10" stroke-linejoin="round"/>
-  </g>
+  <!-- right fader: the same rounded knob as the others, drawn as a rocket (nose cone on top, fins, flame) -->
+  <path d="M328 156 L284 222 L328 206 Z M408 156 L452 222 L408 206 Z" fill="#FACC15" stroke="#133629" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M368 52 C386 70 408 104 408 150 L408 190 Q408 206 392 206 L344 206 Q328 206 328 190 L328 150 C328 104 350 70 368 52 Z" fill="#FFFFFF" stroke="#133629" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="368" cy="148" r="14" fill="#D97706" stroke="#133629" stroke-width="8"/>
+  <path d="M346 216 Q368 300 390 216 Z" fill="#FACC15" stroke="#D97706" stroke-width="10" stroke-linejoin="round"/>
 </svg>
