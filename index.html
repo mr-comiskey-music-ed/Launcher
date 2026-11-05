@@ -614,6 +614,13 @@
           border: 1.5px solid #ffffff; color: #ffffff; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.7);
         }
         .toolbar-pinned { display: flex; align-items: center; flex-shrink: 0; }  /* Checklist stays visible in Focus mode */
+        /* In a narrow window the tool buttons drop to their own full-width second line instead of squeezing into a column */
+        @media (max-width: 940px) {
+          .toolbar { flex-wrap: wrap; }
+          .toolbar-pinned { order: 1; }
+          .toolbar-actions { order: 2; }
+          .toolbar-nav { order: 3; flex: 1 1 100%; }
+        }
         .toolbar.tools-hidden .toolbar-nav { display: none; }
         .toolbar.tools-hidden { align-items: center; }
         .toolbar button.magnify-btn { background: #000000; border-color: #ffffff; color: #ffffff; }
@@ -866,7 +873,7 @@
           color: #FEF08A !important;
         }
 
-        /* Logic Pro 11 Dark Mode Glossary Tooltip */
+        /* Logic Pro Dark Mode Glossary Tooltip */
         .logic-glossary-tooltip {
           position: fixed;
           z-index: 999999;
@@ -1526,7 +1533,7 @@
           <button class="chat-close" id="closeChatBtn">&times;</button>
         </div>
         <div class="chat-messages" id="chatMessages">
-          <div class="chat-msg assistant">Hello! I'm your Lane Tech Music Tech AI assistant. Ask me anything about Logic Pro 11, Soundtrap, EQ, compression, or your assignment! (Please don't share personal info like your full name here.)</div>
+          <div class="chat-msg assistant">Hello! I'm your Lane Tech Music Tech AI assistant. Ask me anything about Logic Pro, Soundtrap, EQ, compression, or your assignment! (Please don't share personal info like your full name here.)</div>
         </div>
         <div class="emergency-pill-strip" id="emergencyPillStrip">
           <button class="emergency-pill" data-pill="I can't hear anything">🔇 I can't hear anything</button>
