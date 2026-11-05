@@ -367,23 +367,69 @@
   });
 
   // Shortcuts Data
-  // Soundtrap runs in the browser, so these are the basic Chromebook/browser commands.
-  // Kept short on purpose: add more only after checking them in Soundtrap itself.
+  // Soundtrap shortcuts, from Soundtrap's own Complete Guide, written for Chromebooks (Ctrl instead of Cmd).
   const SOUNDTRAP_SHORTCUTS_DATA = [
-    { category: "Transport", items: [
-      { key: "SPACE", desc: "Play or Stop" }
-    ]},
-    { category: "Editing", items: [
+    { category: "General", items: [
+      { key: "SPACE", desc: "Play / Pause" },
+      { key: "CTRL + SPACE", desc: "Record" },
+      { key: "⬅︎ / ➡︎", desc: "Rewind / Fast forward" },
+      { key: "ENTER", desc: "Back to top / restart recording" },
       { key: "CTRL + Z", desc: "Undo" },
       { key: "CTRL + SHIFT + Z", desc: "Redo" },
-      { key: "CTRL + C", desc: "Copy selected region" },
-      { key: "CTRL + X", desc: "Cut selected region" },
-      { key: "CTRL + V", desc: "Paste" },
-      { key: "DELETE / BACKSPACE", desc: "Delete selected region" }
+      { key: "CTRL + X / C / V", desc: "Cut / Copy / Paste" },
+      { key: "CTRL + K", desc: "Command search" },
+      { key: "SHIFT + DRAG", desc: "Fine knob / slider adjustment" },
+      { key: "DOUBLE-CLICK KNOB", desc: "Reset knob value" }
     ]},
-    { category: "Browser Tips", items: [
-      { key: "CTRL + R", desc: "Reload page (let Soundtrap finish saving first)" },
-      { key: "CTRL + +  /  CTRL + -", desc: "Zoom the whole page in / out" }
+    { category: "Editor (Regions)", items: [
+      { key: "SHIFT + ⬅︎ / ➡︎", desc: "Move region (mouse: drag; Shift = fine, Ctrl = no snap)" },
+      { key: "LEFT / RIGHT", desc: "Move a single focused region" },
+      { key: "SHIFT + CLICK", desc: "Toggle selection" },
+      { key: "CTRL + A", desc: "Select all regions" },
+      { key: "DRAG ON EMPTY SPACE", desc: "Select an area" },
+      { key: "DELETE", desc: "Delete region" },
+      { key: "CTRL + E", desc: "Split region" },
+      { key: "CTRL + M", desc: "Mute / unmute the region" },
+      { key: "ALT + DRAG", desc: "Copy a region" },
+      { key: "HOLD ALT (REGION END)", desc: "Time-stretch" },
+      { key: "SHIFT + ⬆︎ / ⬇︎", desc: "Transpose up / down one semitone" },
+      { key: "CTRL + SHIFT + ⬆︎ / ⬇︎", desc: "Transpose up / down one octave" },
+      { key: "CTRL + ⬅︎ / ➡︎", desc: "Zoom out / in (mouse: Ctrl + wheel)" },
+      { key: "CTRL + CLICK & DRAG", desc: "Zoom to selection" },
+      { key: "ALT + MOUSE SCROLL", desc: "Vertical zoom" },
+      { key: "MOUSE WHEEL", desc: "Scroll up / down" },
+      { key: "SHIFT + MOUSE WHEEL", desc: "Scroll left / right" }
+    ]},
+    { category: "Tracks", items: [
+      { key: "CTRL + CLICK SOLO / MUTE", desc: "Unsolo / unmute all" },
+      { key: "CTRL + CLICK HEADER", desc: "Add or remove a track from the selection" },
+      { key: "SHIFT + CLICK HEADER", desc: "Select a range of tracks" },
+      { key: "ALT + ⬆︎ / ⬇︎", desc: "Move selected tracks up / down" },
+      { key: "ALT + SHIFT + ⬆︎ / ⬇︎", desc: "Move selected tracks to the top / bottom" },
+      { key: "CTRL + D", desc: "Duplicate selected tracks" },
+      { key: "SHIFT + BACKSPACE", desc: "Delete selected tracks" },
+      { key: "ALT + DRAG LINE UNDER HEADER", desc: "Resize every track" }
+    ]},
+    { category: "Piano Roll", items: [
+      { key: "SHIFT + ARROWS", desc: "Move selected notes (mouse: drag; Shift = fine, Ctrl = no snap)" },
+      { key: "SHIFT + CLICK", desc: "Toggle selection" },
+      { key: "SHIFT + DRAG", desc: "Add an area to the selection" },
+      { key: "CTRL + A", desc: "Select all notes" },
+      { key: "CTRL + D", desc: "Duplicate selected notes" },
+      { key: "DELETE", desc: "Delete selected notes" },
+      { key: "ALT (HOLD)", desc: "Draw tool, temporarily" },
+      { key: "ALT + CTRL (HOLD)", desc: "Velocity tool, temporarily" },
+      { key: "ALT + SHIFT (HOLD)", desc: "Erase tool, temporarily" },
+      { key: "M (HOLD)", desc: "Move tool, temporarily" }
+    ]},
+    { category: "Instrument, Loops & Effects", items: [
+      { key: "CTRL + I", desc: "Show / hide Instrument" },
+      { key: "CTRL + U", desc: "Open / close the Loop tab" },
+      { key: "⬆︎ / ⬇︎", desc: "Preview next / previous loop" },
+      { key: "P", desc: "Preview pause / play" },
+      { key: "F", desc: "Add loop to favorites" },
+      { key: "ENTER", desc: "Add loop to project" },
+      { key: "ALT + ARROWS", desc: "Move selected effects" }
     ]}
   ];
 
@@ -566,15 +612,10 @@
 
         .viewport-area { flex: 1; width: 100%; height: 100%; overflow: auto; position: relative; background: #ffffff; }
         .doc-wrapper { width: 100%; height: 100%; transform-origin: top left; position: relative; }
+        .viewport-area.magnified { overflow: hidden; }
         iframe { width: 100%; height: 100%; border: none; display: block; }
         .no-pointer { pointer-events: none !important; }
 
-        .loupe {
-          display: none; position: absolute; width: 200px; height: 200px; border-radius: 50%;
-          border: 3px solid #EAB308; box-shadow: 0 6px 24px rgba(0,0,0,0.6); pointer-events: none;
-          overflow: hidden; z-index: 50; background: #ffffff;
-        }
-        .loupe-iframe { position: absolute; border: none; transform-origin: top left; pointer-events: none; }
 
         /* AI Chat Drawer UI */
         .chat-drawer {
@@ -1462,15 +1503,6 @@
       docWrapper.appendChild(iframe);
       viewportArea.appendChild(docWrapper);
 
-      const loupe = pipWindow.document.createElement('div');
-      loupe.className = 'loupe';
-
-      const loupeIframe = pipWindow.document.createElement('iframe');
-      loupeIframe.src = iframeSrc;
-      loupeIframe.className = 'loupe-iframe';
-
-      loupe.appendChild(loupeIframe);
-      viewportArea.appendChild(loupe);
 
       // AI Chat Drawer element
       const chatDrawer = pipWindow.document.createElement('div');
@@ -2405,7 +2437,7 @@
               html += `<div class="shortcut-row"><span>${item.desc}</span><span class="shortcut-key">${item.key}</span></div>`;
             });
           });
-          if (isST) html += `<div style="font-size:10px; color:#9ca3af; margin-top:10px;">Need more? Check the Soundtrap Help Center.</div>`;
+          if (isST) html += `<div style="font-size:10px; color:#9ca3af; margin-top:10px;">Source: Soundtrap Keyboard Shortcuts Complete Guide (Soundtrap Help Center).</div>`;
           modalBody.innerHTML = html;
           pipWindow.document.getElementById('shortcutsLogicBtn').addEventListener('click', () => { which = 'logic'; render(); });
           pipWindow.document.getElementById('shortcutsSoundtrapBtn').addEventListener('click', () => { which = 'soundtrap'; render(); });
@@ -2835,37 +2867,33 @@
         modal.style.display = 'flex';
       });
 
-      let loupeActive = false;
-      const loupeBtn = pipWindow.document.getElementById('loupeToggleBtn');
+      // Magnify = a real zoom of the doc you are looking at (the scroll position is kept).
+      // The wrapper is made smaller by the zoom factor, then scaled back up to fill the window.
+      const MAGNIFY_FACTOR = 2;
+      let magnifyActive = false;
+      const magnifyBtn = pipWindow.document.getElementById('loupeToggleBtn');
 
-      loupeBtn.addEventListener('click', () => {
-        loupeActive = !loupeActive;
-        loupeBtn.classList.toggle('active-btn', loupeActive);
-        loupe.style.display = loupeActive ? 'block' : 'none';
-        iframe.classList.toggle('no-pointer', loupeActive);
-
-        if (loupeActive) {
-          const rect = viewportArea.getBoundingClientRect();
-          loupeIframe.style.width = `${rect.width}px`;
-          loupeIframe.style.height = `${rect.height}px`;
+      function setMagnify(on) {
+        magnifyActive = !!on;
+        magnifyBtn.classList.toggle('active-btn', magnifyActive);
+        viewportArea.classList.toggle('magnified', magnifyActive);
+        if (magnifyActive) {
+          docWrapper.style.width = `${100 / MAGNIFY_FACTOR}%`;
+          docWrapper.style.height = `${100 / MAGNIFY_FACTOR}%`;
+          docWrapper.style.transform = `scale(${MAGNIFY_FACTOR})`;
+        } else {
+          docWrapper.style.width = '';
+          docWrapper.style.height = '';
+          docWrapper.style.transform = '';
         }
-      });
+      }
 
-      viewportArea.addEventListener('mousemove', (e) => {
-        if (!loupeActive) return;
-        const rect = viewportArea.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-
-        const zoomFactor = 2.0;
-        const radius = 100;
-
-        loupe.style.left = `${mouseX - radius}px`;
-        loupe.style.top = `${mouseY - radius}px`;
-
-        loupeIframe.style.transform = `scale(${zoomFactor})`;
-        loupeIframe.style.left = `${radius - (mouseX * zoomFactor)}px`;
-        loupeIframe.style.top = `${radius - (mouseY * zoomFactor)}px`;
+      magnifyBtn.addEventListener('click', () => setMagnify(!magnifyActive));
+      // Double-click anywhere outside the doc itself also toggles it
+      // (the doc is a Google page, so the browser never tells us about clicks inside it).
+      pipWindow.document.body.addEventListener('dblclick', (e) => {
+        if (e.target.closest('input, textarea, button, select, .modal-content, .chat-drawer, a')) return;
+        setMagnify(!magnifyActive);
       });
 
       // Initialize Logic Glossary & Inspector in the PiP Window
