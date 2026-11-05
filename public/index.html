@@ -1607,27 +1607,76 @@
           : '';
       }
 
+      // Checked items slide to the bottom so the next step is always in view.
+      // Rows keep their ORIGINAL index (data-row) so checkmarks, the mini widget and the big window stay in sync.
+      function sortedIndexes(items, checkedMap) {
+        const open = [];
+        const done = [];
+        items.forEach((item, idx) => (checkedMap[item] ? done : open).push(idx));
+        return open.concat(done);
+      }
+
+      function measureRows(container) {
+        const tops = new Map();
+        container.querySelectorAll('[data-row]').forEach(el => tops.set(el.getAttribute('data-row'), el.getBoundingClientRect().top));
+        return tops;
+      }
+
+      // "FLIP" slide: put each row back where it was, then let it glide to its new spot.
+      function animateRows(container, before) {
+        if (!before || before.size === 0) return;
+        try {
+          if (pipWindow.matchMedia && pipWindow.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        } catch (e) {}
+        container.querySelectorAll('[data-row]').forEach(el => {
+          const was = before.get(el.getAttribute('data-row'));
+          if (was === undefined) return;
+          const dy = was - el.getBoundingClientRect().top;
+          if (!dy) return;
+          el.style.transition = 'none';
+          el.style.transform = `translateY(${dy}px)`;
+          el.getBoundingClientRect(); // force a reflow so the browser sees the starting spot
+          el.style.transition = 'transform 0.3s ease';
+          el.style.transform = '';
+        });
+      }
+
+      function reorderModalList(items, checkedMap) {
+        const list = pipWindow.document.getElementById('checklistRows');
+        if (!list) return;
+        const before = measureRows(list);
+        sortedIndexes(items, checkedMap).forEach(idx => {
+          const row = list.querySelector(`[data-row="${idx}"]`);
+          if (row) list.appendChild(row);
+        });
+        animateRows(list, before);
+      }
+
       function renderMiniChecklist(items, checkedMap) {
         currentChecklist = { items: items || [], checkedMap };
         if (!items || items.length === 0) {
           miniBody.innerHTML = `<div style="font-size: 10px; color: #9ca3af; text-align: center; padding: 4px;">No checklist items.</div>`;
           return;
         }
+        const beforeRows = measureRows(miniBody);
         let html = nudgeHtml(items, checkedMap);
-        items.forEach((item, idx) => {
+        sortedIndexes(items, checkedMap).forEach(idx => {
+          const item = items[idx];
           const isChecked = !!checkedMap[item];
           html += `
-            <div class="mini-checklist-item">
+            <div class="mini-checklist-item" data-row="${idx}">
               <input type="checkbox" data-mini-index="${idx}" ${isChecked ? 'checked' : ''}>
               <span style="color: ${isChecked ? '#9ca3af' : '#f3f4f6'}; text-decoration: ${isChecked ? 'line-through' : 'none'};">${escapeHtml(item)}</span>
             </div>
           `;
         });
         miniBody.innerHTML = html;
+        animateRows(miniBody, beforeRows);
 
-        // keep the big checklist window's banner in step with the mini widget
+        // keep the big checklist window in step with the mini widget (banner + order)
         const modalNudge = pipWindow.document.getElementById('checklistNudgeModal');
         if (modalNudge) modalNudge.innerHTML = nudgeHtml(items, checkedMap);
+        reorderModalList(items, checkedMap);
 
         miniBody.querySelectorAll('input[type="checkbox"]').forEach(chk => {
           chk.addEventListener('change', (e) => {
@@ -2570,11 +2619,12 @@
           if (items.length === 0) {
             htmlContent += `<div style="text-align: center; color: #d1d5db; padding: 20px; font-family: 'Cabin', sans-serif;">No checklist items found in this document. (Doc ID: ${escapeHtml(docId)})</div>`;
           } else {
-            htmlContent += `<div style="display: flex; flex-direction: column; gap: 8px;">`;
-            items.forEach((item, idx) => {
+            htmlContent += `<div id="checklistRows" style="display: flex; flex-direction: column; gap: 8px;">`;
+            sortedIndexes(items, checkedMap).forEach(idx => {
+              const item = items[idx];
               const isChecked = !!checkedMap[item];
               htmlContent += `
-                <label style="display: flex; align-items: flex-start; gap: 10px; background: #14382B; padding: 10px; border-radius: 6px; border: 1.5px solid #CA8A04; cursor: pointer; transition: border-color 0.15s ease; font-family: 'Cabin', sans-serif;">
+                <label data-row="${idx}" style="display: flex; align-items: flex-start; gap: 10px; background: #14382B; padding: 10px; border-radius: 6px; border: 1.5px solid #CA8A04; cursor: pointer; transition: border-color 0.15s ease; font-family: 'Cabin', sans-serif;">
                   <input type="checkbox" data-index="${idx}" ${isChecked ? 'checked' : ''} style="margin-top: 2px; accent-color: #EAB308; cursor: pointer; width: 16px; height: 16px;">
                   <span style="color: ${isChecked ? '#9ca3af' : '#f3f4f6'}; text-decoration: ${isChecked ? 'line-through' : 'none'}; font-size: 12px; line-height: 1.4; flex: 1; font-family: 'Cabin', sans-serif;">${escapeHtml(item)}</span>
                 </label>
