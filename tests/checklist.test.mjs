@@ -195,3 +195,15 @@ test('published HTML: a list directly followed by a paragraph (no gap) is NOT cu
   const html = '<p>Checklist:</p><ul><li>One</li></ul><ul><li>Two</li></ul><ul><li>Three</li></ul>';
   assert.deepEqual(parseChecklist(htmlToText(html)), ['One', 'Two', 'Three']);
 });
+
+import { detectDaw } from '../api/_lib/checklist.js';
+test('detectDaw: soundtrap when clearly dominant', () => {
+  assert.equal(detectDaw('Open Soundtrap. In Soundtrap add a loop.'), 'soundtrap');
+});
+test('detectDaw: logic when it dominates', () => {
+  assert.equal(detectDaw('Open Logic Pro. Logic will ask for a template.'), 'logic');
+});
+test('detectDaw: a single soundtrap mention is not enough; none gives null', () => {
+  assert.equal(detectDaw('Export from Soundtrap once.'), null);
+  assert.equal(detectDaw('Write a melody.'), null);
+});

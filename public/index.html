@@ -367,6 +367,72 @@
   });
 
   // Shortcuts Data
+  // Soundtrap shortcuts, from Soundtrap's own Complete Guide, written for Chromebooks (Ctrl instead of Cmd).
+  const SOUNDTRAP_SHORTCUTS_DATA = [
+    { category: "General", items: [
+      { key: "SPACE", desc: "Play / Pause" },
+      { key: "CTRL + SPACE", desc: "Record" },
+      { key: "⬅︎ / ➡︎", desc: "Rewind / Fast forward" },
+      { key: "ENTER", desc: "Back to top / restart recording" },
+      { key: "CTRL + Z", desc: "Undo" },
+      { key: "CTRL + SHIFT + Z", desc: "Redo" },
+      { key: "CTRL + X / C / V", desc: "Cut / Copy / Paste" },
+      { key: "CTRL + K", desc: "Command search" },
+      { key: "SHIFT + DRAG", desc: "Fine knob / slider adjustment" },
+      { key: "DOUBLE-CLICK KNOB", desc: "Reset knob value" }
+    ]},
+    { category: "Editor (Regions)", items: [
+      { key: "SHIFT + ⬅︎ / ➡︎", desc: "Move region (mouse: drag; Shift = fine, Ctrl = no snap)" },
+      { key: "LEFT / RIGHT", desc: "Move a single focused region" },
+      { key: "SHIFT + CLICK", desc: "Toggle selection" },
+      { key: "CTRL + A", desc: "Select all regions" },
+      { key: "DRAG ON EMPTY SPACE", desc: "Select an area" },
+      { key: "DELETE", desc: "Delete region" },
+      { key: "CTRL + E", desc: "Split region" },
+      { key: "CTRL + M", desc: "Mute / unmute the region" },
+      { key: "ALT + DRAG", desc: "Copy a region" },
+      { key: "HOLD ALT (REGION END)", desc: "Time-stretch" },
+      { key: "SHIFT + ⬆︎ / ⬇︎", desc: "Transpose up / down one semitone" },
+      { key: "CTRL + SHIFT + ⬆︎ / ⬇︎", desc: "Transpose up / down one octave" },
+      { key: "CTRL + ⬅︎ / ➡︎", desc: "Zoom out / in (mouse: Ctrl + wheel)" },
+      { key: "CTRL + CLICK & DRAG", desc: "Zoom to selection" },
+      { key: "ALT + MOUSE SCROLL", desc: "Vertical zoom" },
+      { key: "MOUSE WHEEL", desc: "Scroll up / down" },
+      { key: "SHIFT + MOUSE WHEEL", desc: "Scroll left / right" }
+    ]},
+    { category: "Tracks", items: [
+      { key: "CTRL + CLICK SOLO / MUTE", desc: "Unsolo / unmute all" },
+      { key: "CTRL + CLICK HEADER", desc: "Add or remove a track from the selection" },
+      { key: "SHIFT + CLICK HEADER", desc: "Select a range of tracks" },
+      { key: "ALT + ⬆︎ / ⬇︎", desc: "Move selected tracks up / down" },
+      { key: "ALT + SHIFT + ⬆︎ / ⬇︎", desc: "Move selected tracks to the top / bottom" },
+      { key: "CTRL + D", desc: "Duplicate selected tracks" },
+      { key: "SHIFT + BACKSPACE", desc: "Delete selected tracks" },
+      { key: "ALT + DRAG LINE UNDER HEADER", desc: "Resize every track" }
+    ]},
+    { category: "Piano Roll", items: [
+      { key: "SHIFT + ARROWS", desc: "Move selected notes (mouse: drag; Shift = fine, Ctrl = no snap)" },
+      { key: "SHIFT + CLICK", desc: "Toggle selection" },
+      { key: "SHIFT + DRAG", desc: "Add an area to the selection" },
+      { key: "CTRL + A", desc: "Select all notes" },
+      { key: "CTRL + D", desc: "Duplicate selected notes" },
+      { key: "DELETE", desc: "Delete selected notes" },
+      { key: "ALT (HOLD)", desc: "Draw tool, temporarily" },
+      { key: "ALT + CTRL (HOLD)", desc: "Velocity tool, temporarily" },
+      { key: "ALT + SHIFT (HOLD)", desc: "Erase tool, temporarily" },
+      { key: "M (HOLD)", desc: "Move tool, temporarily" }
+    ]},
+    { category: "Instrument, Loops & Effects", items: [
+      { key: "CTRL + I", desc: "Show / hide Instrument" },
+      { key: "CTRL + U", desc: "Open / close the Loop tab" },
+      { key: "⬆︎ / ⬇︎", desc: "Preview next / previous loop" },
+      { key: "P", desc: "Preview pause / play" },
+      { key: "F", desc: "Add loop to favorites" },
+      { key: "ENTER", desc: "Add loop to project" },
+      { key: "ALT + ARROWS", desc: "Move selected effects" }
+    ]}
+  ];
+
   const SHORTCUTS_DATA = [
     { category: "Navigation & Transport", items: [
       { key: "SPACE", desc: "Play or Stop" },
@@ -541,20 +607,24 @@
         .toolbar button.bpm-btn { background: #2563eb !important; border-color: #60a5fa !important; color: #ffffff !important; font-weight: 700; }
         .toolbar button.glossary-btn { background: #7c3aed !important; border-color: #a78bfa !important; color: #ffffff !important; font-weight: 600; }
         .toolbar button.ai-btn { background: #db2777 !important; border-color: #f472b6 !important; color: #ffffff !important; font-weight: 600; }
+        /* Focus button: black & white like Zoom / Open Doc. In Focus mode it turns into the rainbow Tools button, which brings the tools back. */
+        .toolbar button.tools-toggle-btn { background: #000000; border: 1px solid #ffffff; color: #ffffff; flex-shrink: 0; }
+        .toolbar button.tools-toggle-btn.tools-off {
+          background: linear-gradient(90deg, #991b1b, #D97706, #EAB308, #065F46, #2563eb, #7c3aed, #db2777);
+          border: 1.5px solid #ffffff; color: #ffffff; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+        }
+        .toolbar-pinned { display: flex; align-items: center; flex-shrink: 0; }  /* Checklist stays visible in Focus mode */
+        .toolbar.tools-hidden .toolbar-nav { display: none; }
+        .toolbar.tools-hidden { align-items: center; }
         .toolbar button.magnify-btn { background: #000000; border-color: #ffffff; color: #ffffff; }
         .toolbar button.active-btn { background: #CA8A04 !important; border-color: #FACC15 !important; color: #133629 !important; font-weight: 700; }
 
         .viewport-area { flex: 1; width: 100%; height: 100%; overflow: auto; position: relative; background: #ffffff; }
         .doc-wrapper { width: 100%; height: 100%; transform-origin: top left; position: relative; }
+        .viewport-area.magnified { overflow: hidden; }
         iframe { width: 100%; height: 100%; border: none; display: block; }
         .no-pointer { pointer-events: none !important; }
 
-        .loupe {
-          display: none; position: absolute; width: 200px; height: 200px; border-radius: 50%;
-          border: 3px solid #EAB308; box-shadow: 0 6px 24px rgba(0,0,0,0.6); pointer-events: none;
-          overflow: hidden; z-index: 50; background: #ffffff;
-        }
-        .loupe-iframe { position: absolute; border: none; transform-origin: top left; pointer-events: none; }
 
         /* AI Chat Drawer UI */
         .chat-drawer {
@@ -1413,8 +1483,10 @@
       const toolbar = pipWindow.document.createElement('div');
       toolbar.className = 'toolbar';
       toolbar.innerHTML = `
-        <div class="toolbar-nav">
+        <div class="toolbar-pinned">
           <button id="openChecklistBtn" class="checklist-btn" title="View interactive project checklist from Google Doc"><span class="btn-emoji">✅</span> Checklist</button>
+        </div>
+        <div class="toolbar-nav">
           <button id="openShortcutsBtn" class="shortcuts-btn"><span class="btn-emoji">⌨️</span> Shortcuts</button>
           <button id="openMixTipsBtn" class="mixtips-btn"><span class="btn-emoji">🎛️</span> Mix Tips</button>
           <button id="openChordsBtn" class="chords-btn" title="Piano Keyboard, Chord Charts & Progression Reference"><span class="btn-emoji">🎹</span> Chords & Notes</button>
@@ -1424,7 +1496,8 @@
           <button id="openAiChatBtn" class="ai-btn"><span class="btn-emoji">🤖</span> Ask AI</button>
         </div>
         <div class="toolbar-actions">
-          <button id="loupeToggleBtn" class="magnify-btn"><span class="btn-emoji">🔍</span> Magnify</button>
+          <button id="toolsToggleBtn" class="tools-toggle-btn" title="Focus: hide the tool buttons to make more room for the doc (the mini checklist stays)"><span class="btn-emoji" id="toolsToggleEmoji">🎯</span> <span id="toolsToggleLabel">Focus</span></button>
+          <button id="loupeToggleBtn" class="magnify-btn"><span class="btn-emoji">🔍</span> <span id="zoomLabel">Zoom</span></button>
           <a href="${directUrl}" target="_blank" class="open-doc-link">↗️ Open Doc</a>
         </div>
       `;
@@ -1442,15 +1515,6 @@
       docWrapper.appendChild(iframe);
       viewportArea.appendChild(docWrapper);
 
-      const loupe = pipWindow.document.createElement('div');
-      loupe.className = 'loupe';
-
-      const loupeIframe = pipWindow.document.createElement('iframe');
-      loupeIframe.src = iframeSrc;
-      loupeIframe.className = 'loupe-iframe';
-
-      loupe.appendChild(loupeIframe);
-      viewportArea.appendChild(loupe);
 
       // AI Chat Drawer element
       const chatDrawer = pipWindow.document.createElement('div');
@@ -1537,6 +1601,18 @@
       const CHECKLIST_TTL_MS = 30 * 60 * 1000;
       let checklistNoteOverride = ''; // lets a refresh message (e.g. "showing your saved checklist") survive the re-open
       let currentChecklist = { items: [], checkedMap: sharedCheckedMap };
+      let currentDaw = null; // 'logic' | 'soundtrap' | null, detected from the assignment doc
+
+      function applyDaw(data) {
+        currentDaw = data && (data.daw === 'soundtrap' || data.daw === 'logic') ? data.daw : null;
+        const input = pipWindow.document.getElementById('chatInput');
+        if (input) {
+          input.placeholder = currentDaw === 'soundtrap'
+            ? 'Ask about Soundtrap, EQ, loops...'
+            : 'Ask about Logic Pro, EQ, shortcuts...';
+        }
+        return data;
+      }
 
       function readChecklistCache() {
         try {
@@ -1558,7 +1634,7 @@
         // A saved copy is used for 30 minutes. Errors and empty answers are never saved.
         const cached = readChecklistCache();
         const isFresh = cached && cached.items.length > 0 && cached.savedAt && (Date.now() - cached.savedAt) < CHECKLIST_TTL_MS;
-        if (!forceRefresh && isFresh) return cached;
+        if (!forceRefresh && isFresh) return applyDaw(cached);
 
         try {
           const res = await fetch(`/api/fetch-checklist?id=${encodeURIComponent(lookupDocId)}`);
@@ -1578,11 +1654,11 @@
           } else if (forceRefresh) {
             try { localStorage.removeItem(cacheKey); } catch (e) {}
           }
-          return data;
+          return applyDaw(data);
         } catch (err) {
           // Offline or the doc is unreachable right now: fall back to the last good copy if there is one.
           if (cached && cached.items.length > 0) {
-            return { ...cached, note: 'Showing your saved checklist. The doc could not be reached just now.' };
+            return applyDaw({ ...cached, note: 'Showing your saved checklist. The doc could not be reached just now.' });
           }
           throw err;
         }
@@ -1751,6 +1827,7 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               prompt: apiPayload,
+              daw: currentDaw,
               // lets the AI know which assignment steps the student has (and has not) finished
               checklist: currentChecklist.items.map(text => ({ text, done: !!currentChecklist.checkedMap[text] }))
             })
@@ -1788,7 +1865,9 @@
         pill.addEventListener('click', () => {
           const pillText = pill.getAttribute('data-pill');
           chatInput.value = pillText;
-          const fullPrompt = `Emergency Logic Pro Troubleshooter request: The student clicked '${pillText}'. Give a clear, encouraging 3-step bulleted checklist using macOS keyboard shortcuts in bold to resolve this issue immediately.`;
+          const fullPrompt = currentDaw === 'soundtrap'
+            ? `Emergency Soundtrap Troubleshooter request: The student clicked '${pillText}'. Give a clear, encouraging 3-step bulleted checklist to fix this in Soundtrap (a browser-based DAW on a Chromebook). Only use steps you are sure of.`
+            : `Emergency Logic Pro Troubleshooter request: The student clicked '${pillText}'. Give a clear, encouraging 3-step bulleted checklist using macOS keyboard shortcuts in bold to resolve this issue immediately.`;
           sendChatQuery(fullPrompt, pillText);
         });
       });
@@ -2358,15 +2437,24 @@
       });
 
       pipWindow.document.getElementById('openShortcutsBtn').addEventListener('click', () => {
-        modalTitle.textContent = "🎹 LOGIC KEYBOARD SHORTCUTS";
-        let html = '';
-        SHORTCUTS_DATA.forEach(cat => {
-          html += `<div style="color:#FACC15; font-weight:bold; margin:10px 0 4px 0; border-bottom:1px solid #285E4A; padding-bottom:2px;">${cat.category}</div>`;
-          cat.items.forEach(item => {
-            html += `<div class="shortcut-row"><span>${item.desc}</span><span class="shortcut-key">${item.key}</span></div>`;
+        let which = currentDaw === 'soundtrap' ? 'soundtrap' : 'logic';
+        const render = () => {
+          const isST = which === 'soundtrap';
+          modalTitle.textContent = isST ? "🎹 SOUNDTRAP KEYBOARD SHORTCUTS" : "🎹 LOGIC KEYBOARD SHORTCUTS";
+          const btn = (id, label, active) => `<button type="button" id="${id}" style="flex:1; padding:4px 6px; font-size:11px; font-weight:700; cursor:pointer; border-radius:4px; border:1px solid #CA8A04; background:${active ? '#CA8A04' : '#1B4D3E'}; color:${active ? '#1B4D3E' : '#FACC15'};">${label}</button>`;
+          let html = `<div style="display:flex; gap:6px; margin-bottom:4px;">${btn('shortcutsLogicBtn', 'Logic Pro', !isST)}${btn('shortcutsSoundtrapBtn', 'Soundtrap', isST)}</div>`;
+          (isST ? SOUNDTRAP_SHORTCUTS_DATA : SHORTCUTS_DATA).forEach(cat => {
+            html += `<div style="color:#FACC15; font-weight:bold; margin:10px 0 4px 0; border-bottom:1px solid #285E4A; padding-bottom:2px;">${cat.category}</div>`;
+            cat.items.forEach(item => {
+              html += `<div class="shortcut-row"><span>${item.desc}</span><span class="shortcut-key">${item.key}</span></div>`;
+            });
           });
-        });
-        modalBody.innerHTML = html;
+          if (isST) html += `<div style="font-size:10px; color:#9ca3af; margin-top:10px;">Source: Soundtrap Keyboard Shortcuts Complete Guide (Soundtrap Help Center).</div>`;
+          modalBody.innerHTML = html;
+          pipWindow.document.getElementById('shortcutsLogicBtn').addEventListener('click', () => { which = 'logic'; render(); });
+          pipWindow.document.getElementById('shortcutsSoundtrapBtn').addEventListener('click', () => { which = 'soundtrap'; render(); });
+        };
+        render();
         modal.style.display = 'flex';
       });
 
@@ -2794,38 +2882,41 @@
         modal.style.display = 'flex';
       });
 
-      let loupeActive = false;
-      const loupeBtn = pipWindow.document.getElementById('loupeToggleBtn');
+      // Zoom = a real zoom of the doc you are looking at (the scroll position is kept).
+      // The wrapper is made smaller by the zoom factor, then scaled back up to fill the window.
+      // Each click steps through 1x -> 1.5x -> 2x -> back to 1x.
+      const ZOOM_LEVELS = [1, 1.5, 2];
+      let zoomIndex = 0;
+      const magnifyBtn = pipWindow.document.getElementById('loupeToggleBtn');
+      const zoomLabel = pipWindow.document.getElementById('zoomLabel');
 
-      loupeBtn.addEventListener('click', () => {
-        loupeActive = !loupeActive;
-        loupeBtn.classList.toggle('active-btn', loupeActive);
-        loupe.style.display = loupeActive ? 'block' : 'none';
-        iframe.classList.toggle('no-pointer', loupeActive);
+      function setZoom(index) {
+        zoomIndex = index;
+        const factor = ZOOM_LEVELS[zoomIndex];
+        const on = factor !== 1;
+        magnifyBtn.classList.toggle('active-btn', on);
+        viewportArea.classList.toggle('magnified', on);
+        zoomLabel.textContent = on ? `${factor}x Zoom` : 'Zoom';
+        docWrapper.style.width = on ? `${100 / factor}%` : '';
+        docWrapper.style.height = on ? `${100 / factor}%` : '';
+        docWrapper.style.transform = on ? `scale(${factor})` : '';
+      }
 
-        if (loupeActive) {
-          const rect = viewportArea.getBoundingClientRect();
-          loupeIframe.style.width = `${rect.width}px`;
-          loupeIframe.style.height = `${rect.height}px`;
-        }
-      });
+      magnifyBtn.addEventListener('click', () => setZoom((zoomIndex + 1) % ZOOM_LEVELS.length));
 
-      viewportArea.addEventListener('mousemove', (e) => {
-        if (!loupeActive) return;
-        const rect = viewportArea.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-
-        const zoomFactor = 2.0;
-        const radius = 100;
-
-        loupe.style.left = `${mouseX - radius}px`;
-        loupe.style.top = `${mouseY - radius}px`;
-
-        loupeIframe.style.transform = `scale(${zoomFactor})`;
-        loupeIframe.style.left = `${radius - (mouseX * zoomFactor)}px`;
-        loupeIframe.style.top = `${radius - (mouseY * zoomFactor)}px`;
-      });
+      // Focus / Tools button: Focus hides the row of tool buttons to leave more room for the doc;
+      // in Focus mode the same button becomes the rainbow Tools button that brings them back.
+      // The mini checklist is its own widget, so it stays visible either way.
+      const toolsBtn = pipWindow.document.getElementById('toolsToggleBtn');
+      function setToolsHidden(hidden) {
+        toolbar.classList.toggle('tools-hidden', hidden);
+        toolsBtn.classList.toggle('tools-off', hidden);
+        pipWindow.document.getElementById('toolsToggleEmoji').textContent = hidden ? '🧰' : '🎯';
+        pipWindow.document.getElementById('toolsToggleLabel').textContent = hidden ? 'Tools' : 'Focus';
+        try { localStorage.setItem('floatdoc_tools_hidden', hidden ? '1' : '0'); } catch (e) {}
+      }
+      toolsBtn.addEventListener('click', () => setToolsHidden(!toolbar.classList.contains('tools-hidden')));
+      try { if (localStorage.getItem('floatdoc_tools_hidden') === '1') setToolsHidden(true); } catch (e) {}
 
       // Initialize Logic Glossary & Inspector in the PiP Window
       initGlossary(pipWindow.document, pipWindow);
