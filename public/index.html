@@ -2901,7 +2901,8 @@
       });
 
       // Zoom = a real zoom of the doc you are looking at (the scroll position is kept).
-      // The wrapper is made smaller by the zoom factor, then scaled back up to fill the window.
+      // Uses CSS zoom on the doc iframe (not transform: scale) so Chrome re-renders the doc at the
+      // higher size and the text stays sharp instead of being a stretched, blurry bitmap.
       // Each click steps through 1x -> 1.5x -> 2x -> back to 1x.
       const ZOOM_LEVELS = [1, 1.5, 2];
       let zoomIndex = 0;
@@ -2915,9 +2916,7 @@
         magnifyBtn.classList.toggle('active-btn', on);
         viewportArea.classList.toggle('magnified', on);
         zoomLabel.textContent = on ? `${factor}x Zoom` : 'Zoom';
-        docWrapper.style.width = on ? `${100 / factor}%` : '';
-        docWrapper.style.height = on ? `${100 / factor}%` : '';
-        docWrapper.style.transform = on ? `scale(${factor})` : '';
+        iframe.style.zoom = on ? String(factor) : '';
       }
 
       magnifyBtn.addEventListener('click', () => setZoom((zoomIndex + 1) % ZOOM_LEVELS.length));
